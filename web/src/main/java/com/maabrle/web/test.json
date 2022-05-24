@@ -1,0 +1,133 @@
+{
+  "_embedded": {
+    "todos": [
+      {
+        "_links": {
+          "todo": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/1"
+          },
+          "self": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/1"
+          }
+        },
+        "todoText": "Create Stark Enterprises (loader)",
+        "createdDateTime": "2022-05-22T12:26:59.893+00:00"
+      },
+      {
+        "_links": {
+          "todo": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/2"
+          },
+          "self": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/2"
+          }
+        },
+        "todoText": "Invent the first Iron Man Suit",
+        "createdDateTime": "2022-05-22T12:27:00.236+00:00"
+      },
+      {
+        "_links": {
+          "todo": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/3"
+          },
+          "self": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/3"
+          }
+        },
+        "todoText": "Become a Hero",
+        "createdDateTime": "2022-05-22T12:27:00.451+00:00"
+      },
+      {
+        "_links": {
+          "todo": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/4"
+          },
+          "self": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/4"
+          }
+        },
+        "todoText": "Help build S.H.I.E.L.D.",
+        "createdDateTime": "2022-05-22T12:27:00.665+00:00"
+      },
+      {
+        "_links": {
+          "todo": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/5"
+          },
+          "self": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/5"
+          }
+        },
+        "todoText": "Form the Avengers",
+        "createdDateTime": "2022-05-22T12:27:00.882+00:00"
+      },
+      {
+        "_links": {
+          "todo": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/6"
+          },
+          "self": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/6"
+          }
+        },
+        "todoText": "Put Hawkeye on the right path",
+        "createdDateTime": "2022-05-22T12:27:01.097+00:00"
+      },
+      {
+        "_links": {
+          "todo": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/7"
+          },
+          "self": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/7"
+          }
+        },
+        "todoText": "Make Stark Industries a massive success",
+        "createdDateTime": "2022-05-22T12:27:01.417+00:00"
+      },
+      {
+        "_links": {
+          "todo": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/8"
+          },
+          "self": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/8"
+          }
+        },
+        "todoText": "Keep escaping death in the most Tony Stark way possible",
+        "createdDateTime": "2022-05-22T12:27:01.732+00:00"
+      },
+      {
+        "_links": {
+          "todo": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/9"
+          },
+          "self": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/9"
+          }
+        },
+        "todoText": "Learn Spring boot",
+        "createdDateTime": "2022-05-22T12:27:02.051+00:00"
+      },
+      {
+        "_links": {
+          "todo": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/10"
+          },
+          "self": {
+            "href": "https://maabrle-todo-api.azurewebsites.net/todos/10"
+          }
+        },
+        "todoText": "Deploy a multi tier Spring boot app into Azure",
+        "createdDateTime": "2022-05-22T12:27:02.366+00:00"
+      }
+    ]
+  },
+  "_links": {
+    "profile": {
+      "href": "https://maabrle-todo-api.azurewebsites.net/profile/todos"
+    },
+    "self": { "href": "https://maabrle-todo-api.azurewebsites.net/todos/" }
+  },
+  "page": { "number": 0, "size": 20, "totalPages": 1, "totalElements": 10 }
+}

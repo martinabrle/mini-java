@@ -1,0 +1,43 @@
+// package com.maabrle.api;
+
+// import java.util.Date;
+
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.CommandLineRunner;
+// import org.springframework.stereotype.Component;
+
+// @Component
+// public class DatabaseLoader implements CommandLineRunner {
+
+//         private final TodoRepository repository;
+
+//         @Autowired 
+//         public DatabaseLoader(TodoRepository repository) {
+//                 this.repository = repository;
+//         }
+
+//         @Override
+//         public void run(String... strings) throws Exception {
+//                 this.repository.save(
+//                                 new Todo(new Date(), "Create Stark Enterprises (loader)", null));
+//                 this.repository.save(
+//                                 new Todo(new Date(), "Invent the first Iron Man Suit", null));
+//                 this.repository.save(
+//                                 new Todo(new Date(), "Become a Hero", null));
+//                 this.repository.save(
+//                                 new Todo(new Date(), "Help build S.H.I.E.L.D.", null));
+//                 this.repository.save(
+//                                 new Todo(new Date(), "Form the Avengers", null));
+//                 this.repository.save(
+//                                 new Todo(new Date(), "Put Hawkeye on the right path", null));
+//                 this.repository.save(
+//                                 new Todo(new Date(), "Make Stark Industries a massive success", null));
+//                 this.repository.save(
+//                                 new Todo(new Date(), "Keep escaping death in the most Tony Stark way possible", null));
+//                 this.repository.save(
+//                                 new Todo(new Date(), "Learn Spring boot", null));
+//                 this.repository.save(
+//                                 new Todo(new Date(), "Deploy a multi tier Spring boot app into Azure", null));
+
+//         }
+// }
