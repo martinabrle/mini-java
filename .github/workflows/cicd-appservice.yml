@@ -98,7 +98,7 @@ jobs:
         id: version
         run: |
           cd ./target
-          files=(./target/api*.jar)
+          files=(api*.jar)
           mv "$files" "./api-${GITHUB_SHA}.java"
           echo "::set-output name=RELEASE_VERSION::${GITHUB_SHA}"
           echo "::set-output name=RELEASE_NAME::api-${GITHUB_SHA}"
