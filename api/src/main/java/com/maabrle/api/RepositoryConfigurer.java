@@ -12,7 +12,7 @@ import javax.persistence.metamodel.Type;
 
 
 @Configuration
-public class Config implements RepositoryRestConfigurer {
+public class RepositoryConfigurer implements RepositoryRestConfigurer {
 
     @Autowired
     private EntityManager entityManager;

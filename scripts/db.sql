@@ -1,3 +1,5 @@
+--create the user
+
 CREATE TABLE IF NOT EXISTS todo (
     "id" BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL, 
     "todo_text" VARCHAR(255) NOT NULL, 
@@ -5,7 +7,14 @@ CREATE TABLE IF NOT EXISTS todo (
     "completed_date_time" TIMESTAMP DEFAULT NULL
 );
 
-INSERT INTO todo ("todo_text", "created_date_time") VALUES ('Create Stark Enterprises II','2011-12-30 15:27:25-07') ON CONFLICT DO NOTHING;
+DO $$
+BEGIN
+CREATE ROLE :v1;
+EXCEPTION WHEN duplicate_object THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
+END
+$$;
+
+INSERT INTO todo ("todo_text", "created_date_time") VALUES ('Create Stark Enterprises','2011-12-30 15:27:25-07') ON CONFLICT DO NOTHING;
 INSERT INTO todo ("todo_text", "created_date_time") VALUES ('Invent the first Iron Man Suit','2012-03-08 13:53:25-07') ON CONFLICT DO NOTHING;
 INSERT INTO todo ("todo_text", "created_date_time") VALUES ('Become a Hero','2013-01-08 15:14:25-07') ON CONFLICT DO NOTHING;
 INSERT INTO todo ("todo_text", "created_date_time") VALUES ('Help build S.H.I.E.L.D.','2013-12-03 12:59:25-07') ON CONFLICT DO NOTHING;
@@ -16,4 +25,3 @@ INSERT INTO todo ("todo_text", "created_date_time") VALUES ('Keep escaping death
 INSERT INTO todo ("todo_text", "created_date_time") VALUES ('Learn Spring boot','2019-11-21 10:44:00-07') ON CONFLICT DO NOTHING;
 INSERT INTO todo ("todo_text", "created_date_time") VALUES ('Deploy a multi tier Spring boot app into Azure','2022-04-22 19:10:25-07') ON CONFLICT DO NOTHING;
 
-I

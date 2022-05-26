@@ -1,13 +1,17 @@
-param dbServerDomain string
 param dbServerName string
-param dbServerPort string
 param dbName string
 
 @secure()
-param dbServerLogin string
+param dbAdminName string
 @secure()
-param dbServerPassword string
+param dbAdminPassword string
 
+@secure()
+param dbUserName string
+@secure()
+param dbUserPassword string
+
+param clientIPAddress string
 param apiServiceName string
 param apiServicePort string
 
@@ -16,56 +20,56 @@ param webServicePort string
 
 param location string = resourceGroup().location
 
-resource postgreSQLServer 'Microsoft.DBforPostgreSQL/servers@2017-12-01' = {
+resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01' = {
   name: dbServerName
   location: location
   tags: {
-    workload: 'test'
-    costCentre: 'development'
+    workload: 'DEVTEST'
+    costCentre: 'FIN'
+    department: 'RESEARCH'
   }
   sku: {
-    capacity: 1
-    family: 'Gen5'
-    name: 'B_Gen5_1'
-    size: 'string'
-    tier: 'Basic'
-  }
-  identity: {
-    type: 'SystemAssigned'
+    name: 'Standard_B2s'
+    tier: 'Burstable'
   }
   properties: {
-    infrastructureEncryption: 'Disabled'
-    minimalTlsVersion: 'TLSEnforcementDisabled'
-    publicNetworkAccess: 'Enabled'
-    sslEnforcement: 'Disabled'
-    storageProfile: {
+    administratorLogin: dbAdminName
+    administratorLoginPassword: dbAdminPassword
+    backup: {
       backupRetentionDays: 7
       geoRedundantBackup: 'Disabled'
-      storageAutogrow: 'Disabled'
-      storageMB: 5120
     }
-    version: '11'
-    createMode: 'Default' //PointInTimeRestore, Replica, GeoRestore
-    administratorLogin: dbServerLogin
-    administratorLoginPassword: dbServerPassword
+    createMode: 'Default'
+    highAvailability: {
+      mode: 'Disabled'
+      standbyAvailabilityZone: ''
+    }
+    network: {
+      delegatedSubnetResourceId: ''
+      privateDnsZoneArmResourceId: ''
+    }
+    storage: {
+      storageSizeGB: 32
+    }
+    version: '13'
   }
 }
 
-resource postgreSQLServer_AllowAllWindowsAzureIps 'Microsoft.DBforPostgreSQL/servers/firewallRules@2017-12-01' = {
+resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2021-06-01' = {
+  name: dbName
   parent: postgreSQLServer
-  name: 'AllowAllWindowsAzureIps'
   properties: {
-    startIpAddress: '0.0.0.0'
-    endIpAddress: '0.0.0.0'
+    charset: 'utf8'
+    collation: 'en_US.utf8'
   }
 }
 
-resource postgreSQLServer_ClientIPAddress 'Microsoft.DBforPostgreSQL/servers/firewallRules@2017-12-01' = {
+resource allowClientIPFirewallRule 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2021-06-01' = {
+  name: 'allowClientIP'
   parent: postgreSQLServer
-  name: 'CurrentClientIPAddress_CICD'
   properties: {
-    startIpAddress: '2.30.99.244'
-    endIpAddress: '2.30.99.244'
+    endIpAddress: clientIPAddress
+    startIpAddress: clientIPAddress
   }
 }
 
@@ -87,10 +91,13 @@ resource apiServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
 resource apiService 'Microsoft.Web/sites@2021-02-01' = {
   name: apiServiceName
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: apiServicePlan.id
     siteConfig: {
-      linuxFxVersion: 'node|16-lts'
+      linuxFxVersion: 'JAVA|11-java11'
       scmType: 'None' 
     }
   }
@@ -104,24 +111,20 @@ resource apiService 'Microsoft.Web/sites@2021-02-01' = {
           value: apiServicePort
         }
         {
-          name: 'DB_SERVER'
-          value: '${dbServerName}.${dbServerDomain}'
+          name: 'SPRING_DATASOURCE_URL'
+          value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}?sslmode=verify-full&sslrootcert=`./DigiCertGlobalRootCA.crt.pem`'
         }
         {
-          name: 'DB_SERVER_PORT'
-          value: dbServerPort
+          name: 'SPRING_DATASOURCE_USERNAME'
+          value: dbUserName
         }
         {
-          name: 'DB_NAME'
-          value: dbName
+          name: 'SPRING_DATASOURCE_PASSWORD'
+          value: dbUserPassword
         }
         {
-          name: 'DB_LOGIN'
-          value: dbServerLogin
-        }
-        {
-          name: 'DB_PASSWORD'
-          value: dbServerPassword
+          name: 'SPRING_DATASOURCE_SHOW_SQL'
+          value: 'false'
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
@@ -150,10 +153,13 @@ resource webServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
 resource webService 'Microsoft.Web/sites@2021-02-01' = {
   name: webServiceName
   location: location
+  identity: {
+     type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: webServicePlan.id
     siteConfig: {
-      linuxFxVersion: 'node|16-lts'
+      linuxFxVersion: 'JAVA|11-java11'
       scmType: 'None' 
     }
   }
@@ -168,7 +174,7 @@ resource webService 'Microsoft.Web/sites@2021-02-01' = {
         }
         {
           name: 'API_SERVER'
-          value: apiService.name
+          value: apiServiceName
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'

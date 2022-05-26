@@ -1,6 +1,7 @@
 https://docs.microsoft.com/en-us/azure/app-service/configure-language-java?pivots=platform-linux
-    --config maven plug in by mvn com.microsoft.azure:azure-webapp-maven-plugin:2.2.0:config
-    --deploy mvn package azure-webapp:deploy
+    --config maven plug in by ./mvnw com.microsoft.azure:azure-webapp-maven-plugin:2.2.0:config
+    --deploy ./mvnw package azure-webapp:deploy
+    --start locally ./mvnw spring-boot:run
 https://docs.microsoft.com/en-us/azure/app-service/quickstart-java?pivots=platform-linux&tabs=javase
 
 az webapp list-runtimes --linux
