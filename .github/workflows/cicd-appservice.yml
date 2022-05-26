@@ -116,7 +116,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.version.outputs.RELEASE_NAME }}
-          path: ./target/${{ steps.version.outputs.RELEASE_FILE_NAME }}
+          path: ./api/target/${{ steps.version.outputs.RELEASE_FILE_NAME }}
           retention-days: 5
   
   deploy_api:
