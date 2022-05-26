@@ -1,26 +1,119 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-
-name: Java CI with Maven
+name: ci-cd-appservice
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  #push:
+  #  branches:
+  #    - main
+  #  paths:
+  #    - 'api/**'  
+  workflow_dispatch:
+    
 
 jobs:
-  build:
-
+  build_deploy_infra:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./scripts
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set default Azure subscription
+        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Create Azure resource group
+        run: |
+              az deployment sub create \
+               --location ${{ secrets.AZURE_LOCATION }} \
+               --template-file ./deployment-rg.bicep \
+               --parameters name=${{ secrets.AZURE_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
+
+      - name: Deploy Azure resources
+        run: |
+              adminName="a`openssl rand -hex 12`"
+              adminPassword=`openssl rand -base64 22`
+              dbUserName="u`openssl rand -hex 12`"
+              dbUserPassword=`openssl rand -base64 22`
+              #get public ip fromm outside
+              clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
+
+              az deployment group create --resource-group $resourcegroup --template-file ./deployment.bicep \
+                            --parameters location=${{ secrets.AZURE_LOCATION }}  \
+                                         dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
+                                         dbName=${{ secrets.AZURE_DB_NAME }} \
+                                         dbAdminName=$adminName \
+                                         dbAdminPassword=$adminPassword \
+                                         bUserName=$dbUserName \
+                                         dbUserPassword=$dbUserPassword \
+                                         apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
+                                         apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
+                                         webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
+                                         webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
+                                         clientIPAddress=$clientIP
+               
+               dbConnectionString="host=${dbServerName}.postgres.database.azure.com port=5432 dbname=${dbName} user=$adminName password=$adminPassword sslmode=require"
+               
+               dbUserExists=`psql "${dbConnectionString}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName'"`
+               
+               if [ $dbUserExists -ne '1' ]
+               then
+                 psql "${dbConnectionString}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName'"
+                 psql "${dbConnectionString}" -tAc "CREATE USER $dbUserName WITH PASSWORD '$dbUserPassword';"
+                 psql "${dbConnectionString}" -tAc "GRANT CONNECT ON DATABASE $dbName TO $dbUserName;"
+                 psql "${dbConnectionString}" -tAc "GRANT USAGE ON SCHEMA public TO $dbUserName;"
+                 psql "${dbConnectionString}" -tAc "GRANT SELECT ON todo TO $dbUserName;""
+               endif
+
+               psql "${dbConnectionString}" --file=./scripts/db.sql
+
+  build_api:
+    needs: [build_api, build_deploy_infra]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 11
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+  deploy_api:
+    needs: [build_web, build_deploy_infra]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./web
+  
+  build_web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./web
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+  deploy_web:
+    needs: [build_web, build_deploy_infra]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./web
