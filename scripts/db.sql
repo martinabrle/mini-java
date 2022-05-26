@@ -1,4 +1,3 @@
---create the user
 
 CREATE TABLE IF NOT EXISTS todo (
     "id" BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL, 
@@ -6,13 +5,6 @@ CREATE TABLE IF NOT EXISTS todo (
     "created_date_time" TIMESTAMP DEFAULT NOW()::date,
     "completed_date_time" TIMESTAMP DEFAULT NULL
 );
-
-DO $$
-BEGIN
-CREATE ROLE :v1;
-EXCEPTION WHEN duplicate_object THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
-END
-$$;
 
 INSERT INTO todo ("todo_text", "created_date_time") VALUES ('Create Stark Enterprises','2011-12-30 15:27:25-07') ON CONFLICT DO NOTHING;
 INSERT INTO todo ("todo_text", "created_date_time") VALUES ('Invent the first Iron Man Suit','2012-03-08 13:53:25-07') ON CONFLICT DO NOTHING;

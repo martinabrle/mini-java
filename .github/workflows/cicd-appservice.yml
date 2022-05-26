@@ -72,7 +72,6 @@ jobs:
                psql "${dbConnectionString}" --file=./scripts/db.sql
 
   build_api:
-    needs: [build_api, build_deploy_infra]
     runs-on: ubuntu-latest
     defaults:
       run:
