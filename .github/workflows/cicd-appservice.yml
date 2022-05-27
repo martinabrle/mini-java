@@ -69,7 +69,7 @@ jobs:
               #get public ip fromm outside
               clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
               
-              dbConnectionString="host=${{ secrets.AZURE_DB_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$adminName password=$adminPassword sslmode=require"
+              dbConnectionString="host=${{ secrets.AZURE_DB_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$dbAdminName password=$dbAdminPassword sslmode=require"
               
               echo '::set-output name=DB_ADMIN_NAME::${dbAdminName}'
               echo '::set-output name=DB_ADMIN_PASSWORD::${dbAdminPassword}'
@@ -80,6 +80,9 @@ jobs:
               echo '::set-output name=CLIENT_IP::${clientIP}'
               
               echo '::set-output name=DB_CONNECTION_STRING::${dbConnectionString}'
+              
+              echo "${dbConnectionString}" > ./secrets.txt
+              cat ./secrets.txt
               
       - name: Create Azure resource group
         run: |
