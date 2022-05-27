@@ -41,6 +41,7 @@ jobs:
               dbUserPassword=`openssl rand -base64 22`
               #get public ip fromm outside
               clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
+              echo "My IP: $clientIP"
 
               az deployment group create --resource-group $resourcegroup --template-file ./deployment.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
