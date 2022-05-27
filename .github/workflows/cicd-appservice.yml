@@ -57,7 +57,9 @@ jobs:
                                          webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
                                          clientIPAddress=$clientIP
                
-               dbConnectionString="host=${dbServerName}.postgres.database.azure.com port=5432 dbname=${dbName} user=$adminName password=$adminPassword sslmode=require"
+               dbConnectionString="host=${{ secrets.AZURE_DB_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$adminName password=$adminPassword sslmode=require"
+               
+               echo "Connection string:$dbConnectionString"
                
                dbUserExists=`psql "${dbConnectionString}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName'"`
                
