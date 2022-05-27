@@ -116,15 +116,14 @@ jobs:
                                          clientIPAddress=${{ steps.vars.outputs.CLIENT_IP }}
       - name: Initialize database
         run: |               
-              dbUserExists=`psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName'"`
+              dbUserExists=`psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ steps.vars.outputs.DB_USER_NAME }}'"`
                
               if [ $dbUserExists -ne '1' ]
                then
-                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName'"
-                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "CREATE USER $dbUserName WITH PASSWORD '$dbUserPassword';"
-                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT CONNECT ON DATABASE $dbName TO $dbUserName;"
-                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT USAGE ON SCHEMA public TO $dbUserName;"
-                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT SELECT ON todo TO $dbUserName;"
+                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "CREATE USER ${{ steps.vars.outputs.DB_USER_NAME }} WITH PASSWORD '${{ steps.vars.outputs.DB_USER_PASSWORD }}';"
+                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT CONNECT ON DATABASE $dbName TO ${{ steps.vars.outputs.DB_USER_NAME }};"
+                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT USAGE ON SCHEMA public TO ${{ steps.vars.outputs.DB_USER_NAME }};"
+                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT SELECT ON todo TO ${{ steps.vars.outputs.DB_USER_NAME }};"
                endif
 
                psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" --file=./db.sql
