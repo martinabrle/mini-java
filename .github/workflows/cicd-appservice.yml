@@ -64,6 +64,30 @@ jobs:
               dbConnectionString="host=${{ secrets.AZURE_DB_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$adminName password=$adminPassword sslmode=require"
                
               printf "$dbConnectionString" >> secrets.txt
+      
+      - name: Init variables
+        id: vars
+        run: |
+              dbAdminName="a`openssl rand -hex 12`"
+              dbAdminPassword=`openssl rand -base64 22`
+              dbUserName="u`openssl rand -hex 12`"
+              dbUserPassword=`openssl rand -base64 22`
+              #get public ip fromm outside
+              clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
+              
+              dbConnectionString="host=${{ secrets.AZURE_DB_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$adminName password=$adminPassword sslmode=require"
+              
+              echo '::set-output name=DB_ADMIN_NAME::${dbAdminName}'
+              echo '::set-output name=DB_ADMIN_PASSWORD::${dbAdminPassword}'
+              
+              echo '::set-output name=DB_USER_NAME::${dbUserName}'
+              echo '::set-output name=DB_USER_PASSWORD::${dbUserPassword}'
+              
+              echo '::set-output name=CLIENT_IP::${clientIP}'
+              
+              echo '::set-output name=DB_CONNECTION_STRING::${dbConnectionString}'
+              
+              echo "$dbConnectionString" > ./secrets.txt
               
       - name: Run tmate
         uses: mxschmitt/action-tmate@v2
@@ -77,43 +101,33 @@ jobs:
 
       - name: Deploy Azure resources
         run: |
-              adminName="a`openssl rand -hex 12`"
-              adminPassword=`openssl rand -base64 22`
-              dbUserName="u`openssl rand -hex 12`"
-              dbUserPassword=`openssl rand -base64 22`
-              #get public ip fromm outside
-              clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
-              echo "My IP: $clientIP"
-               
               az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                          dbName=${{ secrets.AZURE_DB_NAME }} \
-                                         dbAdminName=$adminName \
-                                         dbAdminPassword=$adminPassword \
-                                         dbUserName=$dbUserName \
-                                         dbUserPassword=$dbUserPassword \
+                                         dbAdminName=${{ steps.vars.outputs.DB_ADMIN_NAME }} \
+                                         dbAdminPassword=${{ steps.vars.outputs.DB_ADMIN_PASSWORD }} \
+                                         dbUserName=${{ steps.vars.outputs.DB_USER_NAME }} \
+                                         dbUserPassword=${{ steps.vars.outputs.DB_USER_PASSWORD }} \
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
                                          apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
                                          webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
                                          webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
-                                         clientIPAddress=$clientIP
+                                         clientIPAddress=${{ steps.vars.outputs.CLIENT_IP }}
+      - name: Initialize database
+        run: |               
+              dbUserExists=`psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName'"`
                
-               
-               dbConnectionString="host=${{ secrets.AZURE_DB_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$adminName password=$adminPassword sslmode=require"
-               
-               dbUserExists=`psql "${dbConnectionString}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName'"`
-               
-               if [ $dbUserExists -ne '1' ]
+              if [ $dbUserExists -ne '1' ]
                then
-                 psql "${dbConnectionString}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName'"
-                 psql "${dbConnectionString}" -tAc "CREATE USER $dbUserName WITH PASSWORD '$dbUserPassword';"
-                 psql "${dbConnectionString}" -tAc "GRANT CONNECT ON DATABASE $dbName TO $dbUserName;"
-                 psql "${dbConnectionString}" -tAc "GRANT USAGE ON SCHEMA public TO $dbUserName;"
-                 psql "${dbConnectionString}" -tAc "GRANT SELECT ON todo TO $dbUserName;"
+                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName'"
+                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "CREATE USER $dbUserName WITH PASSWORD '$dbUserPassword';"
+                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT CONNECT ON DATABASE $dbName TO $dbUserName;"
+                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT USAGE ON SCHEMA public TO $dbUserName;"
+                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT SELECT ON todo TO $dbUserName;"
                endif
 
-               psql "${dbConnectionString}" --file=./scripts/db.sql
+               psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" --file=./db.sql
   build_api:
     runs-on: ubuntu-latest
     defaults:
