@@ -93,6 +93,9 @@ jobs:
 
       - name: Deploy Azure resources
         run: |
+              echo ${DB_ADMIN_NAME}
+              echo $DB_ADMIN_NAME
+              
               az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
