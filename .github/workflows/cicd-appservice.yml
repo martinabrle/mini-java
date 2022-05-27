@@ -49,7 +49,7 @@ jobs:
                                          dbName=${{ secrets.AZURE_DB_NAME }} \
                                          dbAdminName=$adminName \
                                          dbAdminPassword=$adminPassword \
-                                         bUserName=$dbUserName \
+                                         dbUserName=$dbUserName \
                                          dbUserPassword=$dbUserPassword \
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
                                          apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
