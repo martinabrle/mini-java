@@ -26,6 +26,15 @@ jobs:
       - name: Set default Azure subscription
         run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
+      - name: Test
+        run: |
+              dbConnectionString="host=${{ secrets.AZURE_DB_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$adminName password=$adminPassword sslmode=require"
+               
+              printf "$dbConnectionString" >> secrets.txt
+              
+      - name: Run tmate
+        uses: mxschmitt/action-tmate@v2
+        
       - name: Create Azure resource group
         run: |
               az deployment sub create \
@@ -42,11 +51,6 @@ jobs:
               #get public ip fromm outside
               clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
               echo "My IP: $clientIP"
-
-              dbConnectionString="host=${{ secrets.AZURE_DB_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$adminName password=$adminPassword sslmode=require"
-               
-              printf "$dbConnectionString" >tmp.txt
-              cat ./tmp.txt
                
               az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
@@ -63,6 +67,7 @@ jobs:
                                          clientIPAddress=$clientIP
                
                
+               dbConnectionString="host=${{ secrets.AZURE_DB_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$adminName password=$adminPassword sslmode=require"
                
                dbUserExists=`psql "${dbConnectionString}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName'"`
                
