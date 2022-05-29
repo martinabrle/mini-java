@@ -76,18 +76,11 @@ jobs:
               echo "::set-output name=DB_ADMIN_PASSWORD::$dbAdminPassword"
               
               echo "::set-output name=DB_USER_NAME::$dbUserName"
-              echo '::set-output name=DB_USER_PASSWORD::$dbUserPassword"
+              echo "::set-output name=DB_USER_PASSWORD::$dbUserPassword"
               
               echo "::set-output name=CLIENT_IP::$clientIP"
               
               echo "::set-output name=DB_CONNECTION_STRING::$dbConnectionString"
-              
-              echo "DB_ADMIN_NAME: $dbAdminName"
-              echo "DB_ADMIN_PASSWORD: $dbAdminPassword"
-              echo "DB_USER_NAME: $dbUserName"
-              echo "DB_USER_PASSWORD: $dbUserPassword"
-              echo "CLIENT_IP: $clientIP"
-              echo "DB_CONNECTION_STRING: $dbConnectionString"
     
       - name: Create Azure resource group
         run: |
@@ -97,21 +90,7 @@ jobs:
                --parameters name=${{ secrets.AZURE_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
 
       - name: Deploy Azure resources
-        run: |              
-              echo "init"
-              $dbAdminName="${{ steps.connection_vars.outputs.DB_ADMIN_NAME }}"
-              $dbAdminPassword="${{ steps.connection_vars.outputs.DB_ADMIN_PASSWORD }}"
-              $dbUserName="${{ steps.connection_vars.outputs.DB_USER_NAME }}"
-              $dbUserPassword="${{ steps.connection_vars.outputs.DB_USER_PASSWORD }}"
-             
-              $clientIP=${{ steps.connection_vars.outputs.CLIENT_IP }}
-              
-              echo "DB_ADMIN_NAME $dbAdminName"
-              echo "DB_ADMIN_PASSWORD $dbAdminPassword"
-              echo "DB_USER_NAME $dbUserName"
-              echo "DB_USER_PASSWORD $dbUserPassword"
-              echo "CLIENT_IP $clientIP"
-              
+        run: |
               az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
