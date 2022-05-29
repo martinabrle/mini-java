@@ -66,7 +66,7 @@ jobs:
               dbAdminName="a`openssl rand -hex 12`"
               dbAdminPassword=`openssl rand -base64 22`
               dbUserName="u`openssl rand -hex 12`"
-              dbUserPassword=`openssl rand -base64 22`
+              dbUserPassword=`openssl rand -base64 24`
               #get public ip fromm outside
               clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
               
@@ -105,11 +105,11 @@ jobs:
               $dbUserName=${{ steps.connection_vars.outputs.DB_USER_NAME }}
               $clientIP=${{ steps.connection_vars.outputs.CLIENT_IP }}
               
-              echo "DB_ADMIN_NAME::$dbAdminName"
-              echo "DB_ADMIN_PASSWORD::$dbAdminPassword"
-              echo "DB_USER_NAME::$dbUserName"
-              echo "DB_USER_PASSWORD::$dbUserPassword"
-              echo "CLIENT_IP::$clientIP"
+              echo "DB_ADMIN_NAME $dbAdminName"
+              echo "DB_ADMIN_PASSWORD $dbAdminPassword"
+              echo "DB_USER_NAME $dbUserName"
+              echo "DB_USER_PASSWORD $dbUserPassword"
+              echo "CLIENT_IP $clientIP"
               
               az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
@@ -133,7 +133,7 @@ jobs:
               if [ $dbUserExists -ne '1' ]
                then
                  psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "CREATE USER ${DB_USER_NAME} WITH PASSWORD '${{ steps.connection_vars.outputs.DB_USER_PASSWORD }}';"
-                 psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT CONNECT ON DATABASE $dbName TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
+                 psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT CONNECT ON DATABASE todoDb TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
                  psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT USAGE ON SCHEMA public TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
                  psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT SELECT ON todo TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
                endif
