@@ -108,7 +108,7 @@ jobs:
         run: echo "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" > secrets.txt
       
       - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v
+        uses: mxschmitt/action-tmate@v3.11
       
       - name: Initialize database
         run: | 
