@@ -44,6 +44,7 @@ jobs:
       
   build_deploy_infra:
     needs: [cleanup]
+    
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -71,15 +72,15 @@ jobs:
               
               dbConnectionString="host=${{ secrets.AZURE_DB_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$dbAdminName password=$dbAdminPassword sslmode=require"
               
-              echo '::set-output name=DB_ADMIN_NAME::${dbAdminName}'
-              echo '::set-output name=DB_ADMIN_PASSWORD::${dbAdminPassword}'
+              echo '::set-output name=DB_ADMIN_NAME::$dbAdminName'
+              echo '::set-output name=DB_ADMIN_PASSWORD::$dbAdminPassword'
               
               echo '::set-output name=DB_USER_NAME::${dbUserName}'
-              echo '::set-output name=DB_USER_PASSWORD::${dbUserPassword}'
+              echo '::set-output name=DB_USER_PASSWORD::$dbUserPassword'
               
-              echo '::set-output name=CLIENT_IP::${clientIP}'
+              echo '::set-output name=CLIENT_IP::$clientIP'
               
-              echo '::set-output name=DB_CONNECTION_STRING::${dbConnectionString}'
+              echo '::set-output name=DB_CONNECTION_STRING::$dbConnectionString'
               
               echo "${dbConnectionString}" > ./secrets.txt
     
@@ -91,9 +92,7 @@ jobs:
                --parameters name=${{ secrets.AZURE_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
 
       - name: Deploy Azure resources
-        run: |
-
-              
+        run: |              
               az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
