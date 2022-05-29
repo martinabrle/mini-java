@@ -104,7 +104,12 @@ jobs:
                                          webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
                                          webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
                                          clientIPAddress=${{ steps.connection_vars.outputs.CLIENT_IP }}
-        
+      - name: Debug
+        run: echo "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" > secrets.txt
+      
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v
+      
       - name: Initialize database
         run: | 
               dbUserExists=`psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "SELECT 1 FROM pg_roles WHERE rolname=\'${{ steps.connection_vars.outputs.DB_USER_NAME }}\'"`
