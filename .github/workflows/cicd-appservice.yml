@@ -82,12 +82,12 @@ jobs:
               
               echo "::set-output name=DB_CONNECTION_STRING::$dbConnectionString"
               
-              echo "DB_ADMIN_NAME::$dbAdminName"
-              echo "DB_ADMIN_PASSWORD::$dbAdminPassword"
-              echo "DB_USER_NAME::$dbUserName"
-              echo "DB_USER_PASSWORD::$dbUserPassword"
-              echo "CLIENT_IP::$clientIP"
-              echo "DB_CONNECTION_STRING::$dbConnectionString"
+              echo "DB_ADMIN_NAME: $dbAdminName"
+              echo "DB_ADMIN_PASSWORD: $dbAdminPassword"
+              echo "DB_USER_NAME: $dbUserName"
+              echo "DB_USER_PASSWORD: $dbUserPassword"
+              echo "CLIENT_IP: $clientIP"
+              echo "DB_CONNECTION_STRING: $dbConnectionString"
     
       - name: Create Azure resource group
         run: |
@@ -98,11 +98,12 @@ jobs:
 
       - name: Deploy Azure resources
         run: |              
-              $dbAdminName=${{ steps.connection_vars.outputs.DB_ADMIN_NAME }}
-              $dbAdminPassword=${{ steps.connection_vars.outputs.DB_ADMIN_PASSWORD }}
-              $dbUserName=${{ steps.connection_vars.outputs.DB_USER_NAME }}
-              $dbUserPassword=${{ steps.connection_vars.outputs.DB_USER_PASSWORD }}
-              $dbUserName=${{ steps.connection_vars.outputs.DB_USER_NAME }}
+              echo "init"
+              $dbAdminName="${{ steps.connection_vars.outputs.DB_ADMIN_NAME }}"
+              $dbAdminPassword="${{ steps.connection_vars.outputs.DB_ADMIN_PASSWORD }}"
+              $dbUserName="${{ steps.connection_vars.outputs.DB_USER_NAME }}"
+              $dbUserPassword="${{ steps.connection_vars.outputs.DB_USER_PASSWORD }}"
+             
               $clientIP=${{ steps.connection_vars.outputs.CLIENT_IP }}
               
               echo "DB_ADMIN_NAME $dbAdminName"
@@ -118,7 +119,7 @@ jobs:
                                          dbAdminName=${{ steps.connection_vars.outputs.DB_ADMIN_NAME }} \
                                          dbAdminPassword=${{ steps.connection_vars.outputs.DB_ADMIN_PASSWORD }} \
                                          dbUserName=${{ steps.connection_vars.outputs.DB_USER_NAME }} \
-                                         dbUserPassword=${{ steps.connection_vars.outputs.DB_ADMIN_PASSWORD }} \
+                                         dbUserPassword=${{ steps.connection_vars.outputs.DB_USER_PASSWORD }} \
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
                                          apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
                                          webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
