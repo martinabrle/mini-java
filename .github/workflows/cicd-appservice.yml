@@ -167,7 +167,8 @@ jobs:
         with:
           name: ${{ steps.version.outputs.RELEASE_NAME }}
           path: ./api/target/${{ steps.version.outputs.RELEASE_FILE_NAME }}
-          retention-days: 5
+          if-no-files-found: error
+          retention-days: 1
   
   deploy_api:
     needs: [build_api, build_deploy_infra]
