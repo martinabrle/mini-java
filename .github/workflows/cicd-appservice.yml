@@ -83,6 +83,11 @@ jobs:
               echo '::set-output name=DB_CONNECTION_STRING::$dbConnectionString'
               
               echo "DB_ADMIN_NAME::$dbAdminName"
+              echo "DB_ADMIN_PASSWORD::$dbAdminPassword"
+              echo "DB_USER_NAME::$dbUserName"
+              echo "DB_USER_PASSWORD::$dbUserPassword"
+              echo "CLIENT_IP::$clientIP"
+              echo "DB_CONNECTION_STRING::$dbConnectionString"
     
       - name: Create Azure resource group
         run: |
