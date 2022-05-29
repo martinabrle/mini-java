@@ -83,7 +83,10 @@ jobs:
               
               echo "${dbConnectionString}" > ./secrets.txt
               cat ./secrets.txt
-              
+    
+      - name: Run tmate
+        uses: mxschmitt/action-tmate@v2
+        
       - name: Create Azure resource group
         run: |
               az deployment sub create \
