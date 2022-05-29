@@ -97,20 +97,36 @@ jobs:
                --parameters name=${{ secrets.AZURE_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
 
       - name: Deploy Azure resources
-        run: |              
+        run: |
+              echo '::set-output name=DB_ADMIN_NAME::$dbAdminName'
+              echo '::set-output name=DB_ADMIN_PASSWORD::$dbAdminPassword'
+              
+              $dbAdminName=${{ steps.connection_vars.outputs.DB_ADMIN_NAME }}
+              $dbAdminPassword=${{ steps.connection_vars.outputs.DB_ADMIN_PASSWORD }}
+              $dbUserName=${{ steps.connection_vars.outputs.DB_USER_NAME }}
+              $dbUserPassword=${{ steps.connection_vars.outputs.DB_USER_PASSWORD }}
+              $dbUserName=${{ steps.connection_vars.outputs.DB_USER_NAME }}
+              $clientIP=${{ steps.connection_vars.outputs.CLIENT_IP }}
+              
+              echo "DB_ADMIN_NAME::$dbAdminName"
+              echo "DB_ADMIN_PASSWORD::$dbAdminPassword"
+              echo "DB_USER_NAME::$dbUserName"
+              echo "DB_USER_PASSWORD::$dbUserPassword"
+              echo "CLIENT_IP::$clientIP"
+              
               az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                          dbName=${{ secrets.AZURE_DB_NAME }} \
-                                         dbAdminName=${{ steps.connection_vars.outputs.DB_ADMIN_NAME }} \
-                                         dbAdminPassword=${{ steps.connection_vars.outputs.DB_ADMIN_PASSWORD }} \
-                                         dbUserName=${{ steps.connection_vars.outputs.DB_USER_NAME }} \
-                                         dbUserPassword=${{ steps.connection_vars.outputs.DB_USER_PASSWORD }} \
+                                         dbAdminName=$dbAdminName \
+                                         dbAdminPassword=$dbAdminPassword \
+                                         dbUserName=$dbUserName \
+                                         dbUserPassword=$dbUserPassword \
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
                                          apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
                                          webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
                                          webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
-                                         clientIPAddress=${{ steps.connection_vars.outputs.CLIENT_IP }}
+                                         clientIPAddress=$clientIP
         
       - name: Initialize database
         run: |
