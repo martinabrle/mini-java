@@ -70,7 +70,7 @@ jobs:
               #get public ip fromm outside
               clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
               
-              dbConnectionString="host=${{ secrets.AZURE_DB_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$dbAdminName password=$dbAdminPassword sslmode=require"
+              dbConnectionString="host=${{ secrets.AZURE_DB_SERVER_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$dbAdminName password=$dbAdminPassword sslmode=require"
               
               echo "::set-output name=DB_ADMIN_NAME::$dbAdminName"
               echo "::set-output name=DB_ADMIN_PASSWORD::$dbAdminPassword"
@@ -104,11 +104,11 @@ jobs:
                                          webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
                                          webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
                                          clientIPAddress=${{ steps.connection_vars.outputs.CLIENT_IP }}
-      - name: Debug
-        run: echo "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" > secrets.txt
+      #- name: Debug
+      #  run: echo "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" > secrets.txt
       
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3.11
+      #- name: Setup tmate session
+      #  uses: mxschmitt/action-tmate@v3.11
       
       - name: Initialize database
         run: | 
@@ -116,8 +116,8 @@ jobs:
                
               if [ $dbUserExists -ne '1' ]
                then
-                 psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "CREATE USER ${DB_USER_NAME} WITH PASSWORD \'${{ steps.connection_vars.outputs.DB_USER_PASSWORD }}\';"
-                 psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT CONNECT ON DATABASE todoDb TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
+                 psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "CREATE USER ${{ steps.connection_vars.outputs.DB_USER_NAME }} WITH PASSWORD \'${{ steps.connection_vars.outputs.DB_USER_PASSWORD }}\';"
+                 psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT CONNECT ON DATABASE {{ steps.connection_vars.outputs.AZURE_DB_NAME }} TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
                  psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT USAGE ON SCHEMA public TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
                  psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT SELECT ON todo TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
                endif
