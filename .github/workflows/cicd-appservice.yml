@@ -59,8 +59,8 @@ jobs:
       - name: Set default Azure subscription
         run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
-      - name: Init variables
-        id: vars
+      - name: Init connection variables
+        id: connection_vars
         run: |
               dbAdminName="a`openssl rand -hex 12`"
               dbAdminPassword=`openssl rand -base64 22`
@@ -82,14 +82,7 @@ jobs:
               echo '::set-output name=DB_CONNECTION_STRING::${dbConnectionString}'
               
               echo "${dbConnectionString}" > ./secrets.txt
-              cat ./secrets.txt
-              echo "${{ dbConnectionString }}" > ./secrets2.txt
-              echo "${{ DB_USER_NAME }}" > ./secrets3.txt
-              echo "${{ DB_USER_PASSWORD }}" > ./secrets4.txt
     
-      - name: Run tmate
-        uses: mxschmitt/action-tmate@v2
-        
       - name: Create Azure resource group
         run: |
               az deployment sub create \
@@ -99,22 +92,21 @@ jobs:
 
       - name: Deploy Azure resources
         run: |
-              echo ${DB_ADMIN_NAME}
-              echo $DB_ADMIN_NAME
+
               
               az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                          dbName=${{ secrets.AZURE_DB_NAME }} \
-                                         dbAdminName=${DB_ADMIN_NAME} \
-                                         dbAdminPassword=${DB_ADMIN_PASSWORD} \
-                                         dbUserName=${DB_USER_NAME} \
-                                         dbUserPassword=${DB_USER_PASSWORD} \
+                                         dbAdminName=${{ steps.connection_vars.outputs.DB_ADMIN_NAME }} \
+                                         dbAdminPassword=${{ steps.connection_vars.outputs.DB_ADMIN_PASSWORD }} \
+                                         dbUserName=${{ steps.connection_vars.outputs.DB_USER_NAME }} \
+                                         dbUserPassword=${{ steps.connection_vars.outputs.DB_USER_PASSWORD }} \
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
                                          apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
                                          webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
                                          webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
-                                         clientIPAddress=${CLIENT_IP}
+                                         clientIPAddress=${{ steps.connection_vars.outputs.CLIENT_IP }}
       - name: Debug secrets
         run: |
               echo "${DB_CONNECTION_STRING}" > ./secrets.txt
@@ -124,18 +116,19 @@ jobs:
         uses: mxschmitt/action-tmate@v2
         
       - name: Initialize database
-        run: |               
-              dbUserExists=`psql "${DB_CONNECTION_STRING}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${DB_USER_NAME}'"`
+        run: |
+              
+              dbUserExists=`psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ steps.connection_vars.outputs.DB_USER_NAME }}'"`
                
               if [ $dbUserExists -ne '1' ]
                then
-                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "CREATE USER ${DB_USER_NAME} WITH PASSWORD '${DB_USER_PASSWORD}';"
-                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT CONNECT ON DATABASE $dbName TO ${DB_USER_NAME};"
-                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT USAGE ON SCHEMA public TO ${DB_USER_NAME};"
-                 psql "${{ steps.vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT SELECT ON todo TO ${DB_USER_NAME};"
+                 psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "CREATE USER ${DB_USER_NAME} WITH PASSWORD '${{ steps.connection_vars.outputs.DB_USER_PASSWORD }}';"
+                 psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT CONNECT ON DATABASE $dbName TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
+                 psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT USAGE ON SCHEMA public TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
+                 psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT SELECT ON todo TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
                endif
 
-               psql "${DB_CONNECTION_STRING}" --file=./db.sql
+               psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" --file=./db.sql
   build_api:
     runs-on: ubuntu-latest
     defaults:
