@@ -73,6 +73,15 @@ resource allowClientIPFirewallRule 'Microsoft.DBforPostgreSQL/flexibleServers/fi
   }
 }
 
+resource allowClientIPFirewallRule 'Microsoft.DBforPostgreSQL/flexibleServers/firewallRules@2021-06-01' = {
+  name: 'allowAllIps'
+  parent: postgreSQLServer
+  properties: {
+    startIpAddress: '0.0.0.0'
+    endIpAddress: '255.255.255.255'
+  }
+}
+
 resource apiServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
   name: '${apiServiceName}-plan'
   location: location
