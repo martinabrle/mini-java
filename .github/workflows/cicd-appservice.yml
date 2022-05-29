@@ -64,7 +64,7 @@ jobs:
         id: connection_vars
         run: |
               dbAdminName="a`openssl rand -hex 12`"
-              dbAdminPassword=`openssl -hex 22`
+              dbAdminPassword=`openssl rand -hex 22`
               dbUserName="u`openssl rand -hex 12`"
               dbUserPassword=`openssl rand -hex 22`
               #get public ip fromm outside
