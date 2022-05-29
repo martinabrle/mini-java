@@ -111,13 +111,12 @@ jobs:
         run: | 
               dbUserExists=`psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ steps.connection_vars.outputs.DB_USER_NAME }}'"`
                
-              if [ $dbUserExists -ne '1' ]
-              then
+              if [[ $dbUserExists -ne '1' ]]; then
                  psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "CREATE USER ${DB_USER_NAME} WITH PASSWORD '${{ steps.connection_vars.outputs.DB_USER_PASSWORD }}';"
                  psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT CONNECT ON DATABASE {{ steps.connection_vars.outputs.AZURE_DB_NAME }} TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
                  psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT USAGE ON SCHEMA public TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
                  psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT SELECT ON todo TO ${{ steps.connection_vars.outputs.DB_USER_NAME }};"
-              endif
+              fi
 
               #psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" --file=./db.sql
   
