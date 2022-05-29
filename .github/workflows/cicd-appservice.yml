@@ -83,6 +83,9 @@ jobs:
               
               echo "${dbConnectionString}" > ./secrets.txt
               cat ./secrets.txt
+              echo "${{ dbConnectionString }}" > ./secrets2.txt
+              echo "${{ DB_USER_NAME }}" > ./secrets3.txt
+              echo "${{ DB_USER_PASSWORD }}" > ./secrets4.txt
     
       - name: Run tmate
         uses: mxschmitt/action-tmate@v2
