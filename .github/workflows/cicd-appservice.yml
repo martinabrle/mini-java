@@ -115,15 +115,15 @@ jobs:
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                          dbName=${{ secrets.AZURE_DB_NAME }} \
-                                         dbAdminName=$dbAdminName \
-                                         dbAdminPassword=$dbAdminPassword \
-                                         dbUserName=$dbUserName \
-                                         dbUserPassword=$dbUserPassword \
+                                         dbAdminName=${{ steps.connection_vars.outputs.DB_ADMIN_NAME }} \
+                                         dbAdminPassword=${{ steps.connection_vars.outputs.DB_ADMIN_PASSWORD }} \
+                                         dbUserName=${{ steps.connection_vars.outputs.DB_USER_NAME }} \
+                                         dbUserPassword=${{ steps.connection_vars.outputs.DB_ADMIN_PASSWORD }} \
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
                                          apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
                                          webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
                                          webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
-                                         clientIPAddress=$clientIP
+                                         clientIPAddress=${{ steps.connection_vars.outputs.CLIENT_IP }}
         
       - name: Initialize database
         run: |
