@@ -232,7 +232,7 @@ jobs:
         id: version
         run: |
           cd ./target
-          files=(api*.jar)
+          files=(web*.jar)
           mv "$files" "./web-${GITHUB_SHA}.jar"
           ls -la
           cd ..
@@ -250,7 +250,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.version.outputs.RELEASE_NAME }}
-          path: ./api/target/${{ steps.version.outputs.RELEASE_FILE_NAME }}
+          path: ./web/target/${{ steps.version.outputs.RELEASE_FILE_NAME }}
           if-no-files-found: error
           retention-days: 1
           
