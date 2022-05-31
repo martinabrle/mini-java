@@ -183,7 +183,6 @@ jobs:
           pwd
           ls -la
           pwd
-          ls -la ./scripts/
       
       - name: Azure login
         uses: azure/login@v1
