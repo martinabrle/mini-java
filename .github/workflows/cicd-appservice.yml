@@ -182,7 +182,7 @@ jobs:
         run: |
           pwd
           ls -la
-          ls -la ./${{ needs.build.outputs.RELEASE_FILE_NAME }}
+          ls -la ./${{ needs.build_api.outputs.RELEASE_FILE_NAME }}
       
       - name: Azure login
         uses: azure/login@v1
@@ -198,7 +198,7 @@ jobs:
         uses: azure/webapps-deploy@v2
         with: 
           app-name: "${{ secrets.AZURE_API_SERVICE_NAME }}"
-          package: ./${{ needs.build.outputs.RELEASE_FILE_NAME }}
+          package: ./${{ needs.build_api.outputs.RELEASE_FILE_NAME }}
       
       - name: Run integration test(s)
         run: |
@@ -209,6 +209,11 @@ jobs:
     defaults:
       run:
         working-directory: ./web
+    outputs:
+      RELEASE_VERSION: ${{ steps.version.outputs.RELEASE_VERSION }}
+      RELEASE_NAME: ${{ steps.version.outputs.RELEASE_NAME }}
+      RELEASE_FILE_NAME: ${{ steps.version.outputs.RELEASE_FILE_NAME }}
+      
     steps:
       - uses: actions/checkout@v3
 
@@ -218,13 +223,68 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: maven
+      
+      - name: Build the .jar
+        run: |
+          ./mvnw clean package -DskipTests
+      
+      - name: Figure out the version info
+        id: version
+        run: |
+          cd ./target
+          files=(api*.jar)
+          mv "$files" "./web-${GITHUB_SHA}.jar"
+          ls -la
+          cd ..
+          echo "::set-output name=RELEASE_VERSION::${GITHUB_SHA}"
+          echo "::set-output name=RELEASE_NAME::web-${GITHUB_SHA}"
+          echo "::set-output name=RELEASE_FILE_NAME::web-${GITHUB_SHA}.jar"
+          
+      - name: Display next version
+        run: |
+          echo "Version: ${{ steps.version.outputs.RELEASE_VERSION }}"
+          echo "Release name: ${{ steps.version.outputs.RELEASE_NAME }}"
+          echo "Release file name: ${{ steps.version.outputs.RELEASE_FILE_NAME }}"
+      
+      - name: 'Upload build artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.version.outputs.RELEASE_NAME }}
+          path: ./api/target/${{ steps.version.outputs.RELEASE_FILE_NAME }}
+          if-no-files-found: error
+          retention-days: 1
           
   deploy_web:
     needs: [build_web, build_deploy_infra]
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./web
     steps:
-      - uses: actions/checkout@v3
+      - name: Download build artefacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{needs.build_web.outputs.RELEASE_NAME}}
+      - name: Check downloaded files
+        run: |
+          pwd
+          ls -la
+          ls -la ./${{ needs.build_web.outputs.RELEASE_FILE_NAME }}
+      
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+        #see https://docs.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-cli%2Clinux
+        #    az account list-locations -o table
+
+      - name: Set default Azure subscription
+        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Deploy to AppService
+        uses: azure/webapps-deploy@v2
+        with: 
+          app-name: "${{ secrets.AZURE_API_SERVICE_NAME }}"
+          package: ./${{ needs.build_web.outputs.RELEASE_FILE_NAME }}
+      
+      - name: Run integration test(s)
+        run: |
+          echo "Run integration tests...."
   
