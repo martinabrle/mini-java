@@ -182,7 +182,7 @@ jobs:
         run: |
           pwd
           ls -la
-          pwd
+          ls -la ./${{ needs.build.outputs.RELEASE_FILE_NAME }}
       
       - name: Azure login
         uses: azure/login@v1
