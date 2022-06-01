@@ -92,7 +92,7 @@ resource apiServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
     reserved: true
   }
   sku: {
-    name:'B1'
+    name:'S1'
   }
   kind: 'linux'
 }
@@ -154,7 +154,7 @@ resource webServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
     reserved: true
   }
   sku: {
-    name: 'B1'
+    name: 'S1'
   }
   kind: 'linux'
 }
