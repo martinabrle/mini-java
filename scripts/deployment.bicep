@@ -121,7 +121,7 @@ resource apiService 'Microsoft.Web/sites@2021-02-01' = {
         }
         {
           name: 'SPRING_DATASOURCE_URL'
-          value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}?sslmode=verify-full&sslrootcert=`./DigiCertGlobalRootCA.crt.pem`'
+          value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
         }
         {
           name: 'SPRING_DATASOURCE_USERNAME'
