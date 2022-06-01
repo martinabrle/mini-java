@@ -25,16 +25,7 @@ jobs:
         id: rg_exists
         run: |
           RG_EXISTS=$(az group exists --name ${{ secrets.AZURE_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
-          if [[ -z $RG_EXISTS ]]; then
-            echo "RG does NOT exist"
-            echo '::set-output name=RG_EXISTS::false'
-          elif [[ $RG_EXISTS == "true" ]]; then
-            echo "RG does exist"
-            echo '::set-output name=RG_EXISTS::true'
-          else
-            echo "RG does NOT exist"
-            echo '::set-output name=RG_EXISTS::false'
-          fi
+          echo "::set-output name=RG_EXISTS::${RG_EXISTS}"
 
       - name: Remove deployed resource group (if exists)
         if: steps.rg_exists.outputs.RG_EXISTS == 'true'
