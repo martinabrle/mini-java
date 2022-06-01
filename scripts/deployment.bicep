@@ -182,8 +182,8 @@ resource webService 'Microsoft.Web/sites@2021-02-01' = {
           value: webServicePort
         }
         {
-          name: 'API_SERVER'
-          value: apiServiceName
+          name: 'API_URI'
+          value: 'https://${apiServiceName}.azurewebsites.net/todos/'
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
