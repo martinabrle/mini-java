@@ -15,5 +15,4 @@ public class TodoListController {
 		model.addAttribute("todos", TodoService.GetTodos());
 		return "todo";
 	}
-
 }
