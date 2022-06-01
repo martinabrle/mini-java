@@ -255,7 +255,7 @@ jobs:
           retention-days: 1
           
   deploy_web:
-    needs: [build_web, build_deploy_infra]
+    needs: [build_deploy_infra, build_web, deploy_api]
     runs-on: ubuntu-latest
     steps:
       - name: Download build artefacts
