@@ -106,9 +106,9 @@ jobs:
       
       #- name: Setup tmate session
       #  uses: mxschmitt/action-tmate@v3.11
-      - name: Sleep 40 sec to avoid deployment timeouts
+      - name: Sleep 90 sec to avoid deployment timeouts
         run: |
-          sleep 11m
+          sleep 90s
       
       - name: Initialize database
         run: |
