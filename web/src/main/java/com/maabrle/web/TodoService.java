@@ -57,7 +57,7 @@ public class TodoService {
             }
 
         } catch (Exception exception) {
-            System.out.println(exception.getMessage());
+            System.err.println(exception.getMessage());
         }
 
         return retVaList;

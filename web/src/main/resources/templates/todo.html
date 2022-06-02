@@ -1,20 +1,36 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-  <head>
-    <title>Getting Started: Serving Web Content</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  </head>
-  <body>
+
+<head>
+  <title>Getting Started: Serving Web Content</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+
+<body>
+  <div>
+    <!--
     <div>
-      <div th:if="${todos.empty}">
-        <p>All TO DOs completed. Yay!</p>
-      </div>
-      <div th:each="todo : ${todos}" th:key="${todo.id}">
-        <div th:text="${todo.createdDateTimeShortString}">text</div>
-        <div th:text="${todo.text}">text</div>
-        <div th:text="${todo.completed}">text</div>
-      </div>
+      <form method="post" th:action="@{/}" th:object="${newTodo}">
+        <input id="todoText" placeholder="Enter the next task" required type="text" th:field="*{todoText}" />
+        <select id="processingType" required th:field="*{processingType}">
+          <option value="" hidden>Select a role</option>
+          <option value="SYNC" hidden>Snchronously</option>
+          <option value="ASYNC" hidden>Asynchronously</option>
+        </select>
+        <input type="submit" value="Create Task">
+      </form>
     </div>
-    <p th:text="'Hello, ' + ${name} + '!'" />
-  </body>
+    -->
+    <div th:if="${todos.empty}">
+      <p>All TO DOs completed. Yay!</p>
+    </div>
+    <div th:each="todo : ${todos}" th:key="${todo.id}">
+      <div th:text="${todo.createdDateTimeShortString}">text</div>
+      <div th:text="${todo.text}">text</div>
+      <div th:text="${todo.completed}">text</div>
+    </div>
+  </div>
+  <p th:text="'Hello, ' + ${name} + '!'" />
+</body>
+
 </html>

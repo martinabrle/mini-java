@@ -38,13 +38,27 @@ public class TodoApiConfiguration {
 
     public static String getTodoApiURI() {
         String apiURI = "";
-        try {
-            System.out.println(getConfig().properties.get("todo.api.url").getClass().getName());
 
+        System.out.println(getConfig().properties.get("todo.api.url").getClass().getName());
+
+        try {
             apiURI = removeQuotes((String) getConfig().properties.get("todo.api.url"));
+            if (apiURI == null || apiURI.isEmpty()) {
+                apiURI = System.getenv("API_URI");
+            }
+            if (apiURI.startsWith("${") && apiURI.endsWith("}")) {
+                apiURI = apiURI.substring(2, apiURI.length() - 1);
+                apiURI = System.getenv(apiURI);
+            }
+            apiURI = removeQuotes(apiURI);
         } catch (Exception exception) {
-            apiURI = "";
+            try {
+                apiURI = System.getenv("API_URI");
+            } catch (Exception exception2) {
+                apiURI = "";
+            }
         }
+
         return apiURI;
     }
 }

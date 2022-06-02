@@ -106,8 +106,8 @@ jobs:
       
       #- name: Setup tmate session
       #  uses: mxschmitt/action-tmate@v3.11
-      
-      - name: Sleep 240 sec to avoid deployment timeouts on a limited resources plan
+
+      - name: Sleep 240 sec to avoid deployment issues on a minimal app service plan
         run: |
           sleep 240s
       
