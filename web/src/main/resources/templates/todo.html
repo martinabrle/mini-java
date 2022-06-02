@@ -8,25 +8,24 @@
 
 <body>
   <div>
-    <!--
     <div>
       <form method="post" th:action="@{/}" th:object="${newTodo}">
         <input id="todoText" placeholder="Enter the next task" required type="text" th:field="*{todoText}" />
         <select id="processingType" required th:field="*{processingType}">
-          <option value="" hidden>Select a role</option>
-          <option value="SYNC" hidden>Snchronously</option>
-          <option value="ASYNC" hidden>Asynchronously</option>
+          <option value="" hidden>Select a processing type</option>
+          <option value="SYNC">Snchronously</option>
+          <option value="ASYNC">Asynchronously</option>
         </select>
         <input type="submit" value="Create Task">
       </form>
     </div>
-    -->
+    
     <div th:if="${todos.empty}">
       <p>All TO DOs completed. Yay!</p>
     </div>
     <div th:each="todo : ${todos}" th:key="${todo.id}">
       <div th:text="${todo.createdDateTimeShortString}">text</div>
-      <div th:text="${todo.text}">text</div>
+      <div th:text="${todo.todoText}">text</div>
       <div th:text="${todo.completed}">text</div>
     </div>
   </div>

@@ -15,6 +15,7 @@ public class Todo {
     private Date createdDateTime;
 	private String todoText;
 	private Date completedDateTime;
+	private String trackingId;
 
 	private Todo() {}
 
@@ -32,6 +33,7 @@ public class Todo {
 		return Objects.equals(id, todo.id) &&
             ((createdDateTime == null && todo.createdDateTime == null) || (createdDateTime != null && createdDateTime.compareTo(todo.createdDateTime) == 0)) &&
 			Objects.equals(todoText, todo.todoText) &&
+			Objects.equals(trackingId, todo.trackingId) &&
             ((completedDateTime == null && todo.completedDateTime == null) || (completedDateTime != null && completedDateTime.compareTo(todo.completedDateTime) == 0));
 	}
 
@@ -47,6 +49,14 @@ public class Todo {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getTrackingId() {
+		return trackingId;
+	}
+
+	public void setTrackingId(String trackingId) {
+		this.trackingId = trackingId;
 	}
 
 	public String getTodoText() {
@@ -71,6 +81,7 @@ public class Todo {
 			"id=" + id +
 			", todoText='" + todoText + '\'' +
 			", created='" + createdDateTime + '\'' +
+			", trackingId='" + trackingId + '\'' +
 			", completed='" + completedDateTime + '\'' +
 			'}';
 	}
