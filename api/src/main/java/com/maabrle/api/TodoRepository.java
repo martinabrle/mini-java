@@ -1,7 +1,7 @@
 package com.maabrle.api;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TodoRepository extends PagingAndSortingRepository<Todo, Long> { // <1>
+interface TodoRepository extends JpaRepository<Todo, Long> {
 
 }
