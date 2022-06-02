@@ -1,5 +1,7 @@
 package com.maabrle.web;
 
+import java.util.ArrayList;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,6 +9,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.maabrle.web.Exception.NewTodoIsEmptyException;
+import com.maabrle.web.Exception.TodosRetrievalFailedException;
 import com.maabrle.web.model.NewTodo;
 
 @Controller
@@ -16,7 +20,17 @@ public class TodoListController {
 	public String greeting(@RequestParam(name = "name", required = false, defaultValue = "World") String name,
 			Model model) {
 		model.addAttribute("newTodo", new NewTodo());
-		model.addAttribute("todos", TodoService.GetTodos());
+		model.addAttribute("status", "");
+		model.addAttribute("todos", new ArrayList<Todo>());
+		
+		try
+		{
+			model.addAttribute("todos", TodoService.GetTodos());
+		}
+		catch (Exception e) {
+			model.addAttribute("status", "error");
+			model.addAttribute("message", "Failed to fetch Todos. Please try again later.");
+		}
 		return "todo";
 	}
     
@@ -24,13 +38,42 @@ public class TodoListController {
 	@PostMapping("/")
 	public String greetingSubmit(@ModelAttribute NewTodo newTodo, Model model) {
 		model.addAttribute("newTodo", newTodo);
-		if (newTodo != null) {
-			System.out.println(String.format("New task: $s", newTodo.getTodoText()));
-			TodoService.CreateTodo(newTodo);
-		} else {
-			System.err.println("Received an ampty request");
+		model.addAttribute("status", "");
+		model.addAttribute("todos", new ArrayList<Todo>());
+		
+		try
+		{
+			if (newTodo == null) {
+				throw new NewTodoIsEmptyException();
+			}
+
+			if (newTodo.getProcessingType().equals("SYNC")) {
+				Todo todo = TodoService.CreateTodoSync(newTodo);
+				model.addAttribute("status", "saved");
+				model.addAttribute("message", String.format("Task %o has been saved.",todo.getId()));
+			} else {
+				String trackingId = TodoService.CreateTodoAsync(newTodo);
+				model.addAttribute("status", "saving");
+				model.addAttribute("trackingId", trackingId);
+			}
 		}
-		model.addAttribute("todos", TodoService.GetTodos());
+		catch (NewTodoIsEmptyException e) {
+			model.addAttribute("status", "error");
+			model.addAttribute("message", "New Todo cannot be empty. Please fill in the text.");
+		}
+		catch (Exception e) {
+			model.addAttribute("status", "error");
+			model.addAttribute("message", "Error while saving the new task. Please try again later.");
+		}
+
+		try
+		{
+			model.addAttribute("todos", TodoService.GetTodos());
+		}
+		catch (TodosRetrievalFailedException e) {
+			model.addAttribute("status", "error");
+			model.addAttribute("message", "Failed to fetch Todos. Please try again later.");
+		}
 		return "todo";
 	}
 

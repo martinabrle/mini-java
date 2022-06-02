@@ -8,12 +8,18 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+import com.maabrle.web.Exception.TodosRetrievalFailedException;
+import com.maabrle.web.model.NewTodo;
 
 public class TodoService {
-    public static List<com.maabrle.web.Todo> GetTodos() {
+    public static List<com.maabrle.web.Todo> GetTodos() throws TodosRetrievalFailedException {
 
         ArrayList<Todo> retVaList = new ArrayList<>();
 
@@ -56,10 +62,38 @@ public class TodoService {
                 retVaList.add(new Todo(todoJSON.getLong("id"), createdDateTime, todoJSON.getString("todoText")));
             }
 
-        } catch (Exception exception) {
-            System.err.println(exception.getMessage());
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            throw new TodosRetrievalFailedException(e.getMessage());
         }
 
         return retVaList;
+    }
+
+    public static Todo CreateTodoSync(NewTodo newTodo) {
+        try
+        {
+            //https://howtodoinjava.com/spring-boot2/resttemplate/resttemplate-post-json-example/
+            String baseUrl = TodoApiConfiguration.getTodoApiURI();
+            
+            RestTemplate restTemplate = new RestTemplate();
+     
+            URI uri = new URI(baseUrl);
+
+            HttpClient client = HttpClient.newHttpClient();
+
+            Todo todo = new Todo(newTodo.getTodoText(), UUID.randomUUID());
+ 
+            ResponseEntity<Todo> result = restTemplate.postForEntity(uri, todo, String.class);
+
+            
+        }
+        catch (Exception exception) {
+
+        }
+    }
+
+    public static String CreateTodoAsync(NewTodo newTodo) {
+        return null;
     }
 }
