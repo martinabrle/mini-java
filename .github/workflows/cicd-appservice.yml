@@ -18,7 +18,7 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Azure login
         uses: azure/login@v1
         with:
@@ -46,8 +46,7 @@ jobs:
               az deployment group create --resource-group ${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} --template-file ./deployment-logs.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                          logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}
-                                      
-
+  
   cleanup_if_requested:
     runs-on: ubuntu-latest
     

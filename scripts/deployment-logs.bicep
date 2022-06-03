@@ -38,7 +38,6 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12
   location: location
   tags: tagsArray
   properties: {
-    defaultDataCollectionRuleResourceId: 'string'
     features: {
       immediatePurgeDataOn30Days: true
     }
