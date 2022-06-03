@@ -1,10 +1,10 @@
 package com.maabrle.web.Exception;
 
-public class TodosRetrievalFailedException extends RuntimeException{
+public class TodoCreationFailedException extends RuntimeException{
     private String technicalDetail;
 
-    public TodosRetrievalFailedException(String technicalDetail) {
-        super(String.format("Todos retrieval failed"));
+    public TodoCreationFailedException(String technicalDetail) {
+        super(String.format("Todos creation failed"));
         this.technicalDetail = technicalDetail;
     }
 

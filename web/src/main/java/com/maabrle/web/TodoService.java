@@ -12,11 +12,15 @@ import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import com.maabrle.web.Exception.TodoCreationFailedException;
 import com.maabrle.web.Exception.TodosRetrievalFailedException;
 import com.maabrle.web.model.NewTodo;
+
+import reactor.core.publisher.Mono;
 
 public class TodoService {
     public static List<com.maabrle.web.Todo> GetTodos() throws TodosRetrievalFailedException {
@@ -70,27 +74,29 @@ public class TodoService {
         return retVaList;
     }
 
-    public static Todo CreateTodoSync(NewTodo newTodo) {
+    public static Todo CreateTodoSync(NewTodo newTodo) throws TodoCreationFailedException {
+        Todo createdTodo = null;
         try
         {
-            //https://howtodoinjava.com/spring-boot2/resttemplate/resttemplate-post-json-example/
-            String baseUrl = TodoApiConfiguration.getTodoApiURI();
+            //https://howtodoinjava.com/spring-webflux/webclient-get-post-example/
+            String apiUri = TodoApiConfiguration.getTodoApiURI();
+            WebClient webClient = WebClient.create(apiUri);
             
-            RestTemplate restTemplate = new RestTemplate();
-     
-            URI uri = new URI(baseUrl);
+            var todo = new Todo(newTodo.getTodoText(), UUID.randomUUID());
 
-            HttpClient client = HttpClient.newHttpClient();
-
-            Todo todo = new Todo(newTodo.getTodoText(), UUID.randomUUID());
- 
-            ResponseEntity<Todo> result = restTemplate.postForEntity(uri, todo, String.class);
-
-            
+            //Review: no idea what this Mono is and why do I need to convert the response first to Mono
+            //        and later to the desired type
+            createdTodo = webClient.post()
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+              .body(Mono.just(todo), Todo.class)
+              .retrieve()
+              .bodyToMono(Todo.class)
+              .block();
         }
-        catch (Exception exception) {
-
+        catch (Exception e) {
+            throw new TodoCreationFailedException(e.getMessage());
         }
+        return createdTodo;
     }
 
     public static String CreateTodoAsync(NewTodo newTodo) {

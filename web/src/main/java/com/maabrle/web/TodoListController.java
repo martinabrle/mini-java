@@ -68,6 +68,7 @@ public class TodoListController {
 
 		try
 		{
+			//Review: shall we ammed the message from the previous step (?)
 			model.addAttribute("todos", TodoService.GetTodos());
 		}
 		catch (TodosRetrievalFailedException e) {
@@ -76,5 +77,4 @@ public class TodoListController {
 		}
 		return "todo";
 	}
-
 }
