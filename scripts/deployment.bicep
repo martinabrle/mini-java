@@ -1,3 +1,7 @@
+param logAnalyticsWorkspaceName string
+param logAnalyticsWorkspaceRG string
+param appInsightsName string
+
 param dbServerName string
 param dbName string
 
@@ -20,14 +24,34 @@ param webServicePort string
 
 param location string = resourceGroup().location
 
+param tagsArray object = {
+  workload: 'DEVTEST'
+  costCentre: 'FIN'
+  department: 'RESEARCH'
+}
+
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
+  name: logAnalyticsWorkspaceName
+  scope: resourceGroup(logAnalyticsWorkspaceRG)
+}
+
+resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
+  name: appInsightsName
+  location: location
+  tags: tagsArray
+  kind: 'web'
+  properties: {
+    Application_Type: 'web'
+    Request_Source: 'rest'
+    WorkspaceResourceId: logAnalyticsWorkspace.id
+    Flow_Type: 'Bluefield'
+  }
+}
+
 resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01' = {
   name: dbServerName
   location: location
-  tags: {
-    workload: 'DEVTEST'
-    costCentre: 'FIN'
-    department: 'RESEARCH'
-  }
+  tags: tagsArray
   sku: {
     name: 'Standard_B2s'
     tier: 'Burstable'
@@ -82,9 +106,10 @@ resource allowAllIPsFirewallRule 'Microsoft.DBforPostgreSQL/flexibleServers/fire
   }
 }
 
-resource apiServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
+resource apiServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${apiServiceName}-plan'
   location: location
+  tags: tagsArray
   dependsOn: [
     postgreSQLServer
   ]
@@ -97,9 +122,10 @@ resource apiServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
   kind: 'linux'
 }
 
-resource apiService 'Microsoft.Web/sites@2021-02-01' = {
+resource apiService 'Microsoft.Web/sites@2021-03-01' = {
   name: apiServiceName
   location: location
+  tags: tagsArray
   identity: {
     type: 'SystemAssigned'
   }
@@ -110,7 +136,7 @@ resource apiService 'Microsoft.Web/sites@2021-02-01' = {
       scmType: 'None' 
     }
   }
-  resource apiServicePARMS 'config@2021-02-01' = {
+  resource apiServicePARMS 'config@2021-03-01' = {
     name: 'web'
     kind: 'string'
     properties: {
@@ -144,9 +170,10 @@ resource apiService 'Microsoft.Web/sites@2021-02-01' = {
   }
 }
 
-resource webServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
+resource webServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${webServiceName}-plan'
   location: location
+  tags: tagsArray
   dependsOn: [
     apiService
   ]
@@ -159,9 +186,10 @@ resource webServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
   kind: 'linux'
 }
 
-resource webService 'Microsoft.Web/sites@2021-02-01' = {
+resource webService 'Microsoft.Web/sites@2021-03-01' = {
   name: webServiceName
   location: location
+  tags: tagsArray
   identity: {
      type: 'SystemAssigned'
   }
@@ -172,7 +200,7 @@ resource webService 'Microsoft.Web/sites@2021-02-01' = {
       scmType: 'None' 
     }
   }
-  resource webServicePARMS 'config@2021-02-01' = {
+  resource webServicePARMS 'config@2021-03-01' = {
     name: 'web'
     kind: 'string'
     properties: {
