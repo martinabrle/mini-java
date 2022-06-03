@@ -42,6 +42,7 @@ jobs:
                --parameters name=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
 
       - name: Deploy Log Workspace
+        if: steps.rg_exists.outputs.RG_EXISTS == 'false'
         run: |
               az deployment group create --resource-group ${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} --template-file ./deployment-logs.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
