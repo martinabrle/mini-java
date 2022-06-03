@@ -17,6 +17,8 @@ jobs:
         working-directory: ./scripts
     
     steps:
+      - uses: actions/checkout@v3
+      
       - name: Azure login
         uses: azure/login@v1
         with:
@@ -46,7 +48,7 @@ jobs:
                                          logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}
                                       
 
-  cleanup:
+  cleanup_if_requested:
     runs-on: ubuntu-latest
     
     steps:
@@ -71,7 +73,7 @@ jobs:
           az group delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --yes
       
   build_deploy_infra:
-    needs: [cleanup, create_log_analytics]
+    needs: [cleanup_if_requested, create_log_analytics]
     
     runs-on: ubuntu-latest
     defaults:
