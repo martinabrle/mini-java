@@ -12,6 +12,9 @@ on:
 jobs:
   create_log_analytics:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./scripts
     
     steps:
       - name: Azure login
@@ -68,7 +71,7 @@ jobs:
           az group delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --yes
       
   build_deploy_infra:
-    needs: [cleanup]
+    needs: [cleanup, create_log_analytics]
     
     runs-on: ubuntu-latest
     defaults:
