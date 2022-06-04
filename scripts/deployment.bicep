@@ -45,7 +45,6 @@ resource symbolicname 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
       enableRbacAuthorization: true
       enablePurgeProtection: true
       enableSoftDelete: true
-      softDeleteRetentionInDays: 30
    }
 }
 
