@@ -131,7 +131,6 @@ jobs:
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }}
 
   create_log_analytics_if_needed:
-    needs: [connection_vars]
     runs-on: ubuntu-latest
     defaults:
       run:
