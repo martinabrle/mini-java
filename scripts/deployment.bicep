@@ -37,7 +37,7 @@ resource symbolicname 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   tags: tagsArray
    properties: {           
     createMode: 'default'
-    tenantId: '' 
+    tenantId: '30adb879-45b4-49c3-bf8b-7731fcce5394' 
       sku: {
          family: 'A'
           name: 'standard'
