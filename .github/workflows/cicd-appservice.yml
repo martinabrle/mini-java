@@ -39,9 +39,11 @@ jobs:
         run: |
             rgExists=$(az group exists --name ${{ secrets.AZURE_KV_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
             echo "::set-output name=RG_EXISTS::${rgExists}"
-            echo "::set-output name=DEPLOY::false"
             if [[ $rgExists == 'true' ]]; then
+              echo "Test on whether to deploy KV: ${{ github.event.inputs.redeploy_key_vault }}"
               echo "::set-output name=DEPLOY::${{ github.event.inputs.redeploy_key_vault }}"
+            else
+              echo "::set-output name=DEPLOY::false"
             fi
 
       - name: Create Azure resource group
