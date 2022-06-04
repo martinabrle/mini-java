@@ -14,81 +14,7 @@ on:
     
 
 jobs:
-  connection_vars:
-    runs-on: ubuntu-latest
-    outputs:
-      DB_ADMIN_NAME: ${{ steps.connection_vars.outputs.DB_ADMIN_NAME }}
-      DB_ADMIN_PASSWORD: ${{ steps.connection_vars.outputs.DB_ADMIN_PASSWORD }}
-      DB_USER_NAME: ${{ steps.connection_vars.outputs.DB_USER_NAME }}
-      DB_USER_PASSWORD: ${{ steps.connection_vars.outputs.DB_USER_PASSWORD }}
-      CLIENT_IP: ${{ steps.connection_vars.outputs.CLIENT_IP }}
-      DB_CONNECTION_STRING: ${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}
-      KV_EXISTS: ${{ steps.kv_exists.outputs.KV_EXISTS }}
-    
-    steps:
-      - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set default Azure subscription
-        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
-      - name: Check KV deployed
-        id: kv_exists
-        run: |
-          RG_EXISTS=$(az group exists --name ${{ secrets.AZURE_KV_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
-          echo "::set-output name=KV_EXISTS::${RG_EXISTS}"
-
-      - name: Init connection variables
-        id: connection_vars
-        run: |
-              dbAdminName=""
-              dbAdminPassword=""
-              dbUserName=""
-              dbUserPassword=""
-              echo "RG_EXISTS: ${{ steps.kv_exists.RG_EXISTS }}"
-
-              if [[ "${{ steps.kv_exists.RG_EXISTS }}" == "true" ]]; then
-                echo "Retrieving credentials from KV"
-                dbAdminName="$(az keyvault secret show --name "DB_ADMIN_NAME" --vault-name ${{ secrets.AZURE_KV_NAME }} -o tsv)"
-                echo "$dbAdminName"
-                dbAdminPassword="$(az keyvault secret show --name "DB_ADMIN_PASSWORD" --vault-name ${{ secrets.AZURE_KV_NAME }} -o tsv)"
-                echo "$dbAdminPassword"
-                dbUserName="$(az keyvault secret show --name "SPRING_DATASOURCE_USERNAME" --vault-name ${{ secrets.AZURE_KV_NAME }} -o tsv)"
-                dbUserPassword="$(az keyvault secret show --name "SPRING_DATASOURCE_PASSWORD" --vault-name ${{ secrets.AZURE_KV_NAME }} -o tsv)"
-              fi
-              if [[ -z "$dbAdminName" ]]; then
-                echo "Generating a new db admin name..."
-                dbAdminName="a`openssl rand -hex 12`"
-              fi
-              if [[ -z "$dbAdminPassword" ]]; then
-                echo "Generating a new db admin password..."
-                dbAdminPassword=`openssl rand -hex 22`
-              fi
-              if [[ -z "$dbUserName" ]]; then
-                echo "Generating a new db user name..."
-                dbUserName="u`openssl rand -hex 12`"
-              fi
-              if [[ -z "$dbUserPassword" ]]; then
-                echo "Generating a new db user password..."
-                dbUserPassword=`openssl rand -hex 22`
-              fi
-              
-              #get public ip fromm outside
-              clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
-              
-              dbConnectionString="host=${{ secrets.AZURE_DB_SERVER_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=$dbAdminName password=$dbAdminPassword sslmode=require"
-              
-              echo "::set-output name=DB_ADMIN_NAME::$dbAdminName"
-              echo "::set-output name=DB_ADMIN_PASSWORD::$dbAdminPassword"
-              echo "::set-output name=DB_USER_NAME::$dbUserName"
-              echo "::set-output name=DB_USER_PASSWORD::$dbUserPassword"
-              echo "::set-output name=CLIENT_IP::$clientIP"
-              echo "::set-output name=DB_CONNECTION_STRING::$dbConnectionString"
-
   create_key_vault_if_needed:
-    needs: [connection_vars]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -126,10 +52,10 @@ jobs:
                                          kvName=${{ secrets.AZURE_KV_NAME }} \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                          dbName=${{ secrets.AZURE_DB_NAME }} \
-                                         dbAdminName=${{ needs.connection_vars.outputs.DB_ADMIN_NAME }} \
-                                         dbAdminPassword=${{ needs.connection_vars.outputs.DB_ADMIN_PASSWORD }} \
-                                         dbUserName=${{ needs.connection_vars.outputs.DB_USER_NAME }} \
-                                         dbUserPassword=${{ needs.connection_vars.outputs.DB_USER_PASSWORD }} \
+                                         dbAdminName=${{ secrets.AZURE_DB_ADMIN_NAME }} \
+                                         dbAdminPassword=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} \
+                                         dbUserName=${{ secrets.AZURE_DB_USER_NAME }} \
+                                         dbUserPassword=${{ secrets.AZURE_DB_USER_PASSWORD }} \
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }}
 
   create_log_analytics_if_needed:
@@ -198,7 +124,7 @@ jobs:
           az group delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --yes
       
   build_deploy_infra:
-    needs: [cleanup_if_requested, create_log_analytics_if_needed, connection_vars]
+    needs: [cleanup_if_requested, create_log_analytics_if_needed, create_key_vault_if_needed]
     
     runs-on: ubuntu-latest
     defaults:
@@ -224,6 +150,7 @@ jobs:
 
       - name: Deploy Azure resources
         run: |
+              clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`        
               az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                          logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}  \
@@ -233,20 +160,17 @@ jobs:
                                          kvRG=${{ secrets.AZURE_KV_RESOURCE_GROUP }} \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                          dbName=${{ secrets.AZURE_DB_NAME }} \
-                                         dbAdminName=${{ needs.connection_vars.outputs.DB_ADMIN_NAME }} \
-                                         dbAdminPassword=${{ needs.connection_vars.outputs.DB_ADMIN_PASSWORD }} \
-                                         dbUserName=${{ needs.connection_vars.outputs.DB_USER_NAME }} \
-                                         dbUserPassword=${{ needs.connection_vars.outputs.DB_USER_PASSWORD }} \
+                                         dbAdminName=${{ secrets.AZURE_DB_ADMIN_NAME }} \
+                                         dbAdminPassword=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} \
+                                         dbUserName=${{ secrets.AZURE_DB_USER_NAME }} \
+                                         dbUserPassword=${{ secrets.AZURE_DB_USER_PASSWORD }} \
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
                                          apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
                                          webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
                                          webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
-                                         clientIPAddress=${{ needs.connection_vars.outputs.CLIENT_IP }}
-      #- name: Debug
-      #  run: echo "${{ needs.connection_vars.outputs.DB_CONNECTION_STRING }}" > secrets.txt
-      
-      #- name: Setup tmate session
-      #  uses: mxschmitt/action-tmate@v3.11
+                                         clientIPAddress=$clientIP
+      #Debug: - name: Setup tmate session
+      #         uses: mxschmitt/action-tmate@v3.11
 
       - name: Sleep 240 sec to avoid deployment issues on a minimal app service plan
         run: |
@@ -256,16 +180,18 @@ jobs:
       #         run mvwm and init it from java spring-boot on the admin connection (?)
       - name: Initialize database
         run: |
-              psql "${{ needs.connection_vars.outputs.DB_CONNECTION_STRING }}" --file=./db.sql
+              dbConnectionString="host=${{ secrets.AZURE_DB_SERVER_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=${{ secrets.AZURE_DB_ADMIN_NAME }} password=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} sslmode=require"
+
+              psql "${dbConnectionString}" --file=./db.sql
               
-              dbUserExists=`psql "${{ needs.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ needs.connection_vars.outputs.DB_USER_NAME }}'"`
+              dbUserExists=`psql "${dbConnectionString}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ secrets.AZURE_DB_USER_NAME }}'"`
                
               if [[ $dbUserExists -ne '1' ]]; then
-                 psql "${{ needs.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "CREATE USER ${{ needs.connection_vars.outputs.DB_USER_NAME }} WITH PASSWORD '${{ needs.connection_vars.outputs.DB_USER_PASSWORD }}';"
-                 psql "${{ needs.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT CONNECT ON DATABASE ${{ secrets.AZURE_DB_NAME }} TO ${{ needs.connection_vars.outputs.DB_USER_NAME }};"
-                 psql "${{ needs.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT USAGE ON SCHEMA public TO ${{ needs.connection_vars.outputs.DB_USER_NAME }};"
-                 psql "${{ needs.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT SELECT ON todo TO ${{ needs.connection_vars.outputs.DB_USER_NAME }};"
-                 psql "${{ needs.connection_vars.outputs.DB_CONNECTION_STRING }}" -tAc "GRANT INSERT ON todo TO ${{ needs.connection_vars.outputs.DB_USER_NAME }};"
+                 psql "${dbConnectionString}" -tAc "CREATE USER ${{ secrets.AZURE_DB_USER_NAME }} WITH PASSWORD '${{ secrets.AZURE_DB_USER_PASSWORD }}';"
+                 psql "${dbConnectionString}" -tAc "GRANT CONNECT ON DATABASE ${{ secrets.AZURE_DB_NAME }} TO ${{ secrets.AZURE_DB_USER_NAME }};"
+                 psql "${dbConnectionString}" -tAc "GRANT USAGE ON SCHEMA public TO ${{ secrets.AZURE_DB_USER_NAME }};"
+                 psql "${dbConnectionString}" -tAc "GRANT SELECT ON todo TO ${{ secrets.AZURE_DB_USER_NAME }};"
+                 psql "${dbConnectionString}" -tAc "GRANT INSERT ON todo TO ${{ secrets.AZURE_DB_USER_NAME }};"
               fi
   
   build_api:

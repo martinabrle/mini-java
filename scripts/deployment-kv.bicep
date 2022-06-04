@@ -41,8 +41,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
     properties: {
       value: dbAdminName
       contentType: 'string'
-    }
-     
+    }  
   }
 
   // resource databaseAdminPassword 'secrets' = {
