@@ -64,7 +64,7 @@ jobs:
                                          dbName=${{ secrets.AZURE_DB_NAME }} \
                                          dbAdminName=${{ secrets.AZURE_DB_ADMIN_NAME }} \
                                          dbAdminPassword=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} \
-                                         dbUserName=${{ secrets.AZURE_DB_USER_NAME }} \
+                                         dbUserName=${{ secrets.AZURE_API_DB_USER_NAME }} \
                                          dbUserPassword=${{ secrets.AZURE_DB_USER_PASSWORD }} \
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }}
 
@@ -172,8 +172,8 @@ jobs:
                                          dbName=${{ secrets.AZURE_DB_NAME }} \
                                          dbAdminName=${{ secrets.AZURE_DB_ADMIN_NAME }} \
                                          dbAdminPassword=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} \
-                                         dbUserName=${{ secrets.AZURE_DB_USER_NAME }} \
-                                         dbUserPassword=${{ secrets.AZURE_DB_USER_PASSWORD }} \
+                                         dbUserName=${{ secrets.AZURE_API_DB_USER_NAME }} \
+                                         dbUserPassword=${{ secrets.AZURE_API_DB_USER_PASSWORD }} \
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
                                          apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
                                          webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
@@ -194,14 +194,14 @@ jobs:
 
               psql "${dbConnectionString}" --file=./db.sql
               
-              dbUserExists=`psql "${dbConnectionString}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ secrets.AZURE_DB_USER_NAME }}'"`
+              dbUserExists=`psql "${dbConnectionString}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ secrets.AZURE_API_DB_USER_NAME }}'"`
                
               if [[ $dbUserExists -ne '1' ]]; then
-                 psql "${dbConnectionString}" -tAc "CREATE USER ${{ secrets.AZURE_DB_USER_NAME }} WITH PASSWORD '${{ secrets.AZURE_DB_USER_PASSWORD }}';"
-                 psql "${dbConnectionString}" -tAc "GRANT CONNECT ON DATABASE ${{ secrets.AZURE_DB_NAME }} TO ${{ secrets.AZURE_DB_USER_NAME }};"
-                 psql "${dbConnectionString}" -tAc "GRANT USAGE ON SCHEMA public TO ${{ secrets.AZURE_DB_USER_NAME }};"
-                 psql "${dbConnectionString}" -tAc "GRANT SELECT ON todo TO ${{ secrets.AZURE_DB_USER_NAME }};"
-                 psql "${dbConnectionString}" -tAc "GRANT INSERT ON todo TO ${{ secrets.AZURE_DB_USER_NAME }};"
+                 psql "${dbConnectionString}" -tAc "CREATE USER ${{ secrets.AZURE_API_DB_USER_NAME }} WITH PASSWORD '${{ secrets.AZURE_API_DB_USER_PASSWORD }}';"
+                 psql "${dbConnectionString}" -tAc "GRANT CONNECT ON DATABASE ${{ secrets.AZURE_DB_NAME }} TO ${{ secrets.AZURE_API_DB_USER_NAME }};"
+                 psql "${dbConnectionString}" -tAc "GRANT USAGE ON SCHEMA public TO ${{ secrets.AZURE_API_DB_USER_NAME }};"
+                 psql "${dbConnectionString}" -tAc "GRANT SELECT ON todo TO ${{ secrets.AZURE_API_DB_USER_NAME }};"
+                 psql "${dbConnectionString}" -tAc "GRANT INSERT ON todo TO ${{ secrets.AZURE_API_DB_USER_NAME }};"
               fi
   
   build_api:
