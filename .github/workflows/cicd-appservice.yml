@@ -11,6 +11,9 @@ on:
       run_cleanup:
         type: boolean
         description: Delete all existing resources first  
+      redeploy_key_vault:
+        type: boolean
+        description: Force Keyvault re-deployment  
     
 
 jobs:
@@ -32,13 +35,17 @@ jobs:
         run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
       - name: Check the resource group exists
-        id: rg_exists
+        id: check_status
         run: |
-          RG_EXISTS=$(az group exists --name ${{ secrets.AZURE_KV_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
-          echo "::set-output name=RG_EXISTS::${RG_EXISTS}"
+            rgExists=$(az group exists --name ${{ secrets.AZURE_KV_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
+            echo "::set-output name=RG_EXISTS::${rgExists}"
+            echo "::set-output name=DEPLOY::false"
+            if [[ $rgExists == 'true' ]]; then
+              echo "::set-output name=DEPLOY::${{ github.event.inputs.redeploy_key_vault }}"
+            fi
 
       - name: Create Azure resource group
-        if: steps.rg_exists.outputs.RG_EXISTS == 'false'
+        if: steps.check_status.outputs.RG_EXISTS == 'false'
         run: |
               az deployment sub create \
                --location ${{ secrets.AZURE_LOCATION }} \
@@ -46,6 +53,7 @@ jobs:
                --parameters name=${{ secrets.AZURE_KV_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
 
       - name: Deploy Azure resources
+        if: steps.check_status.outputs.DEPLOY == 'true'
         run: |
               az deployment group create --resource-group ${{ secrets.AZURE_KV_RESOURCE_GROUP }} --template-file ./deployment-kv.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \

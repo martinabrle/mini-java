@@ -36,14 +36,13 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
       enableRbacAuthorization: true
       enableSoftDelete: true
    }
-   resource databaseAdminName 'secrets' = {
-    name: 'DB_ADMIN_NAME'
-    properties: {
-      value: dbAdminName
-      contentType: 'string'
-    }  
-  }
-
+  //  resource databaseAdminName 'secrets' = {
+  //   name: 'DB_ADMIN_NAME'
+  //   properties: {
+  //     value: dbAdminName
+  //     contentType: 'string'
+  //   }  
+  // }
   // resource databaseAdminPassword 'secrets' = {
   //     name: 'DB_ADMIN_PASSWORD'
   //     properties: {
