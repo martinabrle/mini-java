@@ -31,7 +31,7 @@ param tagsArray object = {
   department: 'RESEARCH'
 }
 
-resource symbolicname 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
+resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: kvName
   location: location
   tags: tagsArray
@@ -43,7 +43,7 @@ resource symbolicname 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
           name: 'standard'
       }
       enableRbacAuthorization: true
-      enablePurgeProtection: true
+      enablePurgeProtection: false
       enableSoftDelete: true
    }
 }
