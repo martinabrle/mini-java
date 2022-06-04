@@ -119,7 +119,7 @@ jobs:
 
       - name: Deploy Azure resources
         run: |
-              az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment-kv.bicep \
+              az deployment group create --resource-group ${{ secrets.AZURE_KV_RESOURCE_GROUP }} --template-file ./deployment-kv.bicep \
                             --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                          kvName=${{ secrets.AZURE_KV_NAME }} \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
@@ -131,6 +131,7 @@ jobs:
                                          apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }}
 
   create_log_analytics_if_needed:
+    needs: [connection_vars]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -433,4 +434,3 @@ jobs:
       - name: Run integration test(s)
         run: |
           echo "Run integration tests...."
-  
