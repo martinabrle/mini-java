@@ -230,6 +230,7 @@ jobs:
                                          logAnalyticsWorkspaceRG=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }}  \
                                          appInsightsName=${{ secrets.AZURE_APP_INSIGHTS_NAME }}  \
                                          kvName=${{ secrets.AZURE_KV_NAME }} \
+                                         kvRG=${{ secrets.AZURE_KV_RESOURCE_GROUP }} \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                          dbName=${{ secrets.AZURE_DB_NAME }} \
                                          dbAdminName=${{ needs.connection_vars.outputs.DB_ADMIN_NAME }} \
