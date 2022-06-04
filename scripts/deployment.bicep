@@ -43,7 +43,6 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
           name: 'standard'
       }
       enableRbacAuthorization: true
-      enablePurgeProtection: true
       enableSoftDelete: true
    }
 }
