@@ -9,7 +9,7 @@
 <body>
   <div>
     <div>
-      <form method="post" th:action="@{/}" th:object="${newTodo}">
+      <form method="post" th:action="@{/create}" th:object="${newTodo}">
         <input id="todoText" placeholder="Enter the next task" required type="text" th:field="*{todoText}" />
         <select id="processingType" required th:field="*{processingType}">
           <option value="" hidden>Select a processing type</option>

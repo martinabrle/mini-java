@@ -55,6 +55,17 @@ public class TodoService {
 
             //Review: no idea what this Mono is and why do I need to convert the response first to Mono
             //        and later to the desired type
+            System.out.println("sending");
+            String trace = webClient.post()
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+              .body(Mono.just(todo), Todo.class)
+              .retrieve()
+              .bodyToMono(String.class)
+              .block();
+
+            System.out.println(trace);
+
+
             createdTodo = webClient.post()
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
               .body(Mono.just(todo), Todo.class)
@@ -63,6 +74,7 @@ public class TodoService {
               .block();
         }
         catch (Exception e) {
+            System.err.println(e);
             throw new TodoCreationFailedException(e.getMessage());
         }
         return createdTodo;

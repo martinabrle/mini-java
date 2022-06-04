@@ -8,7 +8,9 @@ public class TodoApiConfiguration {
     private static TodoApiConfiguration INSTANCE;
 
     private Properties properties;
+    private String API_URI;
 
+    
     protected TodoApiConfiguration() {
         try {
             Properties props = new Properties();
@@ -19,6 +21,24 @@ public class TodoApiConfiguration {
             properties = props;
         } catch (Exception exception) {
             properties = new Properties();
+        }
+        
+        try {
+            API_URI = removeQuotes((String) properties.get("todo.api.url"));
+            if (API_URI == null || API_URI.isEmpty()) {
+                API_URI = System.getenv("API_URI");
+            }
+            if (API_URI.startsWith("${") && API_URI.endsWith("}")) {
+                API_URI = API_URI.substring(2, API_URI.length() - 1);
+                API_URI = System.getenv(API_URI);
+            }
+            API_URI = removeQuotes(API_URI);
+        } catch (Exception exception) {
+            try {
+                API_URI = System.getenv("API_URI");
+            } catch (Exception exception2) {
+                API_URI = "";
+            }
         }
     }
 
@@ -35,30 +55,8 @@ public class TodoApiConfiguration {
         }
         return INSTANCE;
     }
-
+    
     public static String getTodoApiURI() {
-        String apiURI = "";
-
-        System.out.println(getConfig().properties.get("todo.api.url").getClass().getName());
-
-        try {
-            apiURI = removeQuotes((String) getConfig().properties.get("todo.api.url"));
-            if (apiURI == null || apiURI.isEmpty()) {
-                apiURI = System.getenv("API_URI");
-            }
-            if (apiURI.startsWith("${") && apiURI.endsWith("}")) {
-                apiURI = apiURI.substring(2, apiURI.length() - 1);
-                apiURI = System.getenv(apiURI);
-            }
-            apiURI = removeQuotes(apiURI);
-        } catch (Exception exception) {
-            try {
-                apiURI = System.getenv("API_URI");
-            } catch (Exception exception2) {
-                apiURI = "";
-            }
-        }
-
-        return apiURI;
+        return getConfig().API_URI;
     }
 }

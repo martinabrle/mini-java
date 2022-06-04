@@ -36,7 +36,7 @@ public class TodoListController {
 	}
     
 	//@PostMapping("/greeting")
-	@PostMapping("/")
+	@PostMapping("/create")
 	public String greetingSubmit(@ModelAttribute NewTodo newTodo, Model model) {
 		model.addAttribute("newTodo", newTodo);
 		model.addAttribute("status", "");
