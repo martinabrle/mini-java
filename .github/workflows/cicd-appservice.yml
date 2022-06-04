@@ -85,7 +85,6 @@ jobs:
               echo "::set-output name=DB_USER_PASSWORD::$dbUserPassword"
               echo "::set-output name=CLIENT_IP::$clientIP"
               echo "::set-output name=DB_CONNECTION_STRING::$dbConnectionString"
-    
 
   create_key_vault_if_needed:
     needs: [connection_vars]
