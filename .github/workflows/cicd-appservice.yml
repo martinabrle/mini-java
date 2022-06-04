@@ -7,7 +7,8 @@ on:
   #  paths:
   #    - 'api/**'  
   workflow_dispatch:
-    run_cleanup:
+    inputs:
+      run_cleanup:
         type: boolean
         description: Delete all existing resources first  
     
