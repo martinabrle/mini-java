@@ -53,7 +53,6 @@ jobs:
   
   cleanup_if_requested:
     runs-on: ubuntu-latest
-    ${{ github.event.inputs.run_cleanup }}
 
     steps:
       - name: Azure login
