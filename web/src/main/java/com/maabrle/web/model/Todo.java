@@ -1,4 +1,4 @@
-package com.maabrle.web;
+package com.maabrle.web.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,6 +16,8 @@ public class Todo {
 
     private String trackingId;
 
+    public Todo() {}
+    
     public Todo(long id, Date createdDateTime, String todoText) {
         this.id = id;
         this.createdDateTime = createdDateTime;

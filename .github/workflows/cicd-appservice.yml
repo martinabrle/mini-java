@@ -10,7 +10,7 @@ on:
     
 
 jobs:
-  create_log_analytics:
+  create_log_analytics_if_needed:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -73,7 +73,7 @@ jobs:
           az group delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --yes
       
   build_deploy_infra:
-    needs: [cleanup_if_requested, create_log_analytics]
+    needs: [cleanup_if_requested, create_log_analytics_if_needed]
     
     runs-on: ubuntu-latest
     defaults:
@@ -123,6 +123,7 @@ jobs:
                                          logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}  \
                                          logAnalyticsWorkspaceRG=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }}  \
                                          appInsightsName=${{ secrets.AZURE_APP_INSIGHTS_NAME }}  \
+                                         kvName=${{ secrets.AZURE_KV_NAME }} \
                                          dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                          dbName=${{ secrets.AZURE_DB_NAME }} \
                                          dbAdminName=${{ steps.connection_vars.outputs.DB_ADMIN_NAME }} \
@@ -144,6 +145,8 @@ jobs:
         run: |
           sleep 240s
       
+      # Review: instead of running the --file=./db.sql db init script,
+      #         run mvwm and init it from java spring-boot on the admin connection (?)
       - name: Initialize database
         run: |
               psql "${{ steps.connection_vars.outputs.DB_CONNECTION_STRING }}" --file=./db.sql
@@ -181,6 +184,7 @@ jobs:
         run: |
           ./mvnw clean package -DskipTests
       
+      # Review: Implement some more mature mono repo versioning 
       - name: Figure out the version info
         id: version
         run: |

@@ -1,4 +1,4 @@
-package com.maabrle.web.Exception;
+package com.maabrle.web.exception;
 
 public class NewTodoIsEmptyException extends RuntimeException {
 

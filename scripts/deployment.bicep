@@ -2,6 +2,7 @@ param logAnalyticsWorkspaceName string
 param logAnalyticsWorkspaceRG string
 param appInsightsName string
 
+param kvName string
 param dbServerName string
 param dbName string
 
@@ -30,22 +31,22 @@ param tagsArray object = {
   department: 'RESEARCH'
 }
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
-  name: logAnalyticsWorkspaceName
-  scope: resourceGroup(logAnalyticsWorkspaceRG)
-}
-
-resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: appInsightsName
+resource symbolicname 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
+  name: kvName
   location: location
   tags: tagsArray
-  kind: 'web'
-  properties: {
-    Application_Type: 'web'
-    Request_Source: 'rest'
-    WorkspaceResourceId: logAnalyticsWorkspace.id
-    Flow_Type: 'Bluefield'
-  }
+   properties: {           
+    createMode: 'default'
+    tenantId: '' 
+      sku: {
+         family: 'A'
+          name: 'standard'
+      }
+      enableRbacAuthorization: true
+      enablePurgeProtection: true
+      enableSoftDelete: true
+      softDeleteRetentionInDays: 30
+   }
 }
 
 resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01' = {

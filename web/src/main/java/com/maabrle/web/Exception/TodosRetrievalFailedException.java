@@ -1,4 +1,4 @@
-package com.maabrle.web.Exception;
+package com.maabrle.web.exception;
 
 public class TodosRetrievalFailedException extends RuntimeException{
     private String technicalDetail;

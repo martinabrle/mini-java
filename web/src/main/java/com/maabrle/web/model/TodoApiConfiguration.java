@@ -1,4 +1,4 @@
-package com.maabrle.web;
+package com.maabrle.web.model;
 
 import java.io.InputStream;
 import java.util.Properties;

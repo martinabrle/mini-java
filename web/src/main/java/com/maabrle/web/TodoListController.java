@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.maabrle.web.Exception.NewTodoIsEmptyException;
-import com.maabrle.web.Exception.TodosRetrievalFailedException;
+import com.maabrle.web.exception.NewTodoIsEmptyException;
+import com.maabrle.web.exception.TodosRetrievalFailedException;
 import com.maabrle.web.model.NewTodo;
+import com.maabrle.web.model.Todo;
 
 @Controller
 public class TodoListController {
