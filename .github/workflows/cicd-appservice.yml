@@ -49,7 +49,8 @@ jobs:
               dbUserPassword=""
               echo "RG_EXISTS: ${{ steps.kv_exists.RG_EXISTS }}"
 
-              if [[ "${{ steps.kv_exists.RG_EXISTS }}" -eq "true" ]]; then
+              if [[ "${{ steps.kv_exists.RG_EXISTS }}" == "true" ]]; then
+                echo "Retrieving credentials from KV"
                 dbAdminName="$(az keyvault secret show --name "DB_ADMIN_NAME" --vault-name ${{ secrets.AZURE_KV_NAME }} -o tsv)"
                 echo "$dbAdminName"
                 dbAdminPassword="$(az keyvault secret show --name "DB_ADMIN_PASSWORD" --vault-name ${{ secrets.AZURE_KV_NAME }} -o tsv)"
