@@ -75,10 +75,10 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   // }
 }
 
-resource apiURISecret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
+resource apiURISecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   name: 'API_URI'
   parent: keyVault
   properties: {
-    value: 'https://${apiServiceName}.azurewebsites.net/todos/'
+    value: 'whatever'
   }
 }
