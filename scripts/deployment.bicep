@@ -211,7 +211,7 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
 
 // deploy to different scope
 module rbac './deployment-rbac.bicep' = {
-  name: '<linked-deployment-name>'
+  name: 'deployment-rbac'
   scope: resourceGroup(kvRG)
   params: {
     mainDeploymentRG: resourceGroup().name
@@ -222,14 +222,14 @@ module rbac './deployment-rbac.bicep' = {
 }
 
 
-resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
-  properties: {
-    roleDefinitionId: keyVaultSecretsUser.id
-    principalId: apiService.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
+// resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+//   name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
+//   properties: {
+//     roleDefinitionId: keyVaultSecretsUser.id
+//     principalId: apiService.identity.principalId
+//     principalType: 'ServicePrincipal'
+//   }
+// }
 
 
 // @description('Create a brand new User Assigned Managed Identity')
