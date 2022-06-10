@@ -5,8 +5,6 @@ param logAnalyticsWorkspaceName string
 param logAnalyticsWorkspaceRG string
 param appInsightsName string
 
-
-
 param dbServerName string
 param dbName string
 
@@ -33,6 +31,16 @@ param tagsArray object = {
   workload: 'DEVTEST'
   costCentre: 'FIN'
   department: 'RESEARCH'
+}
+
+resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
+  name: kvName
+  scope: resourceGroup(kvRG)
+}
+
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
+  name: logAnalyticsWorkspaceName
+  scope: resourceGroup(logAnalyticsWorkspaceRG)
 }
 
 resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01' = {
@@ -209,25 +217,20 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
   }
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
-  name: kvName
-  scope: resourceGroup(kvRG)
-}
-
 @description('This is the built-in Key Vault Secrets User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
 resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
   scope:  keyVault
   name: '4633458b-17de-408a-b874-0445c86b69e6'
 }
 
-resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
-  properties: {
-    roleDefinitionId: keyVaultSecretsUser.id
-    principalId: apiService.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
+// resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+//   name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
+//   properties: {
+//     roleDefinitionId: keyVaultSecretsUser.id
+//     principalId: apiService.identity.principalId
+//     principalType: 'ServicePrincipal'
+//   }
+// }
 
 
 

@@ -54,7 +54,7 @@ jobs:
                --template-file ./deployment-rg.bicep \
                --parameters name=${{ secrets.AZURE_KV_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
 
-      - name: Deploy Azure resources
+      - name: Deploy KeyVault
         if: steps.check_status.outputs.DEPLOY == 'true'
         run: |
               az deployment group create --resource-group ${{ secrets.AZURE_KV_RESOURCE_GROUP }} --template-file ./deployment-kv.bicep \
