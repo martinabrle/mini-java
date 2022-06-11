@@ -210,7 +210,8 @@ resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@
         enabled: true
       }
       {
-        category: 'AuditEvent'
+        categoryGroup: 'audit'
+        // category: 'AuditEvent'
         enabled: true
       }
     ]
