@@ -1,4 +1,4 @@
-name: ci-cd-appservice-infra
+name: ci-cd-appservice-infra-mi
 
 on:
   #push:
