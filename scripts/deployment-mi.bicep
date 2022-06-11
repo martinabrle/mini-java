@@ -108,14 +108,14 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
           enabled: true
         }
       }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-        retentionPolicy: {
-          days: 365
-          enabled: true
-        }
-      }
+      // {
+      //   categoryGroup: 'audit'
+      //   enabled: true
+      //   retentionPolicy: {
+      //     days: 365
+      //     enabled: true
+      //   }
+      // }
     ]
     metrics: [
       {
@@ -213,14 +213,14 @@ resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@
           enabled: true
         }
       }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-        retentionPolicy: {
-          days: 365
-          enabled: true
-        }
-      }
+      // {
+      //   categoryGroup: 'audit'
+      //   enabled: true
+      //   retentionPolicy: {
+      //     days: 365
+      //     enabled: true
+      //   }
+      // }
     ]
     metrics: [
       {
@@ -313,14 +313,14 @@ resource apiServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-0
           enabled: true
         }
       }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-        retentionPolicy: {
-          days: 365
-          enabled: true
-        }
-      }
+      // {
+      //   categoryGroup: 'audit'
+      //   enabled: true
+      //   retentionPolicy: {
+      //     days: 365
+      //     enabled: true
+      //   }
+      // }
     ]
     metrics: [
       {
@@ -401,14 +401,14 @@ resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-0
           enabled: true
         }
       }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-        retentionPolicy: {
-          days: 365
-          enabled: true
-        }
-      }
+      // {
+      //   categoryGroup: 'audit'
+      //   enabled: true
+      //   retentionPolicy: {
+      //     days: 365
+      //     enabled: true
+      //   }
+      // }
     ]
     metrics: [
       {

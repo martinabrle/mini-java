@@ -40,49 +40,8 @@ jobs:
           echo "${{ steps.check_next_steps.outputs.DELETE_RG }}"
           az group delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --yes
 
-  deploy_log_analytics_if_needed:
-    # Having this as a separte Job, as there are many situations where Log Analytics
-    # workspace would be outside of the current subscription
-    needs: [cleanup_if_requested]
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./scripts
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set default Azure subscription
-        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Check the resource group exists
-        id: logs_rg_exists
-        run: |
-          LOGS_RG_EXISTS=$(az group exists --name ${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
-          echo "::set-output name=LOGS_RG_EXISTS::${LOGS_RG_EXISTS}"
-
-      - name: Create Logs Workspace Azure resource group
-        if: steps.logs_rg_exists.outputs.LOGS_RG_EXISTS == 'false'
-        run: |
-          az deployment sub create \
-           --location ${{ secrets.AZURE_LOCATION }} \
-           --template-file ./deployment-rg.bicep \
-           --parameters name=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
-
-      - name: Deploy Log Workspace
-        if: steps.logs_rg_exists.outputs.LOGS_RG_EXISTS == 'false'
-        run: |
-          az deployment group create --resource-group ${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} --template-file ./deployment-logs.bicep \
-                        --parameters location=${{ secrets.AZURE_LOCATION }}  \
-                                     logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}
-
   deploy_infra:
-    needs: [deploy_log_analytics_if_needed]
+    needs: [cleanup_if_requested]
 
     runs-on: ubuntu-latest
     defaults:
