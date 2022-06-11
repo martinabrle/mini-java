@@ -108,14 +108,14 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
           enabled: true
         }
       }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-        retentionPolicy: {
-          days: 365
-          enabled: true
-        }
-      }
+      // {
+      //   categoryGroup: 'audit'
+      //   enabled: true
+      //   retentionPolicy: {
+      //     days: 365
+      //     enabled: true
+      //   }
+      // }
     ]
     metrics: [
       {
