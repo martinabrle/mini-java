@@ -50,42 +50,39 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
       contentType: 'string'
     }
   }
-  resource databaseAdminPassword 'secrets@2021-11-01-preview' = {
-    name: 'DB_ADMIN_PASSWORD'
-    properties: {
-      value: dbAdminPassword
-    }
-  }
-  resource databaseReaderUserName 'secrets@2021-11-01-preview' = {
-    name: 'SPRING_DATASOURCE_USERNAME'
-    properties: {
-      value: dbUserName
-    }
-  }
-  resource databaseReaderUserPassword 'secrets@2021-11-01-preview' = {
-    name: 'SPRING_DATASOURCE_PASSWORD'
-    properties: {
-      value: dbUserPassword
-    }
-  }
-  resource springDataSourceURL 'secrets@2021-11-01-preview' = {
-    name: 'SPRING_DATASOURCE_URL'
-    properties: {
-      value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
-    }
-  }
-  resource apiURI 'secrets@2021-11-01-preview' = {
-    name: 'API_URI'
-    properties: {
-      value: 'https://${apiServiceName}.azurewebsites.net/todos/'
-    }
-  }
+  // resource databaseAdminPassword 'secrets@2021-11-01-preview' = {
+  //   name: 'DB_ADMIN_PASSWORD'
+  //   properties: {
+  //     value: dbAdminPassword
+  //     contentType: 'string'
+  //   }
+  // }
+  // resource databaseReaderUserName 'secrets@2021-11-01-preview' = {
+  //   name: 'SPRING_DATASOURCE_USERNAME'
+  //   properties: {
+  //     value: dbUserName
+  //     contentType: 'string'
+  //   }
+  // }
+  // resource databaseReaderUserPassword 'secrets@2021-11-01-preview' = {
+  //   name: 'SPRING_DATASOURCE_PASSWORD'
+  //   properties: {
+  //     value: dbUserPassword
+  //     contentType: 'string'
+  //   }
+  // }
+  // resource springDataSourceURL 'secrets@2021-11-01-preview' = {
+  //   name: 'SPRING_DATASOURCE_URL'
+  //   properties: {
+  //     value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
+  //     contentType: 'string'
+  //   }
+  // }
+  // resource apiURI 'secrets@2021-11-01-preview' = {
+  //   name: 'API_URI'
+  //   properties: {
+  //     value: 'https://${apiServiceName}.azurewebsites.net/todos/'
+  //     contentType: 'string'
+  //   }
+  // }
 }
-
-// resource apiURISecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
-//   name: 'API_URI'
-//   parent: keyVault
-//   properties: {
-//     value: 'whatever'
-//   }
-// }
