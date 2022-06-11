@@ -111,7 +111,7 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
     ]
     metrics: [
       {
-        category: 'WorkflowMetrics'
+        category: 'AllMetrics'
         enabled: true
         retentionPolicy: {
           days: 90
