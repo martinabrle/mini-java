@@ -5,107 +5,14 @@ on:
   #  branches:
   #    - main
   #  paths:
-  #    - 'api/**'  
+  #    - 'api/**'
   workflow_dispatch:
     inputs:
       run_cleanup:
         type: boolean
-        description: Delete all existing resources first  
-      redeploy_key_vault:
-        type: boolean
-        description: Force Keyvault re-deployment  
-    
+        description: Delete all existing resources first
 
 jobs:
-  create_key_vault_if_needed:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./scripts
-    
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set default Azure subscription
-        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
-      - name: Check the resource group exists
-        id: check_status
-        run: |
-            rgExists=$(az group exists --name ${{ secrets.AZURE_KV_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
-            echo "::set-output name=RG_EXISTS::${rgExists}"
-            if [[ $rgExists == 'true' ]]; then
-              echo "Test on whether to deploy KV: ${{ github.event.inputs.redeploy_key_vault }}"
-              echo "::set-output name=DEPLOY::${{ github.event.inputs.redeploy_key_vault }}"
-            else
-              echo "::set-output name=DEPLOY::false"
-            fi
-
-      - name: Create Azure resource group
-        if: steps.check_status.outputs.RG_EXISTS == 'false'
-        run: |
-              az deployment sub create \
-               --location ${{ secrets.AZURE_LOCATION }} \
-               --template-file ./deployment-rg.bicep \
-               --parameters name=${{ secrets.AZURE_KV_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
-
-      - name: Deploy KeyVault
-        if: steps.check_status.outputs.DEPLOY == 'true'
-        run: |
-              az deployment group create --resource-group ${{ secrets.AZURE_KV_RESOURCE_GROUP }} --template-file ./deployment-kv.bicep \
-                            --parameters location=${{ secrets.AZURE_LOCATION }}  \
-                                         kvName=${{ secrets.AZURE_KV_NAME }} \
-                                         dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
-                                         dbName=${{ secrets.AZURE_DB_NAME }} \
-                                         dbAdminName=${{ secrets.AZURE_DB_ADMIN_NAME }} \
-                                         dbAdminPassword=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} \
-                                         dbUserName=${{ secrets.AZURE_API_DB_USER_NAME }} \
-                                         dbUserPassword=${{ secrets.AZURE_DB_USER_PASSWORD }} \
-                                         apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }}
-
-  create_log_analytics_if_needed:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./scripts
-    
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set default Azure subscription
-        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
-      - name: Check the resource group exists
-        id: rg_exists
-        run: |
-          RG_EXISTS=$(az group exists --name ${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
-          echo "::set-output name=RG_EXISTS::${RG_EXISTS}"
-
-      - name: Create Azure resource group
-        if: steps.rg_exists.outputs.RG_EXISTS == 'false'
-        run: |
-              az deployment sub create \
-               --location ${{ secrets.AZURE_LOCATION }} \
-               --template-file ./deployment-rg.bicep \
-               --parameters name=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
-
-      - name: Deploy Log Workspace
-        if: steps.rg_exists.outputs.RG_EXISTS == 'false'
-        run: |
-              az deployment group create --resource-group ${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} --template-file ./deployment-logs.bicep \
-                            --parameters location=${{ secrets.AZURE_LOCATION }}  \
-                                         logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}
-  
   cleanup_if_requested:
     runs-on: ubuntu-latest
 
@@ -132,10 +39,49 @@ jobs:
         run: |
           echo "${{ steps.check_next_steps.outputs.DELETE_RG }}"
           az group delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --yes
-      
+
+  create_log_analytics_if_needed:
+    needs: [cleanup_if_requested, create_log_analytics_if_needed]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./scripts
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set default Azure subscription
+        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Check the resource group exists
+        id: logs_rg_exists
+        run: |
+          LOGS_RG_EXISTS=$(az group exists --name ${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
+          echo "::set-output name=LOGS_RG_EXISTS::${LOGS_RG_EXISTS}"
+
+      - name: Create Logs Workspace Azure resource group
+        if: steps.rg_exists.outputs.LOGS_RG_EXISTS == 'false'
+        run: |
+          az deployment sub create \
+           --location ${{ secrets.AZURE_LOCATION }} \
+           --template-file ./deployment-rg.bicep \
+           --parameters name=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
+
+      - name: Deploy Log Workspace
+        if: steps.logs_rg_exists.outputs.LOGS_RG_EXISTS == 'false'
+        run: |
+          az deployment group create --resource-group ${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} --template-file ./deployment-logs.bicep \
+                        --parameters location=${{ secrets.AZURE_LOCATION }}  \
+                                     logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}
+
   build_infra:
-    needs: [cleanup_if_requested, create_log_analytics_if_needed, create_key_vault_if_needed]
-    
+    needs: [cleanup_if_requested]
+
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -150,34 +96,32 @@ jobs:
 
       - name: Set default Azure subscription
         run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
+
       - name: Create Azure resource group
         run: |
-              az deployment sub create \
-               --location ${{ secrets.AZURE_LOCATION }} \
-               --template-file ./deployment-rg.bicep \
-               --parameters name=${{ secrets.AZURE_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
+          az deployment sub create \
+           --location ${{ secrets.AZURE_LOCATION }} \
+           --template-file ./deployment-rg.bicep \
+           --parameters name=${{ secrets.AZURE_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
 
       - name: Deploy Azure resources
         run: |
-              clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`        
-              az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
-                            --parameters location=${{ secrets.AZURE_LOCATION }}  \
-                                         logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}  \
-                                         logAnalyticsWorkspaceRG=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }}  \
-                                         appInsightsName=${{ secrets.AZURE_APP_INSIGHTS_NAME }}  \
-                                         kvName=${{ secrets.AZURE_KV_NAME }} \
-                                         kvRG=${{ secrets.AZURE_KV_RESOURCE_GROUP }} \
-                                         dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
-                                         dbName=${{ secrets.AZURE_DB_NAME }} \
-                                         dbAdminName=${{ secrets.AZURE_DB_ADMIN_NAME }} \
-                                         dbAdminPassword=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} \
-                                         dbUserName=${{ secrets.AZURE_API_DB_USER_NAME }} \
-                                         dbUserPassword=${{ secrets.AZURE_API_DB_USER_PASSWORD }} \
-                                         apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
-                                         apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
-                                         webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
-                                         webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
-                                         clientIPAddress=$clientIP
+          clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`        
+          az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
+                        --parameters location=${{ secrets.AZURE_LOCATION }}  \
+                                     logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}  \
+                                     logAnalyticsWorkspaceRG=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }}  \
+                                     appInsightsName=${{ secrets.AZURE_APP_INSIGHTS_NAME }}  \
+                                     dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
+                                     dbName=${{ secrets.AZURE_DB_NAME }} \
+                                     dbAdminName=${{ secrets.AZURE_DB_ADMIN_NAME }} \
+                                     dbAdminPassword=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} \
+                                     dbUserName=${{ secrets.AZURE_API_DB_USER_NAME }} \
+                                     dbUserPassword=${{ secrets.AZURE_API_DB_USER_PASSWORD }} \
+                                     apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
+                                     apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
+                                     webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
+                                     webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
+                                     clientIPAddress=$clientIP
       #Debug: - name: Setup tmate session
       #         uses: mxschmitt/action-tmate@v3.11

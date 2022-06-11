@@ -1,6 +1,3 @@
-param kvName string
-param kvRG string
-
 param logAnalyticsWorkspaceName string
 param logAnalyticsWorkspaceRG string
 param appInsightsName string
@@ -31,11 +28,6 @@ param tagsArray object = {
   workload: 'DEVTEST'
   costCentre: 'FIN'
   department: 'RESEARCH'
-}
-
-resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
-  name: kvName
-  scope: resourceGroup(kvRG)
 }
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
@@ -112,7 +104,7 @@ resource apiServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
     reserved: true
   }
   sku: {
-    name:'S1'
+    name: 'S1'
   }
   kind: 'linux'
 }
@@ -128,9 +120,10 @@ resource apiService 'Microsoft.Web/sites@2021-03-01' = {
     serverFarmId: apiServicePlan.id
     siteConfig: {
       linuxFxVersion: 'JAVA|11-java11'
-      scmType: 'None' 
+      scmType: 'None'
     }
   }
+
   resource apiServicePARMS 'config@2021-03-01' = {
     name: 'web'
     kind: 'string'
@@ -186,13 +179,13 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
   location: location
   tags: tagsArray
   identity: {
-     type: 'SystemAssigned'
+    type: 'SystemAssigned'
   }
   properties: {
     serverFarmId: webServicePlan.id
     siteConfig: {
       linuxFxVersion: 'JAVA|11-java11'
-      scmType: 'None' 
+      scmType: 'None'
     }
   }
   resource webServicePARMS 'config@2021-03-01' = {
@@ -216,99 +209,3 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
     }
   }
 }
-
-@description('This is the built-in Key Vault Secrets User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
-resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-  scope:  keyVault
-  name: '4633458b-17de-408a-b874-0445c86b69e6'
-}
-
-// resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
-//   properties: {
-//     roleDefinitionId: keyVaultSecretsUser.id
-//     principalId: apiService.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
-
-
-// deploy to different scope
-// module rbac './deployment-rbac.bicep' = {
-//   name: 'deployment-rbac'
-//   scope: resourceGroup(kvRG)
-//   params: {
-//     mainDeploymentRG: resourceGroup().name
-//     kvName: kvName
-//     kvRG: kvRG
-//     apiServiceName: apiServiceName
-//   }
-// }
-
-
-// resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
-//   properties: {
-//     roleDefinitionId: keyVaultSecretsUser.id
-//     principalId: apiService.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
-
-// @description('Create a brand new User Assigned Managed Identity')
-// resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
-//   name: containersRGMI
-//   location: location
-// }
-
-
-
-// resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
-//   scope: keyVault
-//   properties: {
-//     roleDefinitionId: keyVaultSecretsUser.id
-//     principalId: apiService.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
-// @description('This is the built-in Key Vault Secrets User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
-// resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-//   scope:  subscription()
-//   name: '4633458b-17de-408a-b874-0445c86b69e6'
-// }
-
-
-// @description('This is the built-in Key Vault Administrator role. See https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#key-vault-administrator')
-// resource keyVaultAdministratorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-//   scope:  subscription()
-//   name: '00482a5a-887f-4fb3-b363-3b7fe8e74483'
-// }
-
-
-// @description('This is the built-in Owner role. See https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#key-vault-administrator')
-// resource OwnerRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-//   scope:  subscription()
-//   name: '8e3af657-a8ff-443c-a75c-2fe8c4bcb635'
-// }
-// resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   dependsOn: apiService
-//   name: guid(apiService.identity, apiService.identity, keyVaultSecretsUser.id)
-//   properties: {
-//     roleDefinitionId: keyVaultAdministratorRoleDefinition.id
-//     principalId: apiService.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
-// resource OwnerRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   name: guid(containersRGMI, containersRGMI, OwnerRoleDefinition.id)
-//   properties: {
-//     roleDefinitionId: OwnerRoleDefinition.id
-//     principalId: managedIdentity.properties.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
