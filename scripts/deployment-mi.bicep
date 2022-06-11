@@ -108,6 +108,14 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
           enabled: true
         }
       }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+        retentionPolicy: {
+          days: 365
+          enabled: true
+        }
+      }
     ]
     metrics: [
       {
@@ -205,6 +213,14 @@ resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@
           enabled: true
         }
       }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+        retentionPolicy: {
+          days: 365
+          enabled: true
+        }
+      }
     ]
     metrics: [
       {
@@ -284,6 +300,42 @@ resource apiService 'Microsoft.Web/sites@2021-03-01' = {
   }
 }
 
+resource apiServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${apiServiceName}-logs'
+  scope: apiService
+  properties: {
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+        retentionPolicy: {
+          days: 90
+          enabled: true
+        }
+      }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+        retentionPolicy: {
+          days: 365
+          enabled: true
+        }
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+        retentionPolicy: {
+          days: 90
+          enabled: true
+        }
+      }
+    ]
+    workspaceId: logAnalyticsWorkspace.id
+  }
+}
+
 resource webServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${webServiceName}-plan'
   location: location
@@ -333,6 +385,42 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
         }
       ]
     }
+  }
+}
+
+resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${webServiceName}-logs'
+  scope: apiService
+  properties: {
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+        retentionPolicy: {
+          days: 90
+          enabled: true
+        }
+      }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+        retentionPolicy: {
+          days: 365
+          enabled: true
+        }
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+        retentionPolicy: {
+          days: 90
+          enabled: true
+        }
+      }
+    ]
+    workspaceId: logAnalyticsWorkspace.id
   }
 }
 
