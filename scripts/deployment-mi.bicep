@@ -274,37 +274,48 @@ resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01
   name: '4633458b-17de-408a-b874-0445c86b69e6'
 }
 
-resource keyVaultApiAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
-  scope: keyVault
-  properties: {
+// deploy to different scope
+module rbac './deployment-mi-role-assignment.bicep' = {
+  name: 'deployment-rbac'
+  params: {
     roleDefinitionId: keyVaultSecretsUser.id
     principalId: apiService.identity.principalId
-    principalType: 'ServicePrincipal'
+    roleAssignmentNameGuid: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
+    kvName: keyVault.name
   }
 }
 
-resource keyVaultWebAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(webService.id, webService.id, keyVaultSecretsUser.id)
-  scope: keyVault
-  properties: {
-    roleDefinitionId: keyVaultSecretsUser.id
-    principalId: webService.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-// deploy to different scope
-// module rbac './deployment-rbac.bicep' = {
-//   name: 'deployment-rbac'
-//   scope: resourceGroup(kvRG)
-//   params: {
-//     mainDeploymentRG: resourceGroup().name
-//     kvName: kvName
-//     kvRG: kvRG
-//     apiServiceName: apiServiceName
+// resource keyVaultApiAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+//   name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
+//   scope: keyVault
+//   properties: {
+//     roleDefinitionId: keyVaultSecretsUser.id
+//     principalId: apiService.identity.principalId
+//     principalType: 'ServicePrincipal'
 //   }
 // }
+
+// resource keyVaultWebAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+//   name: guid(webService.id, webService.id, keyVaultSecretsUser.id)
+//   scope: keyVault
+//   properties: {
+//     roleDefinitionId: keyVaultSecretsUser.id
+//     principalId: webService.identity.principalId
+//     principalType: 'ServicePrincipal'
+//   }
+// }
+
+// resource keyVaultDatabaseReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+//   name: guid(apiService.id, postgreSQLServer.id, keyVaultSecretsUser.id)
+//   scope: postgreSQLServer
+//   properties: {
+//     roleDefinitionId: keyVaultSecretsUser.id
+//     principalId: webService.identity.principalId
+//     principalType: 'ServicePrincipal'
+//   }
+// }
+
+///////////////////////////////////////////
 
 // resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
 //   name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
