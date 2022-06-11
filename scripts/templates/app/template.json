@@ -10,6 +10,10 @@
             "defaultValue": "maabrle-web",
             "type": "String"
         },
+        "vaults_maabrletestkv_name": {
+            "defaultValue": "maabrletestkv",
+            "type": "String"
+        },
         "serverfarms_maabrle_api_plan_name": {
             "defaultValue": "maabrle-api-plan",
             "type": "String"
@@ -60,6 +64,31 @@
                     "startHour": 0,
                     "startMinute": 0
                 }
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2021-11-01-preview",
+            "name": "[parameters('vaults_maabrletestkv_name')]",
+            "location": "eastus",
+            "tags": {
+                "workload": "DEVTEST",
+                "costCentre": "FIN",
+                "department": "RESEARCH"
+            },
+            "properties": {
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "tenantId": "30adb879-45b4-49c3-bf8b-7731fcce5394",
+                "accessPolicies": [],
+                "enabledForDeployment": false,
+                "enableSoftDelete": true,
+                "enableRbacAuthorization": true,
+                "vaultUri": "[concat('https://', parameters('vaults_maabrletestkv_name'), '.vault.azure.net/')]",
+                "provisioningState": "Succeeded",
+                "publicNetworkAccess": "Enabled"
             }
         },
         {
@@ -2920,8 +2949,98 @@
                 "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', parameters('flexibleServers_maabrledev_name'))]"
             ],
             "properties": {
-                "startIpAddress": "20.228.248.174",
-                "endIpAddress": "20.228.248.174"
+                "startIpAddress": "52.188.144.81",
+                "endIpAddress": "52.188.144.81"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2021-11-01-preview",
+            "name": "[concat(parameters('vaults_maabrletestkv_name'), '/API-URI')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_maabrletestkv_name'))]"
+            ],
+            "properties": {
+                "contentType": "string",
+                "attributes": {
+                    "enabled": true
+                }
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2021-11-01-preview",
+            "name": "[concat(parameters('vaults_maabrletestkv_name'), '/DB-ADMIN-NAME')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_maabrletestkv_name'))]"
+            ],
+            "properties": {
+                "contentType": "string",
+                "attributes": {
+                    "enabled": true
+                }
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2021-11-01-preview",
+            "name": "[concat(parameters('vaults_maabrletestkv_name'), '/DB-ADMIN-PASSWORD')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_maabrletestkv_name'))]"
+            ],
+            "properties": {
+                "contentType": "string",
+                "attributes": {
+                    "enabled": true
+                }
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2021-11-01-preview",
+            "name": "[concat(parameters('vaults_maabrletestkv_name'), '/SPRING-DATASOURCE-PASSWORD')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_maabrletestkv_name'))]"
+            ],
+            "properties": {
+                "contentType": "string",
+                "attributes": {
+                    "enabled": true
+                }
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2021-11-01-preview",
+            "name": "[concat(parameters('vaults_maabrletestkv_name'), '/SPRING-DATASOURCE-URL')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_maabrletestkv_name'))]"
+            ],
+            "properties": {
+                "contentType": "string",
+                "attributes": {
+                    "enabled": true
+                }
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2021-11-01-preview",
+            "name": "[concat(parameters('vaults_maabrletestkv_name'), '/SPRING-DATASOURCE-USERNAME')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_maabrletestkv_name'))]"
+            ],
+            "properties": {
+                "contentType": "string",
+                "attributes": {
+                    "enabled": true
+                }
             }
         },
         {
@@ -3163,7 +3282,7 @@
                 "vnetRouteAllEnabled": false,
                 "vnetPrivatePortsCount": 0,
                 "localMySqlEnabled": false,
-                "managedServiceIdentityId": 14417,
+                "managedServiceIdentityId": 7692,
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "Any",
@@ -3249,7 +3368,7 @@
                 "vnetRouteAllEnabled": false,
                 "vnetPrivatePortsCount": 0,
                 "localMySqlEnabled": false,
-                "managedServiceIdentityId": 14418,
+                "managedServiceIdentityId": 7693,
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "Any",
@@ -3305,6 +3424,38 @@
                 "siteName": "maabrle-web",
                 "hostNameType": "Verified"
             }
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_maabrle_api_name'), '/2022-06-11T14_36_40_2475160')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_maabrle_api_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_maabrle_web_name'), '/2022-06-11T14_36_40_2475160')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_maabrle_web_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_maabrle_api_name'), '/2022-06-11T15_36_40_6145820')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_maabrle_api_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_maabrle_web_name'), '/2022-06-11T15_36_40_6145820')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_maabrle_web_name'))]"
+            ]
         }
     ]
 }

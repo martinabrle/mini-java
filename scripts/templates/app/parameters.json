@@ -8,6 +8,9 @@
         "sites_maabrle_web_name": {
             "value": null
         },
+        "vaults_maabrletestkv_name": {
+            "value": null
+        },
         "serverfarms_maabrle_api_plan_name": {
             "value": null
         },
