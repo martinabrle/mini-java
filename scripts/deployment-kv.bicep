@@ -26,7 +26,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: kvName
   location: location
   tags: tagsArray
-  properties: {           
+  properties: {
     createMode: 'default'
     tenantId: subscription().tenantId
     sku: {
@@ -36,50 +36,50 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
     enableRbacAuthorization: true
     enableSoftDelete: true
   }
-  resource test 'secrets@2021-11-01-preview' = {
-    name: 'whatever'
+  // resource test 'secrets@2021-11-01-preview' = {
+  //   name: 'whatever'
+  //   properties: {
+  //     value: 'huhu'
+  //     contentType: 'string'
+  //   }
+  // }
+  resource databaseAdminName 'secrets@2021-11-01-preview' = {
+    name: 'DB_ADMIN_NAME'
     properties: {
-      value: 'huhu'
+      value: dbAdminName
       contentType: 'string'
     }
   }
-  //  resource databaseAdminName 'secrets' = {
-  //   name: 'DB_ADMIN_NAME'
-  //   properties: {
-  //     value: dbAdminName
-  //     contentType: 'string'
-  //   }  
-  // }
-  // resource databaseAdminPassword 'secrets' = {
-  //     name: 'DB_ADMIN_PASSWORD'
-  //     properties: {
-  //       value: dbAdminPassword
-  //   }
-  // }
-  // resource databaseReaderUserName 'secrets' = {
-  //   name: 'SPRING_DATASOURCE_USERNAME'
-  //   properties: {
-  //     value: dbUserName
-  //   }
-  // }
-  // resource databaseReaderUserPassword 'secrets' = {
-  //   name: 'SPRING_DATASOURCE_PASSWORD'
-  //   properties: {
-  //     value: dbUserPassword
-  //   }
-  // }
-  // resource springDataSourceURL 'secrets' = {
-  //   name: 'SPRING_DATASOURCE_URL'
-  //   properties: {
-  //     value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
-  //   }
-  // }
-  // resource apiURI 'secrets' = {
-  //   name: 'API_URI'
-  //   properties: {
-  //     value: 'https://${apiServiceName}.azurewebsites.net/todos/'
-  //   }
-  // }
+  resource databaseAdminPassword 'secrets@2021-11-01-preview' = {
+    name: 'DB_ADMIN_PASSWORD'
+    properties: {
+      value: dbAdminPassword
+    }
+  }
+  resource databaseReaderUserName 'secrets@2021-11-01-preview' = {
+    name: 'SPRING_DATASOURCE_USERNAME'
+    properties: {
+      value: dbUserName
+    }
+  }
+  resource databaseReaderUserPassword 'secrets@2021-11-01-preview' = {
+    name: 'SPRING_DATASOURCE_PASSWORD'
+    properties: {
+      value: dbUserPassword
+    }
+  }
+  resource springDataSourceURL 'secrets@2021-11-01-preview' = {
+    name: 'SPRING_DATASOURCE_URL'
+    properties: {
+      value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
+    }
+  }
+  resource apiURI 'secrets@2021-11-01-preview' = {
+    name: 'API_URI'
+    properties: {
+      value: 'https://${apiServiceName}.azurewebsites.net/todos/'
+    }
+  }
 }
 
 // resource apiURISecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
