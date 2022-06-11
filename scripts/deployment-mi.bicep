@@ -105,7 +105,7 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
         enabled: true
       }
       {
-        category: 'AuditEvent'
+        categoryGroup: 'audit'
         enabled: true
       }
     ]
