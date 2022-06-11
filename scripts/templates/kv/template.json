@@ -2,8 +2,8 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vaults_maabrletestkv_name": {
-            "defaultValue": "maabrletestkv",
+        "vaults_testmaabrle_name": {
+            "defaultValue": "testmaabrle",
             "type": "String"
         }
     },
@@ -12,24 +12,22 @@
         {
             "type": "Microsoft.KeyVault/vaults",
             "apiVersion": "2021-11-01-preview",
-            "name": "[parameters('vaults_maabrletestkv_name')]",
+            "name": "[parameters('vaults_testmaabrle_name')]",
             "location": "eastus",
-            "tags": {
-                "workload": "DEVTEST",
-                "costCentre": "FIN",
-                "department": "RESEARCH"
-            },
             "properties": {
                 "sku": {
                     "family": "A",
-                    "name": "standard"
+                    "name": "Standard"
                 },
                 "tenantId": "30adb879-45b4-49c3-bf8b-7731fcce5394",
                 "accessPolicies": [],
                 "enabledForDeployment": false,
+                "enabledForDiskEncryption": false,
+                "enabledForTemplateDeployment": false,
                 "enableSoftDelete": true,
+                "softDeleteRetentionInDays": 90,
                 "enableRbacAuthorization": true,
-                "vaultUri": "[concat('https://', parameters('vaults_maabrletestkv_name'), '.vault.azure.net/')]",
+                "vaultUri": "[concat('https://', parameters('vaults_testmaabrle_name'), '.vault.azure.net/')]",
                 "provisioningState": "Succeeded",
                 "publicNetworkAccess": "Enabled"
             }
