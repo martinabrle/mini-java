@@ -94,6 +94,34 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   }
 }
 
+resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name:  '${kvName}-logs'
+  properties: {
+    logs: [
+      {
+        category: 'allLogs'
+        categoryGroup: 'string'
+        enabled: true
+        retentionPolicy: {
+          days: 90
+          enabled: true
+        }
+      }
+    ]
+    metrics: [
+      {
+        category: 'WorkflowMetrics'
+        enabled: true
+        retentionPolicy: {
+          days: 90
+          enabled: true
+        }
+      }
+    ]
+    workspaceId: logAnalyticsWorkspace.id
+  }
+}
+
 resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01-preview' = {
   name: dbServerName
   location: location
