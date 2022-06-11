@@ -274,11 +274,22 @@ resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01
   name: '4633458b-17de-408a-b874-0445c86b69e6'
 }
 
-resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+resource keyVaultApiAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
   name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
+  scope: keyVault
   properties: {
     roleDefinitionId: keyVaultSecretsUser.id
     principalId: apiService.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource keyVaultWebAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(webService.id, webService.id, keyVaultSecretsUser.id)
+  scope: keyVault
+  properties: {
+    roleDefinitionId: keyVaultSecretsUser.id
+    principalId: webService.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
