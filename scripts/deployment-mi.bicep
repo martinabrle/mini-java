@@ -108,14 +108,14 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
           enabled: true
         }
       }
-      // {
-      //   categoryGroup: 'audit'
-      //   enabled: true
-      //   retentionPolicy: {
-      //     days: 365
-      //     enabled: true
-      //   }
-      // }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+        retentionPolicy: {
+          days: 365
+          enabled: true
+        }
+      }
     ]
     metrics: [
       {
@@ -200,41 +200,41 @@ resource allowAllIPsFirewallRule 'Microsoft.DBforPostgreSQL/flexibleServers/fire
   }
 }
 
-resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${dbServerName}-db-logs'
-  scope: postgreSQLServer
-  properties: {
-    logs: [
-      {
-        categoryGroup: 'allLogs'
-        enabled: true
-        retentionPolicy: {
-          days: 90
-          enabled: true
-        }
-      }
-      // {
-      //   categoryGroup: 'audit'
-      //   enabled: true
-      //   retentionPolicy: {
-      //     days: 365
-      //     enabled: true
-      //   }
-      // }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-        retentionPolicy: {
-          days: 90
-          enabled: true
-        }
-      }
-    ]
-    workspaceId: logAnalyticsWorkspace.id
-  }
-}
+// resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: '${dbServerName}-db-logs'
+//   scope: postgreSQLServer
+//   properties: {
+//     logs: [
+//       {
+//         categoryGroup: 'allLogs'
+//         enabled: true
+//         retentionPolicy: {
+//           days: 90
+//           enabled: true
+//         }
+//       }
+//       // {
+//       //   categoryGroup: 'audit'
+//       //   enabled: true
+//       //   retentionPolicy: {
+//       //     days: 365
+//       //     enabled: true
+//       //   }
+//       // }
+//     ]
+//     metrics: [
+//       {
+//         category: 'AllMetrics'
+//         enabled: true
+//         retentionPolicy: {
+//           days: 90
+//           enabled: true
+//         }
+//       }
+//     ]
+//     workspaceId: logAnalyticsWorkspace.id
+//   }
+// }
 
 resource apiServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${apiServiceName}-plan'
@@ -300,41 +300,41 @@ resource apiService 'Microsoft.Web/sites@2021-03-01' = {
   }
 }
 
-resource apiServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${apiServiceName}-app-logs'
-  scope: apiService
-  properties: {
-    logs: [
-      {
-        categoryGroup: 'allLogs'
-        enabled: true
-        retentionPolicy: {
-          days: 90
-          enabled: true
-        }
-      }
-      // {
-      //   categoryGroup: 'audit'
-      //   enabled: true
-      //   retentionPolicy: {
-      //     days: 365
-      //     enabled: true
-      //   }
-      // }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-        retentionPolicy: {
-          days: 90
-          enabled: true
-        }
-      }
-    ]
-    workspaceId: logAnalyticsWorkspace.id
-  }
-}
+// resource apiServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: '${apiServiceName}-app-logs'
+//   scope: apiService
+//   properties: {
+//     logs: [
+//       {
+//         categoryGroup: 'allLogs'
+//         enabled: true
+//         retentionPolicy: {
+//           days: 90
+//           enabled: true
+//         }
+//       }
+//       // {
+//       //   categoryGroup: 'audit'
+//       //   enabled: true
+//       //   retentionPolicy: {
+//       //     days: 365
+//       //     enabled: true
+//       //   }
+//       // }
+//     ]
+//     metrics: [
+//       {
+//         category: 'AllMetrics'
+//         enabled: true
+//         retentionPolicy: {
+//           days: 90
+//           enabled: true
+//         }
+//       }
+//     ]
+//     workspaceId: logAnalyticsWorkspace.id
+//   }
+// }
 
 resource webServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${webServiceName}-plan'
@@ -388,41 +388,41 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
   }
 }
 
-resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${webServiceName}-web-logs'
-  scope: webService
-  properties: {
-    logs: [
-      {
-        categoryGroup: 'allLogs'
-        enabled: true
-        retentionPolicy: {
-          days: 90
-          enabled: true
-        }
-      }
-      // {
-      //   categoryGroup: 'audit'
-      //   enabled: true
-      //   retentionPolicy: {
-      //     days: 365
-      //     enabled: true
-      //   }
-      // }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-        retentionPolicy: {
-          days: 90
-          enabled: true
-        }
-      }
-    ]
-    workspaceId: logAnalyticsWorkspace.id
-  }
-}
+// resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: '${webServiceName}-web-logs'
+//   scope: webService
+//   properties: {
+//     logs: [
+//       {
+//         categoryGroup: 'allLogs'
+//         enabled: true
+//         retentionPolicy: {
+//           days: 90
+//           enabled: true
+//         }
+//       }
+//       // {
+//       //   categoryGroup: 'audit'
+//       //   enabled: true
+//       //   retentionPolicy: {
+//       //     days: 365
+//       //     enabled: true
+//       //   }
+//       // }
+//     ]
+//     metrics: [
+//       {
+//         category: 'AllMetrics'
+//         enabled: true
+//         retentionPolicy: {
+//           days: 90
+//           enabled: true
+//         }
+//       }
+//     ]
+//     workspaceId: logAnalyticsWorkspace.id
+//   }
+// }
 
 @description('This is the built-in Key Vault Secrets User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
 resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
