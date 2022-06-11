@@ -29,13 +29,20 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   properties: {           
     createMode: 'default'
     tenantId: subscription().tenantId
-      sku: {
-         family: 'A'
-          name: 'standard'
-      }
-      enableRbacAuthorization: true
-      enableSoftDelete: true
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
+    enableRbacAuthorization: true
+    enableSoftDelete: true
    }
+    resource test 'secrets@2021-11-01-preview' = {
+      name: 'whatever'
+      properties: {
+        value: 'huhu'
+        contentType: 'string'
+      }
+    }
   //  resource databaseAdminName 'secrets' = {
   //   name: 'DB_ADMIN_NAME'
   //   properties: {
@@ -75,10 +82,10 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   // }
 }
 
-resource apiURISecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
-  name: 'API_URI'
-  parent: keyVault
-  properties: {
-    value: 'whatever'
-  }
-}
+// resource apiURISecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+//   name: 'API_URI'
+//   parent: keyVault
+//   properties: {
+//     value: 'whatever'
+//   }
+// }
