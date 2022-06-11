@@ -81,7 +81,7 @@ jobs:
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                      logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}
 
-  build_infra:
+  deploy_infra:
     needs: [deploy_log_analytics_if_needed]
 
     runs-on: ubuntu-latest

@@ -108,14 +108,14 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
           enabled: true
         }
       }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-        retentionPolicy: {
-          days: 365
-          enabled: true
-        }
-      }
+      // {
+      //   categoryGroup: 'audit'
+      //   enabled: true
+      //   retentionPolicy: {
+      //     days: 365
+      //     enabled: true
+      //   }
+      // }
     ]
     metrics: [
       {
@@ -130,6 +130,24 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
     workspaceId: logAnalyticsWorkspace.id
   }
 }
+
+// resource kvDiagnotsicsAuditLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: '${kvName}-all-logs'
+//   scope: keyVault
+//   properties: {
+//     logs: [
+//       {
+//         categoryGroup: 'audit'
+//         enabled: true
+//         retentionPolicy: {
+//           days: 90
+//           enabled: true
+//         }
+//       }
+//     ]
+//     workspaceId: logAnalyticsWorkspace.id
+//   }
+// }
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
@@ -390,7 +408,7 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
 
 resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   name: '${webServiceName}-logs'
-  scope: apiService
+  scope: webService
   properties: {
     logs: [
       {
@@ -401,14 +419,14 @@ resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-0
           enabled: true
         }
       }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-        retentionPolicy: {
-          days: 365
-          enabled: true
-        }
-      }
+      // {
+      //   categoryGroup: 'audit'
+      //   enabled: true
+      //   retentionPolicy: {
+      //     days: 365
+      //     enabled: true
+      //   }
+      // }
     ]
     metrics: [
       {
