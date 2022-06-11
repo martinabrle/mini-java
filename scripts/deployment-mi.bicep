@@ -95,7 +95,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
 }
 
 resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${kvName}-logs'
+  name: '${kvName}-kv-logs'
   scope: keyVault
   properties: {
     logs: [
@@ -108,14 +108,14 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
           enabled: true
         }
       }
-      // {
-      //   categoryGroup: 'audit'
-      //   enabled: true
-      //   retentionPolicy: {
-      //     days: 365
-      //     enabled: true
-      //   }
-      // }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+        retentionPolicy: {
+          days: 365
+          enabled: true
+        }
+      }
     ]
     metrics: [
       {
@@ -130,24 +130,6 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
     workspaceId: logAnalyticsWorkspace.id
   }
 }
-
-// resource kvDiagnotsicsAuditLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-//   name: '${kvName}-all-logs'
-//   scope: keyVault
-//   properties: {
-//     logs: [
-//       {
-//         categoryGroup: 'audit'
-//         enabled: true
-//         retentionPolicy: {
-//           days: 90
-//           enabled: true
-//         }
-//       }
-//     ]
-//     workspaceId: logAnalyticsWorkspace.id
-//   }
-// }
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
@@ -219,7 +201,7 @@ resource allowAllIPsFirewallRule 'Microsoft.DBforPostgreSQL/flexibleServers/fire
 }
 
 resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${dbServerName}-logs'
+  name: '${dbServerName}-db-logs'
   scope: postgreSQLServer
   properties: {
     logs: [
@@ -319,7 +301,7 @@ resource apiService 'Microsoft.Web/sites@2021-03-01' = {
 }
 
 resource apiServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${apiServiceName}-logs'
+  name: '${apiServiceName}-app-logs'
   scope: apiService
   properties: {
     logs: [
@@ -407,7 +389,7 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
 }
 
 resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${webServiceName}-logs'
+  name: '${webServiceName}-web-logs'
   scope: webService
   properties: {
     logs: [
@@ -419,14 +401,14 @@ resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-0
           enabled: true
         }
       }
-      // {
-      //   categoryGroup: 'audit'
-      //   enabled: true
-      //   retentionPolicy: {
-      //     days: 365
-      //     enabled: true
-      //   }
-      // }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+        retentionPolicy: {
+          days: 365
+          enabled: true
+        }
+      }
     ]
     metrics: [
       {
