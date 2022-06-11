@@ -46,7 +46,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   resource databaseAdminName 'secrets@2021-11-01-preview' = {
     name: 'DB_ADMIN_NAME'
     properties: {
-      value: dbAdminName
+      value: 'dbAdminName'
       contentType: 'string'
     }
   }
