@@ -67,7 +67,7 @@ jobs:
           echo "::set-output name=LOGS_RG_EXISTS::${LOGS_RG_EXISTS}"
 
       - name: Create Logs Workspace Azure resource group
-        if: steps.rg_exists.outputs.LOGS_RG_EXISTS == 'false'
+        if: steps.logs_rg_exists.outputs.LOGS_RG_EXISTS == 'false'
         run: |
           az deployment sub create \
            --location ${{ secrets.AZURE_LOCATION }} \
