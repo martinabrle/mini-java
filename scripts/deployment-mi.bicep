@@ -94,7 +94,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   }
 }
 
-resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01' = {
+resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01-preview' = {
   name: dbServerName
   location: location
   tags: tagsArray
@@ -274,9 +274,17 @@ resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01
   name: '4633458b-17de-408a-b874-0445c86b69e6'
 }
 
-// deploy to different scope
-module rbac './deployment-mi-role-assignment.bicep' = {
-  name: 'deployment-rbac'
+//Coming in 3 months - or some variation of
+// @description('This is the built-in Admin for PGSQL Flexible Server. Coming at some point to... https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
+// resource pgsqlFlexibleServerAdmin 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+//   scope: keyVault
+//   name: 'TODO'
+// }
+
+// to deploy to different scope, we need to utilize modules
+// as we're trying to have the least possible assignment scope
+module rbac './deployment-mi-role-assignment-kv.bicep' = {
+  name: 'deployment-rbac-api'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
     principalId: apiService.identity.principalId
@@ -285,95 +293,22 @@ module rbac './deployment-mi-role-assignment.bicep' = {
   }
 }
 
-// resource keyVaultApiAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
-//   scope: keyVault
-//   properties: {
+module rbacWeb './deployment-mi-role-assignment-kv.bicep' = {
+  name: 'deployment-rbac-web'
+  params: {
+    roleDefinitionId: keyVaultSecretsUser.id
+    principalId: webService.identity.principalId
+    roleAssignmentNameGuid: guid(webService.id, webService.id, keyVaultSecretsUser.id)
+    kvName: keyVault.name
+  }
+}
+
+// module rbacPGSQL './deployment-mi-role-assignment-kv.bicep' = {
+//   name: 'deployment-rbac-pgsql'
+//   params: {
 //     roleDefinitionId: keyVaultSecretsUser.id
-//     principalId: apiService.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
-// resource keyVaultWebAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   name: guid(webService.id, webService.id, keyVaultSecretsUser.id)
-//   scope: keyVault
-//   properties: {
-//     roleDefinitionId: keyVaultSecretsUser.id
-//     principalId: webService.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
-// resource keyVaultDatabaseReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   name: guid(apiService.id, postgreSQLServer.id, keyVaultSecretsUser.id)
-//   scope: postgreSQLServer
-//   properties: {
-//     roleDefinitionId: keyVaultSecretsUser.id
-//     principalId: webService.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
-///////////////////////////////////////////
-
-// resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
-//   properties: {
-//     roleDefinitionId: keyVaultSecretsUser.id
-//     principalId: apiService.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
-// @description('Create a brand new User Assigned Managed Identity')
-// resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
-//   name: containersRGMI
-//   location: location
-// }
-
-// resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   name: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
-//   scope: keyVault
-//   properties: {
-//     roleDefinitionId: keyVaultSecretsUser.id
-//     principalId: apiService.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
-// @description('This is the built-in Key Vault Secrets User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
-// resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-//   scope:  subscription()
-//   name: '4633458b-17de-408a-b874-0445c86b69e6'
-// }
-
-// @description('This is the built-in Key Vault Administrator role. See https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#key-vault-administrator')
-// resource keyVaultAdministratorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-//   scope:  subscription()
-//   name: '00482a5a-887f-4fb3-b363-3b7fe8e74483'
-// }
-
-// @description('This is the built-in Owner role. See https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#key-vault-administrator')
-// resource OwnerRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-//   scope:  subscription()
-//   name: '8e3af657-a8ff-443c-a75c-2fe8c4bcb635'
-// }
-// resource keyVaultAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   dependsOn: apiService
-//   name: guid(apiService.identity, apiService.identity, keyVaultSecretsUser.id)
-//   properties: {
-//     roleDefinitionId: keyVaultAdministratorRoleDefinition.id
-//     principalId: apiService.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
-// resource OwnerRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   name: guid(containersRGMI, containersRGMI, OwnerRoleDefinition.id)
-//   properties: {
-//     roleDefinitionId: OwnerRoleDefinition.id
-//     principalId: managedIdentity.properties.principalId
-//     principalType: 'ServicePrincipal'
+//     principalId:  apiService.identity.principalId
+//     roleAssignmentNameGuid: guid(postgreSQLServer.id, postgreSQLServer.id, keyVaultSecretsUser.id)
+//     kvName: keyVault.name
 //   }
 // }
