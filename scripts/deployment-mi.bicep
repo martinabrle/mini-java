@@ -200,41 +200,33 @@ resource allowAllIPsFirewallRule 'Microsoft.DBforPostgreSQL/flexibleServers/fire
   }
 }
 
-// resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-//   name: '${dbServerName}-db-logs'
-//   scope: postgreSQLServer
-//   properties: {
-//     logs: [
-//       {
-//         categoryGroup: 'allLogs'
-//         enabled: true
-//         retentionPolicy: {
-//           days: 90
-//           enabled: true
-//         }
-//       }
-//       // {
-//       //   categoryGroup: 'audit'
-//       //   enabled: true
-//       //   retentionPolicy: {
-//       //     days: 365
-//       //     enabled: true
-//       //   }
-//       // }
-//     ]
-//     metrics: [
-//       {
-//         category: 'AllMetrics'
-//         enabled: true
-//         retentionPolicy: {
-//           days: 90
-//           enabled: true
-//         }
-//       }
-//     ]
-//     workspaceId: logAnalyticsWorkspace.id
-//   }
-// }
+resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${dbServerName}-db-logs'
+  scope: postgreSQLServer
+  properties: {
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+      {
+        category: 'AuditEvent'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+        retentionPolicy: {
+          days: 90
+          enabled: true
+        }
+      }
+    ]
+    workspaceId: logAnalyticsWorkspace.id
+  }
+}
 
 resource apiServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${apiServiceName}-plan'
