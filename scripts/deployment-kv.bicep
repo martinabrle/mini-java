@@ -35,14 +35,14 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
     }
     enableRbacAuthorization: true
     enableSoftDelete: true
-   }
-    resource test 'secrets@2021-11-01-preview' = {
-      name: 'whatever'
-      properties: {
-        value: 'huhu'
-        contentType: 'string'
-      }
+  }
+  resource test 'secrets@2021-11-01-preview' = {
+    name: 'whatever'
+    properties: {
+      value: 'huhu'
+      contentType: 'string'
     }
+  }
   //  resource databaseAdminName 'secrets' = {
   //   name: 'DB_ADMIN_NAME'
   //   properties: {
