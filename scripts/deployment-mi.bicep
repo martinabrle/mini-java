@@ -95,7 +95,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
 }
 
 resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${kvName}-logs'
+  name: '${kvName}-kv-logs'
   scope: keyVault
   properties: {
     logs: [
