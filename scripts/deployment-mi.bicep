@@ -95,7 +95,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
 }
 
 resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${kvName}-kv-logs'
+  name: '${kvName}-logs'
   scope: keyVault
   properties: {
     logs: [
@@ -103,13 +103,13 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
         //category: 'allLogs'
         categoryGroup: 'allLogs'
         enabled: true
-        retentionPolicy: {
-          days: 90
-          enabled: true
-        }
+        // retentionPolicy: {
+        //   days: 90
+        //   enabled: true
+        // }
       }
       // {
-      //   categoryGroup: 'audit'
+      //   category: 'AuditEvent'
       //   enabled: true
       //   retentionPolicy: {
       //     days: 365
