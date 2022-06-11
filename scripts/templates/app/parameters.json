@@ -17,7 +17,19 @@
         "serverfarms_maabrle_web_plan_name": {
             "value": null
         },
+        "components_maabrle_app_insights_name": {
+            "value": null
+        },
         "flexibleServers_maabrledev_name": {
+            "value": null
+        },
+        "actionGroups_Application_Insights_Smart_Detection_name": {
+            "value": null
+        },
+        "smartdetectoralertrules_failure_anomalies___maabrle_app_insights_name": {
+            "value": null
+        },
+        "workspaces_maabrle_log_analytics_externalid": {
             "value": null
         }
     }
