@@ -36,53 +36,46 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
     enableRbacAuthorization: true
     enableSoftDelete: true
   }
-  resource test 'secrets@2021-11-01-preview' = {
-    name: 'whateverwhat'
+  resource databaseAdminName 'secrets@2021-11-01-preview' = {
+    name: 'DB-ADMIN-NAME'
     properties: {
       value: dbAdminName
       contentType: 'string'
     }
   }
-  // resource databaseAdminName 'secrets@2021-11-01-preview' = {
-  //   name: 'DB_ADMIN_NAME'
-  //   properties: {
-  //     value: 'dbAdminName'
-  //     contentType: 'string'
-  //   }
-  // }
-  // resource databaseAdminPassword 'secrets@2021-11-01-preview' = {
-  //   name: 'DB_ADMIN_PASSWORD'
-  //   properties: {
-  //     value: dbAdminPassword
-  //     contentType: 'string'
-  //   }
-  // }
-  // resource databaseReaderUserName 'secrets@2021-11-01-preview' = {
-  //   name: 'SPRING_DATASOURCE_USERNAME'
-  //   properties: {
-  //     value: dbUserName
-  //     contentType: 'string'
-  //   }
-  // }
-  // resource databaseReaderUserPassword 'secrets@2021-11-01-preview' = {
-  //   name: 'SPRING_DATASOURCE_PASSWORD'
-  //   properties: {
-  //     value: dbUserPassword
-  //     contentType: 'string'
-  //   }
-  // }
-  // resource springDataSourceURL 'secrets@2021-11-01-preview' = {
-  //   name: 'SPRING_DATASOURCE_URL'
-  //   properties: {
-  //     value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
-  //     contentType: 'string'
-  //   }
-  // }
-  // resource apiURI 'secrets@2021-11-01-preview' = {
-  //   name: 'API_URI'
-  //   properties: {
-  //     value: 'https://${apiServiceName}.azurewebsites.net/todos/'
-  //     contentType: 'string'
-  //   }
-  // }
+  resource databaseAdminPassword 'secrets@2021-11-01-preview' = {
+    name: 'DB-ADMIN-PASSWORD'
+    properties: {
+      value: dbAdminPassword
+      contentType: 'string'
+    }
+  }
+  resource databaseReaderUserName 'secrets@2021-11-01-preview' = {
+    name: 'SPRING-DATASOURCE-USERNAME'
+    properties: {
+      value: dbUserName
+      contentType: 'string'
+    }
+  }
+  resource databaseReaderUserPassword 'secrets@2021-11-01-preview' = {
+    name: 'SPRING-DATASOURCE-PASSWORD'
+    properties: {
+      value: dbUserPassword
+      contentType: 'string'
+    }
+  }
+  resource springDataSourceURL 'secrets@2021-11-01-preview' = {
+    name: 'SPRING-DATASOURCE-URL'
+    properties: {
+      value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
+      contentType: 'string'
+    }
+  }
+  resource apiURI 'secrets@2021-11-01-preview' = {
+    name: 'API-URI'
+    properties: {
+      value: 'https://${apiServiceName}.azurewebsites.net/todos/'
+      contentType: 'string'
+    }
+  }
 }
