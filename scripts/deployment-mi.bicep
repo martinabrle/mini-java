@@ -307,9 +307,9 @@ module rbacWeb './deployment-mi-role-assignment-kv.bicep' = {
 // module rbacPGSQL './deployment-mi-role-assignment-kv.bicep' = {
 //   name: 'deployment-rbac-pgsql'
 //   params: {
-//     roleDefinitionId: keyVaultSecretsUser.id
+//     roleDefinitionId: pgsqlFlexibleServerAdmin.id
 //     principalId:  apiService.identity.principalId
-//     roleAssignmentNameGuid: guid(postgreSQLServer.id, postgreSQLServer.id, keyVaultSecretsUser.id)
-//     kvName: keyVault.name
+//     roleAssignmentNameGuid: guid(postgreSQLServer.id, postgreSQLServer.id, pgsqlFlexibleServerAdmin.id)
+//     postgreSQLServerName: postgreSQLServer.name
 //   }
 // }
