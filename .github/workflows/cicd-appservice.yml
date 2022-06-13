@@ -65,8 +65,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'temurin'
-          cache: maven
+          distribution: 'microsoft'
       
       - name: Build the .jar
         run: |
@@ -150,8 +149,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'temurin'
-          cache: maven
+          distribution: 'microsoft'
       
       - name: Build the .jar
         run: |
