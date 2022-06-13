@@ -100,7 +100,6 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
   properties: {
     logs: [
       {
-        //category: 'allLogs'
         categoryGroup: 'allLogs'
         enabled: true
       }
@@ -199,7 +198,6 @@ resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@
       }
       {
         categoryGroup: 'audit'
-        // category: 'AuditEvent'
         enabled: true
       }
     ]
@@ -254,19 +252,23 @@ resource apiService 'Microsoft.Web/sites@2021-03-01' = {
         }
         {
           name: 'SPRING_DATASOURCE_URL'
-          value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
+          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=SPRING-DATASOURCE-URL)'
+          //value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
         }
         {
           name: 'SPRING_DATASOURCE_USERNAME'
-          value: dbUserName
+          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=SPRING-DATASOURCE-USERNAME)'
+          //value: dbUserName
         }
         {
           name: 'SPRING_DATASOURCE_PASSWORD'
-          value: dbUserPassword
+          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=SPRING-DATASOURCE-PASSWORD)'
+          //value: dbUserPassword
         }
         {
           name: 'SPRING_DATASOURCE_SHOW_SQL'
-          value: 'false'
+          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=SPRING-DATASOURCE-SHOW-SQL)'
+          // value: 'false' 
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
@@ -342,7 +344,8 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
         }
         {
           name: 'API_URI'
-          value: 'https://${apiServiceName}.azurewebsites.net/todos/'
+          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=API-URI)'
+          //'https://${apiServiceName}.azurewebsites.net/todos/'
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
