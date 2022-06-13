@@ -223,11 +223,11 @@ resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@
 
 resource apiServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${apiServiceName}-plan'
-  location: location
-  tags: tagsArray
   dependsOn: [
     postgreSQLServer
   ]
+  location: location
+  tags: tagsArray
   properties: {
     reserved: true
   }
@@ -239,6 +239,10 @@ resource apiServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
 
 resource apiService 'Microsoft.Web/sites@2021-03-01' = {
   name: apiServiceName
+  dependsOn: [
+    postgreSQLServer
+    keyVault
+  ]
   location: location
   tags: tagsArray
   identity: {
@@ -318,11 +322,13 @@ resource apiServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-0
 
 resource webServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${webServiceName}-plan'
-  location: location
-  tags: tagsArray
   dependsOn: [
     apiService
+    keyVault
   ]
+  location: location
+  tags: tagsArray
+
   properties: {
     reserved: true
   }
