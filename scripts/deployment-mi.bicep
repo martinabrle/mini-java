@@ -36,8 +36,22 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12
   scope: resourceGroup(logAnalyticsWorkspaceRG)
 }
 
+resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
+  name: appInsightsName
+  location: location
+  kind: 'java'
+  tags: tagsArray
+  properties: {
+    Application_Type: 'web'
+    WorkspaceResourceId: logAnalyticsWorkspace.id
+  }
+}
+
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: kvName
+  dependsOn: [
+    appInsights
+  ]
   location: location
   tags: tagsArray
   properties: {
@@ -92,6 +106,13 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
       contentType: 'string'
     }
   }
+  resource appInsightsKey 'secrets@2021-11-01-preview' = {
+    name: 'APPLICATIONINSIGHTS-CONNECTION-STRING'
+    properties: {
+      value: appInsights.properties.ConnectionString
+      contentType: 'string'
+    }
+  }
 }
 
 resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
@@ -115,17 +136,6 @@ resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
       }
     ]
     workspaceId: logAnalyticsWorkspace.id
-  }
-}
-
-resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: appInsightsName
-  location: location
-  kind: 'java'
-  tags: tagsArray
-  properties: {
-    Application_Type: 'web'
-    WorkspaceResourceId: logAnalyticsWorkspace.id
   }
 }
 
@@ -267,8 +277,11 @@ resource apiService 'Microsoft.Web/sites@2021-03-01' = {
         }
         {
           name: 'SPRING_DATASOURCE_SHOW_SQL'
-          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=SPRING-DATASOURCE-SHOW-SQL)'
-          // value: 'false' 
+          value: 'false'
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
@@ -346,6 +359,10 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
           name: 'API_URI'
           value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=API-URI)'
           //'https://${apiServiceName}.azurewebsites.net/todos/'
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
