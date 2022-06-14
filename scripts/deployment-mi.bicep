@@ -444,15 +444,15 @@ module rbacWeb './deployment-mi-role-assignment-kv.bicep' = {
   }
 }
 
-// module rbacKVSecretApi './deployment-mi-role-assignment-kv-secret.bicep' = {
-//   name: 'deployment-rbac-kv-secret-api'
-//   params: {
-//     roleDefinitionId: keyVaultSecretsUser.id
-//     principalId: apiService.identity.principalId
-//     roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretAppInsightsKey.id, keyVaultSecretsUser.id)
-//     kvSecretName: keyVaultSecretAppInsightsKey.name
-//   }
-// }
+module rbacKVSecretApi './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-api-app-insights'
+  params: {
+    roleDefinitionId: keyVaultSecretsUser.id
+    principalId: apiService.identity.principalId
+    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretAppInsightsKey.id, keyVaultSecretsUser.id)
+    kvSecretName: keyVaultSecretAppInsightsKey.name
+  }
+}
 
 // TODO coming at some point..
 // module rbacPGSQL './deployment-mi-role-assignment-kv.bicep' = {
