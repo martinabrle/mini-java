@@ -284,8 +284,8 @@ resource apiService 'Microsoft.Web/sites@2021-03-01' = {
           value: 'false'
         }
         {
-           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-           value: 'whatever'
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
