@@ -415,6 +415,12 @@ resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01
   name: '4633458b-17de-408a-b874-0445c86b69e6'
 }
 
+@description('This is the built-in Key Vault Administrator User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
+resource keyVaultAdministrator 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  scope: keyVaultSecretAppInsightsKey
+  name: '00482a5a-887f-4fb3-b363-3b7fe8e74483'
+}
+
 //TODO Coming at some point.. - or some variation of
 // @description('This is the built-in Admin for PGSQL Flexible Server. Coming at some point to... https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
 // resource pgsqlFlexibleServerAdmin 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
@@ -447,9 +453,9 @@ module rbacWeb './deployment-mi-role-assignment-kv.bicep' = {
 module rbacKVSecretApi './deployment-mi-role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-api-app-insights'
   params: {
-    roleDefinitionId: keyVaultSecretsUser.id
+    roleDefinitionId: keyVaultAdministrator.id
     principalId: apiService.identity.principalId
-    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretAppInsightsKey.id, keyVaultSecretsUser.id)
+    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretAppInsightsKey.id, keyVaultAdministrator.id)
     kvSecretName: keyVaultSecretAppInsightsKey.name
   }
 }
