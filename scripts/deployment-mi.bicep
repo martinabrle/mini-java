@@ -232,9 +232,6 @@ resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@
 
 resource apiServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${apiServiceName}-plan'
-  dependsOn: [
-    postgreSQLServer
-  ]
   location: location
   tags: tagsArray
   properties: {
@@ -251,6 +248,10 @@ resource apiService 'Microsoft.Web/sites@2021-03-01' = {
   dependsOn: [
     postgreSQLServer
     keyVault
+    keyVaultSecretSpringDataSourceURL
+    keyVaultSecretSpringDatasourceUserName
+    keyVaultSecretSpringDatasourceUserPassword
+    keyVaultSecretAppInsightsKey
   ]
   location: location
   tags: tagsArray
@@ -331,10 +332,6 @@ resource apiServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-0
 
 resource webServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${webServiceName}-plan'
-  dependsOn: [
-    apiService
-    keyVault
-  ]
   location: location
   tags: tagsArray
 
@@ -349,6 +346,12 @@ resource webServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
 
 resource webService 'Microsoft.Web/sites@2021-03-01' = {
   name: webServiceName
+  dependsOn: [
+    apiService
+    keyVault
+    keyVaultSecretApiURI
+    keyVaultSecretAppInsightsKey
+  ]
   location: location
   tags: tagsArray
   identity: {
