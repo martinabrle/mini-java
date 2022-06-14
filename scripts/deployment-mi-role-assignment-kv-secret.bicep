@@ -7,12 +7,12 @@ resource keyVaultSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' e
   name: kvSecretName
 }
 
-resource keyVaultWebAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: roleAssignmentNameGuid
-  scope: keyVaultSecret
-  properties: {
-    roleDefinitionId: roleDefinitionId
-    principalId: principalId
-    principalType: 'ServicePrincipal'
-  }
-}
+// resource keyVaultWebAppServiceReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+//   name: roleAssignmentNameGuid
+//   scope: keyVaultSecret
+//   properties: {
+//     roleDefinitionId: roleDefinitionId
+//     principalId: principalId
+//     principalType: 'ServicePrincipal'
+//   }
+// }
