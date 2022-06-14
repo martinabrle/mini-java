@@ -456,6 +456,7 @@ module rbacKVSecretApi './deployment-mi-role-assignment-kv-secret.bicep' = {
     roleDefinitionId: keyVaultAdministrator.id
     principalId: apiService.identity.principalId
     roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretAppInsightsKey.id, keyVaultAdministrator.id)
+    kvName: keyVault.name
     kvSecretName: keyVaultSecretAppInsightsKey.name
   }
 }
