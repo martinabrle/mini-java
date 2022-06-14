@@ -368,7 +368,7 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
         }
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: 'whatever'
+          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
