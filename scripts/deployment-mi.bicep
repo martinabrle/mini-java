@@ -106,12 +106,14 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
       contentType: 'string'
     }
   }
-  resource appInsightsKey 'secrets@2021-11-01-preview' = {
-    name: 'APPLICATIONINSIGHTS-CONNECTION-STRING'
-    properties: {
-      value: appInsights.properties.ConnectionString
-      contentType: 'string'
-    }
+}
+
+resource keyVaultSecretAppInsightsKey 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: keyVault
+  name: 'APPLICATIONINSIGHTS-CONNECTION-STRING'
+  properties: {
+    value: appInsights.properties.ConnectionString
+    contentType: 'string'
   }
 }
 
@@ -439,6 +441,16 @@ module rbacWeb './deployment-mi-role-assignment-kv.bicep' = {
     principalId: webService.identity.principalId
     roleAssignmentNameGuid: guid(webService.id, webService.id, keyVaultSecretsUser.id)
     kvName: keyVault.name
+  }
+}
+
+module rbacKVSecretApi './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-api'
+  params: {
+    roleDefinitionId: keyVaultSecretsUser.id
+    principalId: apiService.identity.principalId
+    roleAssignmentNameGuid: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
+    kvSecretName: keyVaultSecretAppInsightsKey.name
   }
 }
 
