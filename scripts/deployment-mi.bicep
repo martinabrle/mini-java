@@ -283,10 +283,10 @@ resource apiService 'Microsoft.Web/sites@2021-03-01' = {
           name: 'SPRING_DATASOURCE_SHOW_SQL'
           value: 'false'
         }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
-        }
+        // {
+        //   name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+        //   value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
+        // }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
           value: 'false'
@@ -366,10 +366,10 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
           value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=API-URI)'
           //'https://${apiServiceName}.azurewebsites.net/todos/'
         }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
-        }
+        // {
+        //   name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+        //   value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
+        // }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
           value: 'false'
