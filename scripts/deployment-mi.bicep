@@ -78,33 +78,31 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
       contentType: 'string'
     }
   }
-  resource databaseReaderUserName 'secrets@2021-11-01-preview' = {
-    name: 'SPRING-DATASOURCE-USERNAME'
-    properties: {
-      value: dbUserName
-      contentType: 'string'
-    }
+}
+
+resource keyVaultSecretSpringDatasourceUserName 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: keyVault
+  name: 'SPRING-DATASOURCE-USERNAME'
+  properties: {
+    value: dbUserName
+    contentType: 'string'
   }
-  resource databaseReaderUserPassword 'secrets@2021-11-01-preview' = {
-    name: 'SPRING-DATASOURCE-PASSWORD'
-    properties: {
-      value: dbUserPassword
-      contentType: 'string'
-    }
+}
+resource keyVaultSecretSpringDatasourceUserPassword 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: keyVault
+  name: 'SPRING-DATASOURCE-PASSWORD'
+  properties: {
+    value: dbUserPassword
+    contentType: 'string'
   }
-  resource springDataSourceURL 'secrets@2021-11-01-preview' = {
-    name: 'SPRING-DATASOURCE-URL'
-    properties: {
-      value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
-      contentType: 'string'
-    }
-  }
-  resource apiURI 'secrets@2021-11-01-preview' = {
-    name: 'API-URI'
-    properties: {
-      value: 'https://${apiServiceName}.azurewebsites.net/todos/'
-      contentType: 'string'
-    }
+}
+
+resource  keyVaultSecretSpringDataSourceURL 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: keyVault
+  name: 'SPRING-DATASOURCE-URL'
+  properties: {
+    value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
+    contentType: 'string'
   }
 }
 
@@ -113,6 +111,15 @@ resource keyVaultSecretAppInsightsKey 'Microsoft.KeyVault/vaults/secrets@2021-11
   name: 'APPLICATIONINSIGHTS-CONNECTION-STRING'
   properties: {
     value: appInsights.properties.ConnectionString
+    contentType: 'string'
+  }
+}
+
+resource keyVaultSecretApiURI 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: keyVault
+  name: 'API-URI'
+  properties: {
+    value: 'https://${apiServiceName}.azurewebsites.net/todos/'
     contentType: 'string'
   }
 }
@@ -450,7 +457,40 @@ module rbacWeb './deployment-mi-role-assignment-kv.bicep' = {
   }
 }
 
-module rbacKVSecretApi './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretApiSpringDatasourceUserName './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-api-spring-datasource-user-name'
+  params: {
+    roleDefinitionId: keyVaultAdministrator.id
+    principalId: apiService.identity.principalId
+    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretSpringDatasourceUserName.id, keyVaultAdministrator.id)
+    kvName: keyVault.name
+    kvSecretName: keyVaultSecretSpringDatasourceUserName.name
+  }
+}
+
+module rbacKVSecretApiSpringDatasourceUserPassword './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-api-spring-datasource-user-password'
+  params: {
+    roleDefinitionId: keyVaultAdministrator.id
+    principalId: apiService.identity.principalId
+    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretSpringDatasourceUserPassword.id, keyVaultAdministrator.id)
+    kvName: keyVault.name
+    kvSecretName: keyVaultSecretSpringDatasourceUserPassword.name
+  }
+}
+
+module rbacKVSecretApiSpringDataSourceURL './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-api-spring-datasource-url'
+  params: {
+    roleDefinitionId: keyVaultAdministrator.id
+    principalId: apiService.identity.principalId
+    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretSpringDataSourceURL.id, keyVaultAdministrator.id)
+    kvName: keyVault.name
+    kvSecretName: keyVaultSecretSpringDataSourceURL.name
+  }
+}
+
+module rbacKVSecretApiAppInsightsKey './deployment-mi-role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-api-app-insights'
   params: {
     roleDefinitionId: keyVaultAdministrator.id
@@ -460,6 +500,29 @@ module rbacKVSecretApi './deployment-mi-role-assignment-kv-secret.bicep' = {
     kvSecretName: keyVaultSecretAppInsightsKey.name
   }
 }
+
+module rbacKVSecretWebAppInsightsKey './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-web-app-insights'
+  params: {
+    roleDefinitionId: keyVaultAdministrator.id
+    principalId: webService.identity.principalId
+    roleAssignmentNameGuid: guid(webService.id, keyVaultSecretAppInsightsKey.id, keyVaultAdministrator.id)
+    kvName: keyVault.name
+    kvSecretName: keyVaultSecretAppInsightsKey.name
+  }
+}
+
+module rbacKVSecretApiWebApiUri './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-web-api-uri'
+  params: {
+    roleDefinitionId: keyVaultAdministrator.id
+    principalId: webService.identity.principalId
+    roleAssignmentNameGuid: guid(webService.id, keyVaultSecretApiURI.id, keyVaultAdministrator.id)
+    kvName: keyVault.name
+    kvSecretName: keyVaultSecretApiURI.name
+  }
+}
+
 
 // TODO coming at some point..
 // module rbacPGSQL './deployment-mi-role-assignment-kv.bicep' = {
