@@ -64,19 +64,23 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
     enableRbacAuthorization: true
     enableSoftDelete: true
   }
-  resource databaseAdminName 'secrets@2021-11-01-preview' = {
-    name: 'DB-ADMIN-NAME'
-    properties: {
-      value: dbAdminName
-      contentType: 'string'
-    }
+}
+
+resource keyVaultSecretDatabaseAdminName 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: keyVault
+  name: 'DB-ADMIN-NAME'
+  properties: {
+    value: dbAdminName
+    contentType: 'string'
   }
-  resource databaseAdminPassword 'secrets@2021-11-01-preview' = {
-    name: 'DB-ADMIN-PASSWORD'
-    properties: {
-      value: dbAdminPassword
-      contentType: 'string'
-    }
+}
+
+resource keyVaultSecretDatabaseAdminPassword 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: keyVault
+  name: 'DB-ADMIN-PASSWORD'
+  properties: {
+    value: dbAdminPassword
+    contentType: 'string'
   }
 }
 
@@ -265,44 +269,52 @@ resource apiService 'Microsoft.Web/sites@2021-03-01' = {
       scmType: 'None'
     }
   }
-  resource apiServicePARMS 'config@2021-03-01' = {
-    name: 'web'
-    kind: 'string'
-    properties: {
-      appSettings: [
-        {
-          name: 'PORT'
-          value: apiServicePort
-        }
-        {
-          name: 'SPRING_DATASOURCE_URL'
-          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=SPRING-DATASOURCE-URL)'
-          //value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
-        }
-        {
-          name: 'SPRING_DATASOURCE_USERNAME'
-          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=SPRING-DATASOURCE-USERNAME)'
-          //value: dbUserName
-        }
-        {
-          name: 'SPRING_DATASOURCE_PASSWORD'
-          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=SPRING-DATASOURCE-PASSWORD)'
-          //value: dbUserPassword
-        }
-        {
-          name: 'SPRING_DATASOURCE_SHOW_SQL'
-          value: 'false'
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
-        }
-        {
-          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'false'
-        }
-      ]
-    }
+}
+
+resource apiServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
+  name: '${apiServiceName}/web'
+  dependsOn: [
+    apiService
+    rbacKVSecretApiSpringDataSourceURL
+    rbacKVSecretApiSpringDatasourceUserName
+    rbacKVSecretApiSpringDatasourceUserPassword
+    rbacKVSecretApiAppInsightsKey
+  ]
+  kind: 'string'
+  properties: {
+    appSettings: [
+      {
+        name: 'PORT'
+        value: apiServicePort
+      }
+      {
+        name: 'SPRING_DATASOURCE_URL'
+        value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=SPRING-DATASOURCE-URL)'
+        //value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
+      }
+      {
+        name: 'SPRING_DATASOURCE_USERNAME'
+        value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=SPRING-DATASOURCE-USERNAME)'
+        //value: dbUserName
+      }
+      {
+        name: 'SPRING_DATASOURCE_PASSWORD'
+        value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=SPRING-DATASOURCE-PASSWORD)'
+        //value: dbUserPassword
+      }
+      {
+        name: 'SPRING_DATASOURCE_SHOW_SQL'
+        value: 'false'
+      }
+      {
+        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+        value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
+      }
+      {
+        name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+        value: 'false'
+      }
+    ]
   }
 }
 
