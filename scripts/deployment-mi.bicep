@@ -272,9 +272,9 @@ resource apiService 'Microsoft.Web/sites@2021-03-01' = {
 }
 
 resource apiServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
-  name: '${apiServiceName}/web'
+  name: 'web'
+  parent: apiService
   dependsOn: [
-    apiService
     rbacKVSecretApiSpringDataSourceURL
     rbacKVSecretApiSpringDatasourceUserName
     rbacKVSecretApiSpringDatasourceUserPassword
@@ -376,30 +376,36 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
       scmType: 'None'
     }
   }
-  resource webServicePARMS 'config@2021-03-01' = {
-    name: 'web'
-    kind: 'string'
-    properties: {
-      appSettings: [
-        {
-          name: 'PORT'
-          value: webServicePort
-        }
-        {
-          name: 'API_URI'
-          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=API-URI)'
-          //'https://${apiServiceName}.azurewebsites.net/todos/'
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
-        }
-        {
-          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'false'
-        }
-      ]
-    }
+}
+
+resource webServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
+  name: 'web'
+  parent: webService
+  dependsOn: [
+    rbacKVSecretApiWebApiUri
+    rbacKVSecretWebAppInsightsKey
+  ]
+  kind: 'string'
+  properties: {
+    appSettings: [
+      {
+        name: 'PORT'
+        value: webServicePort
+      }
+      {
+        name: 'API_URI'
+        value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=API-URI)'
+        //'https://${apiServiceName}.azurewebsites.net/todos/'
+      }
+      {
+        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+        value: '@Microsoft.KeyVault(VaultName=${kvName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
+      }
+      {
+        name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+        value: 'false'
+      }
+    ]
   }
 }
 
