@@ -425,11 +425,11 @@ resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01
   name: '4633458b-17de-408a-b874-0445c86b69e6'
 }
 
-@description('This is the built-in Key Vault Administrator User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
-resource keyVaultAdministrator 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-  scope: keyVaultSecretAppInsightsKey
-  name: '00482a5a-887f-4fb3-b363-3b7fe8e74483'
-}
+// @description('This is the built-in Key Vault Administrator User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
+// resource keyVaultAdministrator 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+//   scope: keyVaultSecretAppInsightsKey
+//   name: '00482a5a-887f-4fb3-b363-3b7fe8e74483'
+// }
 
 //TODO Coming at some point.. - or some variation of
 // @description('This is the built-in Admin for PGSQL Flexible Server. Coming at some point to... https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
@@ -440,32 +440,34 @@ resource keyVaultAdministrator 'Microsoft.Authorization/roleDefinitions@2018-01-
 
 // to deploy to different scope, we need to utilize modules
 // as we're trying to have the least possible assignment scope
-module rbac './deployment-mi-role-assignment-kv.bicep' = {
-  name: 'deployment-rbac-api'
-  params: {
-    roleDefinitionId: keyVaultSecretsUser.id
-    principalId: apiService.identity.principalId
-    roleAssignmentNameGuid: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
-    kvName: keyVault.name
-  }
-}
+// Even though these assignments below work, let's try to avoid
+// too broad of an access
+// module rbac './deployment-mi-role-assignment-kv.bicep' = {
+//   name: 'deployment-rbac-api'
+//   params: {
+//     roleDefinitionId: keyVaultSecretsUser.id
+//     principalId: apiService.identity.principalId
+//     roleAssignmentNameGuid: guid(apiService.id, apiService.id, keyVaultSecretsUser.id)
+//     kvName: keyVault.name
+//   }
+// }
 
-module rbacWeb './deployment-mi-role-assignment-kv.bicep' = {
-  name: 'deployment-rbac-web'
-  params: {
-    roleDefinitionId: keyVaultSecretsUser.id
-    principalId: webService.identity.principalId
-    roleAssignmentNameGuid: guid(webService.id, webService.id, keyVaultSecretsUser.id)
-    kvName: keyVault.name
-  }
-}
+// module rbacWeb './deployment-mi-role-assignment-kv.bicep' = {
+//   name: 'deployment-rbac-web'
+//   params: {
+//     roleDefinitionId: keyVaultSecretsUser.id
+//     principalId: webService.identity.principalId
+//     roleAssignmentNameGuid: guid(webService.id, webService.id, keyVaultSecretsUser.id)
+//     kvName: keyVault.name
+//   }
+// }
 
 module rbacKVSecretApiSpringDatasourceUserName './deployment-mi-role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-api-spring-datasource-user-name'
   params: {
-    roleDefinitionId: keyVaultAdministrator.id
+    roleDefinitionId: keyVaultSecretsUser.id
     principalId: apiService.identity.principalId
-    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretSpringDatasourceUserName.id, keyVaultAdministrator.id)
+    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretSpringDatasourceUserName.id, keyVaultSecretsUser.id)
     kvName: keyVault.name
     kvSecretName: keyVaultSecretSpringDatasourceUserName.name
   }
@@ -474,9 +476,9 @@ module rbacKVSecretApiSpringDatasourceUserName './deployment-mi-role-assignment-
 module rbacKVSecretApiSpringDatasourceUserPassword './deployment-mi-role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-api-spring-datasource-user-password'
   params: {
-    roleDefinitionId: keyVaultAdministrator.id
+    roleDefinitionId: keyVaultSecretsUser.id
     principalId: apiService.identity.principalId
-    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretSpringDatasourceUserPassword.id, keyVaultAdministrator.id)
+    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretSpringDatasourceUserPassword.id, keyVaultSecretsUser.id)
     kvName: keyVault.name
     kvSecretName: keyVaultSecretSpringDatasourceUserPassword.name
   }
@@ -485,9 +487,9 @@ module rbacKVSecretApiSpringDatasourceUserPassword './deployment-mi-role-assignm
 module rbacKVSecretApiSpringDataSourceURL './deployment-mi-role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-api-spring-datasource-url'
   params: {
-    roleDefinitionId: keyVaultAdministrator.id
+    roleDefinitionId: keyVaultSecretsUser.id
     principalId: apiService.identity.principalId
-    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretSpringDataSourceURL.id, keyVaultAdministrator.id)
+    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretSpringDataSourceURL.id, keyVaultSecretsUser.id)
     kvName: keyVault.name
     kvSecretName: keyVaultSecretSpringDataSourceURL.name
   }
@@ -496,9 +498,9 @@ module rbacKVSecretApiSpringDataSourceURL './deployment-mi-role-assignment-kv-se
 module rbacKVSecretApiAppInsightsKey './deployment-mi-role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-api-app-insights'
   params: {
-    roleDefinitionId: keyVaultAdministrator.id
+    roleDefinitionId: keyVaultSecretsUser.id
     principalId: apiService.identity.principalId
-    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretAppInsightsKey.id, keyVaultAdministrator.id)
+    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretAppInsightsKey.id, keyVaultSecretsUser.id)
     kvName: keyVault.name
     kvSecretName: keyVaultSecretAppInsightsKey.name
   }
@@ -507,9 +509,9 @@ module rbacKVSecretApiAppInsightsKey './deployment-mi-role-assignment-kv-secret.
 module rbacKVSecretWebAppInsightsKey './deployment-mi-role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-web-app-insights'
   params: {
-    roleDefinitionId: keyVaultAdministrator.id
+    roleDefinitionId: keyVaultSecretsUser.id
     principalId: webService.identity.principalId
-    roleAssignmentNameGuid: guid(webService.id, keyVaultSecretAppInsightsKey.id, keyVaultAdministrator.id)
+    roleAssignmentNameGuid: guid(webService.id, keyVaultSecretAppInsightsKey.id, keyVaultSecretsUser.id)
     kvName: keyVault.name
     kvSecretName: keyVaultSecretAppInsightsKey.name
   }
@@ -518,9 +520,9 @@ module rbacKVSecretWebAppInsightsKey './deployment-mi-role-assignment-kv-secret.
 module rbacKVSecretApiWebApiUri './deployment-mi-role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-web-api-uri'
   params: {
-    roleDefinitionId: keyVaultAdministrator.id
+    roleDefinitionId: keyVaultSecretsUser.id
     principalId: webService.identity.principalId
-    roleAssignmentNameGuid: guid(webService.id, keyVaultSecretApiURI.id, keyVaultAdministrator.id)
+    roleAssignmentNameGuid: guid(webService.id, keyVaultSecretApiURI.id, keyVaultSecretsUser.id)
     kvName: keyVault.name
     kvSecretName: keyVaultSecretApiURI.name
   }
@@ -528,7 +530,7 @@ module rbacKVSecretApiWebApiUri './deployment-mi-role-assignment-kv-secret.bicep
 
 
 // TODO coming at some point..
-// module rbacPGSQL './deployment-mi-role-assignment-kv.bicep' = {
+// module rbacPGSQL './deployment-mi-role-assignment-pgsql.bicep' = {
 //   name: 'deployment-rbac-pgsql'
 //   params: {
 //     roleDefinitionId: pgsqlFlexibleServerAdmin.id
