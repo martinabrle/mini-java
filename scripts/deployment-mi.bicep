@@ -21,8 +21,8 @@ param eventHubClientId string
 @secure()
 param eventHubClientSecret string
 
-param eventHubTenantId string = subscription().id //event hub may be in another tenant
-param eventHubSubscriptionId string = tenant().tenantId //event hub may be in another subscription
+param eventHubTenantId string =  tenant().tenantId //event hub may be in another tenant
+param eventHubSubscriptionId string = subscription().id //event hub may be in another subscription
 param eventHubRG string
 param eventHubNamespaceName string
 param springCloudStreamInDestination string
@@ -50,7 +50,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12
 
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2022-01-01-preview' existing = {
   name: eventHubNamespaceName
-  scope: resourceGroup(eventHubSubscriptionId, eventHubRG)
+  scope: resourceGroup(eventHubRG)
 }
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
@@ -208,13 +208,20 @@ resource keyVaultSecretSpringCloudStreamOutDestination 'Microsoft.KeyVault/vault
   }
 }
 
-var listEventHubKeysEndpoint = '${eventHubNamespace.id}/AuthorizationRules/RootManageSharedAccessKey'
+resource eventHubNamespaceRootManageSharedAccessKey 'Microsoft.EventHub/namespaces/authorizationRules@2021-11-01' existing = {
+  parent: eventHubNamespace
+  name: 'RootManageSharedAccessKey'
+
+}
+
+// var listEventHubKeysEndpoint = '${eventHubNamespace.id}/AuthorizationRules/RootManageSharedAccessKey'
+// var eventHubNamespaceConnectionString = 'Endpoint=sb://${eventHubNamespace.name}.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=${listKeys(listEventHubKeysEndpoint, eventHubNamespace.apiVersion).primaryKey}'
 
 resource keyVaultSecretAzureEventHubConnectionString 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
   name: 'AZURE-EVENTHUB-NAMESPACE-CONNECTION-STRING'
   properties: {
-    value: '${listKeys(listEventHubKeysEndpoint, eventHubNamespace.apiVersion).primaryKey}'
+    value: eventHubNamespaceRootManageSharedAccessKey.listKeys().primaryConnectionString
     contentType: 'string'
   }
 }

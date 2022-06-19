@@ -38,6 +38,12 @@ param location string = resourceGroup().location
 
 param tagsArray object = resourceGroup().tags
 
+
+resource eventHubNamespace 'Microsoft.EventHub/namespaces@2022-01-01-preview' existing = {
+  name: eventHubNamespaceName
+  scope: resourceGroup(eventHubSubscriptionId, eventHubRG)
+}
+
 resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01' = {
   name: dbServerName
   location: location
@@ -177,6 +183,15 @@ resource webServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   kind: 'linux'
 }
 
+resource eventHubNamespaceRootManageSharedAccessKey 'Microsoft.EventHub/namespaces/authorizationRules@2021-11-01' existing = {
+  parent: eventHubNamespace
+  name: 'RootManageSharedAccessKey'
+
+}
+
+// var listEventHubKeysEndpoint = '${eventHubNamespace.id}/AuthorizationRules/RootManageSharedAccessKey'
+// var eventHubNamespaceConnectionString = 'Endpoint=sb://${eventHubNamespace.name}.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=${listKeys(listEventHubKeysEndpoint, eventHubNamespace.apiVersion).primaryKey}'
+
 resource webService 'Microsoft.Web/sites@2021-03-01' = {
   name: webServiceName
   location: location
@@ -203,6 +218,10 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
         {
           name: 'API_URI'
           value: 'https://${apiServiceName}.azurewebsites.net/todos/'
+        }
+        {
+          name: 'AZURE-EVENTHUB-NAMESPACE-CONNECTION-STRING'
+          value: eventHubNamespaceRootManageSharedAccessKey.listKeys().primaryConnectionString
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
