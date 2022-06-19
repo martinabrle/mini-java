@@ -49,6 +49,7 @@ jobs:
   deploy_event_hub_if_needed:
     # Having this as a separte Job, as there are many situations where Log Analytics
     # workspace would be outside of the current subscription
+    needs: [cleanup_if_requested]
     runs-on: ubuntu-latest
     environment: APP_SERVICE_SIMPLE
     defaults:
