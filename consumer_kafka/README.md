@@ -9,7 +9,7 @@ https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure
 
 * Set and export following variables for this consumer to connect to EventHub (with examples):
 * * UNIX: 
-  ```
+  ``
 export SPRING_DATASOURCE_URL=jdbc:postgresql://PGSQL_SERVER_NAME.postgres.database.azure.com:5432/PGSQL_DATABASE_NAME
 export SPRING_DATASOURCE_USERNAME=YOUR_GENERATED_USER_NAME
 export SPRING_DATASOURCE_PASSWORD=YOUR_GENERATED_USER_PASSWORD_
