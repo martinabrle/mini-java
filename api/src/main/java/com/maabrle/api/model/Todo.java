@@ -1,4 +1,4 @@
-package com.maabrle.api;
+package com.maabrle.api.model;
 
 import java.util.Date;
 import java.util.Objects;
@@ -12,12 +12,14 @@ import javax.persistence.Id;
 public class Todo {
 
 	private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
-    private Date createdDateTime;
+	private Date createdDateTime;
 	private String todoText;
 	private Date completedDateTime;
 	private String trackingId;
 
-	private Todo() {}
+	@SuppressWarnings("unused")
+	private Todo() {
+	}
 
 	public Todo(Date createdDateTime, String todoText, Date completedDateTime) {
 		this.createdDateTime = createdDateTime;
@@ -27,14 +29,19 @@ public class Todo {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		Todo todo = (Todo) o;
 		return Objects.equals(id, todo.id) &&
-            ((createdDateTime == null && todo.createdDateTime == null) || (createdDateTime != null && createdDateTime.compareTo(todo.createdDateTime) == 0)) &&
-			Objects.equals(todoText, todo.todoText) &&
-			Objects.equals(trackingId, todo.trackingId) &&
-            ((completedDateTime == null && todo.completedDateTime == null) || (completedDateTime != null && completedDateTime.compareTo(todo.completedDateTime) == 0));
+				((createdDateTime == null && todo.createdDateTime == null)
+						|| (createdDateTime != null && createdDateTime.compareTo(todo.createdDateTime) == 0))
+				&&
+				Objects.equals(todoText, todo.todoText) &&
+				Objects.equals(trackingId, todo.trackingId) &&
+				((completedDateTime == null && todo.completedDateTime == null)
+						|| (completedDateTime != null && completedDateTime.compareTo(todo.completedDateTime) == 0));
 	}
 
 	@Override
@@ -77,12 +84,13 @@ public class Todo {
 
 	@Override
 	public String toString() {
-		return "Todo{" +
-			"id=" + id +
-			", todoText='" + todoText + '\'' +
-			", created='" + createdDateTime + '\'' +
-			", trackingId='" + trackingId + '\'' +
-			", completed='" + completedDateTime + '\'' +
-			'}';
+
+		return "{" +
+				"id=" + id +
+				", todoText='" + (todoText != null ? todoText : "").replace("\'", "\\'") + '\'' +
+				", created='" + createdDateTime + '\'' +
+				", trackingId='" + trackingId + '\'' +
+				", completed='" + completedDateTime + '\'' +
+				'}';
 	}
 }

@@ -1,10 +1,17 @@
 package com.maabrle.web.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
 public class Todo {
+    public static final Logger LOGGER = LoggerFactory.getLogger(Todo.class);
 
     private long id;
 
@@ -16,8 +23,9 @@ public class Todo {
 
     private String trackingId;
 
-    public Todo() {}
-    
+    public Todo() {
+    }
+
     public Todo(long id, Date createdDateTime, String todoText) {
         this.id = id;
         this.createdDateTime = createdDateTime;
@@ -63,5 +71,23 @@ public class Todo {
             return "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss ");
         return "Created: " + sdf.format(createdDateTime);
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (JsonProcessingException ex) {
+            LOGGER.error("Failed to convert Todo into a string: {}\n{}", ex.getMessage(), ex);
+        }
+        // This is just for the impossible case where the ObjectMapper throws an
+        // exception
+        return "{" +
+                "id=" + id +
+                ", todoText='" + (todoText != null ? todoText : "").replace("\'", "\\'") + '\'' +
+                ", created='" + createdDateTime + '\'' +
+                ", trackingId='" + trackingId + '\'' +
+                ", completed='" + completedDateTime + '\'' +
+                '}';
     }
 }

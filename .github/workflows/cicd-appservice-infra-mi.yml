@@ -81,6 +81,48 @@ jobs:
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                      logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}
 
+deploy_event_hub_if_needed:
+    # Having this as a separte Job, as there are many situations where Log Analytics
+    # workspace would be outside of the current subscription
+    needs: [cleanup_if_requested]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./scripts
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set default Azure subscription
+        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Check the resource group exists
+        id: event_hub_rg_exists
+        run: |
+          EVENT_HUB_RG_EXISTS=$(az group exists --name ${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
+          echo "::set-output name=EVENT_HUB_RG_EXISTS::${EVENT_HUB_RG_EXISTS}"
+
+      - name: Create Logs Workspace Azure resource group
+        if: steps.event_hub_rg_exists.outputs.EVENT_HUB_RG_EXISTS == 'false'
+        run: |
+          az deployment sub create \
+           --location ${{ secrets.AZURE_LOCATION }} \
+           --template-file ./deployment-rg.bicep \
+           --parameters name=${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
+
+      - name: Deploy EventHub
+        if: steps.event_hub_rg_exists.outputs.EVENT_HUB_RG_EXISTS == 'false'
+        run: |
+          az deployment group create --resource-group ${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} --template-file ./deployment-event-hub.bicep \
+                        --parameters location=${{ secrets.AZURE_LOCATION }} \
+                                     eventHubNamespaceName=${{ secrets.AZURE_EVENT_HUB_NAMESPACE }} \
+                                     eventHubName=${{ secrets.SPRING_CLOUD_STREAM_OUT_DESTINATION }}
+
   deploy_infra:
     needs: [deploy_log_analytics_if_needed]
 
@@ -113,7 +155,7 @@ jobs:
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                      logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}  \
                                      logAnalyticsWorkspaceRG=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }}  \
-                                     kvName=${{ secrets.AZURE_KV_NAME }}  \
+                                     keyVaultName=${{ secrets.AZURE_KEY_VAULT_NAME }}  \
                                      appInsightsName=${{ secrets.AZURE_APP_INSIGHTS_NAME }}  \
                                      dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                      dbName=${{ secrets.AZURE_DB_NAME }} \
@@ -121,10 +163,18 @@ jobs:
                                      dbAdminPassword=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} \
                                      dbUserName=${{ secrets.AZURE_API_DB_USER_NAME }} \
                                      dbUserPassword=${{ secrets.AZURE_API_DB_USER_PASSWORD }} \
+                                     eventHubClientId=${{ secrets.AZURE_EVENT_HUB_CLIENT_ID }} \
+                                     eventHubClientSecret=${{ secrets.AZURE_EVENT_HUB_CLIENT_SECRET }} \
+                                     eventHubRG=${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} \
+                                     eventHubNamespaceName=${{ secrets.AZURE_EVENT_HUB_NAMESPACE }} \
+                                     springCloudStreamInDestination=${{ secrets.SPRING_CLOUD_STREAM_IN_DESTINATION }} \
+                                     springCloudStreamInGroup=${{ secrets.SPRING_CLOUD_STREAM_IN_GROUP }} \
+                                     springCloudStreamOutDestination=${{ secrets.SPRING_CLOUD_STREAM_OUT_DESTINATION }} \
                                      apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
                                      apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
                                      webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
                                      webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
+                                     eventConsumerServiceName=${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_NAME }} \
                                      clientIPAddress=$clientIP
       
       #Debug: - name: Setup tmate session
