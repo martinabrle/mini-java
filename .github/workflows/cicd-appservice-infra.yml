@@ -78,7 +78,7 @@ jobs:
           az deployment sub create \
            --location ${{ secrets.AZURE_LOCATION }} \
            --template-file ./deployment-rg.bicep \
-           --parameters name=${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
+           --parameters name=${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }} resourceTags="${{ secrets.AZURE_RESOURCE_TAGS }}"
 
       - name: Deploy EventHub
         if: steps.event_hub_rg_exists.outputs.EVENT_HUB_RG_EXISTS == 'false'
@@ -111,7 +111,7 @@ jobs:
           az deployment sub create \
            --location ${{ secrets.AZURE_LOCATION }} \
            --template-file ./deployment-rg.bicep \
-           --parameters name=${{ secrets.AZURE_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
+           --parameters name=${{ secrets.AZURE_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }} resourceTags="${{ secrets.AZURE_RESOURCE_TAGS }}"
 
       - name: Deploy Azure resources
         run: |
