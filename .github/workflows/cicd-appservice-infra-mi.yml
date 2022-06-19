@@ -107,7 +107,7 @@ jobs:
           EVENT_HUB_RG_EXISTS=$(az group exists --name ${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
           echo "::set-output name=EVENT_HUB_RG_EXISTS::${EVENT_HUB_RG_EXISTS}"
 
-      - name: Create Logs Workspace Azure resource group
+      - name: Create Event Hub Namespace Azure resource group
         if: steps.event_hub_rg_exists.outputs.EVENT_HUB_RG_EXISTS == 'false'
         run: |
           az deployment sub create \
