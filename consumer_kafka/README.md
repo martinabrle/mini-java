@@ -5,8 +5,6 @@
 * [Create an Azure EventHub](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#create-an-azure-event-hub-using-the-azure-portal)
 * [Sign in into Azure from your command line (az login) and set your subscription](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#sign-in-to-azure-and-set-your-subscription)
 * [Create an Azure service principal for this app](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#create-a-service-principal)
-https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#sign-in-to-azure-and-set-your-subscription
-
 * Set and export following variables for this consumer to connect to EventHub (with examples):
 * * UNIX: 
 ```
