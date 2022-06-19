@@ -208,11 +208,13 @@ resource keyVaultSecretSpringCloudStreamOutDestination 'Microsoft.KeyVault/vault
   }
 }
 
+var listEventHubKeysEndpoint = '${eventHubNamespace.id}/AuthorizationRules/RootManageSharedAccessKey'
+
 resource keyVaultSecretAzureEventHubConnectionString 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
   name: 'AZURE-EVENTHUB-NAMESPACE-CONNECTION-STRING'
   properties: {
-    value: 'TODO fix'
+    value: '${listKeys(listEventHubKeysEndpoint, eventHubNamespace.apiVersion).primaryKey}'
     contentType: 'string'
   }
 }
