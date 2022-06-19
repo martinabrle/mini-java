@@ -49,7 +49,6 @@ jobs:
   deploy_event_hub_if_needed:
     # Having this as a separte Job, as there are many situations where Log Analytics
     # workspace would be outside of the current subscription
-    needs: [cleanup_if_requested]
     runs-on: ubuntu-latest
     environment: APP_SERVICE_SIMPLE
     defaults:
@@ -89,7 +88,7 @@ jobs:
                                      eventHubName=${{ secrets.SPRING_CLOUD_STREAM_OUT_DESTINATION }}
 
   deploy_infra:
-    needs: [cleanup_if_requested]
+    needs: [deploy_event_hub_if_needed]
     runs-on: ubuntu-latest
     environment: APP_SERVICE_SIMPLE
     defaults:
