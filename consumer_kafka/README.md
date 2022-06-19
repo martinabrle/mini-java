@@ -5,7 +5,7 @@
 * [Create an Azure EventHub](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#create-an-azure-event-hub-using-the-azure-portal)
 * [Sign in into Azure from your command line (az login) and set your subscription](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#sign-in-to-azure-and-set-your-subscription)
 * [Create an Azure service principal for this app](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#create-a-service-principal)
-* Set and export following variables for this consumer to connect to the previously created EventHub:
+* Set and export following variables for this ```consumer_kafka``` service to connect to the previously created EventHub:
     * UNIX Shell:
       ```
       export SPRING_DATASOURCE_URL=jdbc:postgresql://PGSQL_SERVER_NAME.postgres.database.azure.com:5432/PGSQL_DATABASE_NAME
@@ -38,4 +38,3 @@
       ```
 * Start the event consumer app using ```./mvnw spring-boot:run```
 * If you configured [capturing of events in Azure Blob Storage or Azure Data Lake Storage](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-capture-overview), you can check your storage account and review archived events
-
