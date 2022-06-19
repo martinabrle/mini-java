@@ -123,7 +123,7 @@ jobs:
                                      eventHubNamespaceName=${{ secrets.AZURE_EVENT_HUB_NAMESPACE }} \
                                      eventHubName=${{ secrets.SPRING_CLOUD_STREAM_OUT_DESTINATION }}
   deploy_infra:
-    needs: [deploy_log_analytics_if_needed]
+    needs: [deploy_log_analytics_if_needed, deploy_event_hub_if_needed]
 
     runs-on: ubuntu-latest
     defaults:
