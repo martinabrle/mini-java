@@ -1,11 +1,7 @@
 param logAnalyticsWorkspaceName string
 param location string = resourceGroup().location
 
-param tagsArray object = {
-  workload: 'DEVTEST'
-  costCentre: 'FIN'
-  department: 'RESEARCH'
-}
+param tagsArray object = resourceGroup().tags
 
 // resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' = {
 //   name: logAnalyticsWorkspaceName

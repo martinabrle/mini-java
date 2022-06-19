@@ -1,7 +1,3 @@
-param logAnalyticsWorkspaceName string
-param logAnalyticsWorkspaceRG string
-param appInsightsName string
-
 param dbServerName string
 param dbName string
 
@@ -15,6 +11,19 @@ param dbUserName string
 @secure()
 param dbUserPassword string
 
+@secure()
+param eventHubClientId string
+@secure()
+param eventHubClientSecret string
+
+param eventHubTenantId string = subscription().id //event hub may be in another tenant
+param eventHubSubscriptionId string = tenant().tenantId //event hub may be in another subscription
+param eventHubRG string
+param eventHubNamespaceName string
+param springCloudStreamInDestination string
+param springCloudStreamInGroup string
+param springCloudStreamOutDestination string
+
 param clientIPAddress string
 param apiServiceName string
 param apiServicePort string
@@ -22,18 +31,12 @@ param apiServicePort string
 param webServiceName string
 param webServicePort string
 
+param eventConsumerServiceName string
+param eventConsumerServicePort string
+
 param location string = resourceGroup().location
 
-param tagsArray object = {
-  workload: 'DEVTEST'
-  costCentre: 'FIN'
-  department: 'RESEARCH'
-}
-
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
-  name: logAnalyticsWorkspaceName
-  scope: resourceGroup(logAnalyticsWorkspaceRG)
-}
+param tagsArray object = resourceGroup().tags
 
 resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01' = {
   name: dbServerName
@@ -200,6 +203,101 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
         {
           name: 'API_URI'
           value: 'https://${apiServiceName}.azurewebsites.net/todos/'
+        }
+        {
+          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+          value: 'false'
+        }
+      ]
+    }
+  }
+}
+
+resource eventConsumerServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
+  name: '${eventConsumerServiceName}-plan'
+  location: location
+  tags: tagsArray
+
+  properties: {
+    reserved: true
+  }
+  sku: {
+    name: 'S1'
+  }
+  kind: 'linux'
+}
+
+resource eventConsumerService 'Microsoft.Web/sites@2021-03-01' = {
+  name: eventConsumerServiceName
+  location: location
+  tags: tagsArray
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    serverFarmId: eventConsumerServicePlan.id
+    siteConfig: {
+      linuxFxVersion: 'JAVA|11-java11'
+      scmType: 'None'
+    }
+  }
+
+  resource eventConsumerServicePARMS 'config@2021-03-01' = {
+    name: 'web'
+    kind: 'string'
+    properties: {
+      appSettings: [
+        {
+          name: 'PORT'
+          value: eventConsumerServicePort
+        }
+        {
+          name: 'SPRING_DATASOURCE_URL'
+          value: 'jdbc:postgresql://${dbServerName}.postgres.database.azure.com:5432/${dbName}'
+        }
+        {
+          name: 'SPRING_DATASOURCE_USERNAME'
+          value: dbUserName
+        }
+        {
+          name: 'SPRING_DATASOURCE_PASSWORD'
+          value: dbUserPassword
+        }
+        {
+          name: 'AZURE_EVENT_HUB_CLIENT_ID'
+          value: eventHubClientId
+        }
+        {
+          name: 'AZURE_EVENT_HUB_CLIENT_SECRET'
+          value: eventHubClientSecret
+        }
+        {
+          name: 'AZURE_EVENT_HUB_TENANT_ID'
+          value: eventHubTenantId
+        }
+        {
+          name: 'AZURE_EVENT_HUB_SUBSCRIPTION_ID'
+          value: eventHubSubscriptionId
+        }
+        {
+          name: 'AZURE_EVENT_HUB_NAMESPACE'
+          value: eventHubNamespaceName
+        }
+        {
+          name: 'SPRING_CLOUD_STREAM_IN_DESTINATION'
+          value: springCloudStreamInDestination
+        }
+        {
+          name: 'SPRING_CLOUD_STREAM_IN_GROUP'
+          value: springCloudStreamInGroup
+        }
+        {
+          name: 'SPRING_CLOUD_STREAM_OUT_DESTINATION'
+          value: springCloudStreamOutDestination
+        }
+        {
+          name: 'AZURE_EVENT_HUB_RESOURCE_GROUP'
+          value: eventHubRG
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'

@@ -1,7 +1,5 @@
 param logAnalyticsWorkspaceName string
 param logAnalyticsWorkspaceRG string
-param logAnalyticsWorkspaceSubscriptionId string = subscription().id //Analytics Workspace may be in another subscription
-
 param appInsightsName string
 
 param keyVaultName string
@@ -37,19 +35,17 @@ param apiServicePort string
 
 param webServiceName string
 param webServicePort string
+
 param eventConsumerServiceName string
+param eventConsumerServicePort string
 
 param location string = resourceGroup().location
 
-param tagsArray object = {
-  workload: 'DEVTEST'
-  costCentre: 'FIN'
-  department: 'RESEARCH'
-}
+param tagsArray object = resourceGroup().tags
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
   name: logAnalyticsWorkspaceName
-  scope: resourceGroup(logAnalyticsWorkspaceSubscriptionId, logAnalyticsWorkspaceRG)
+  scope: resourceGroup(logAnalyticsWorkspaceRG)
 }
 
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2022-01-01-preview' existing = {
@@ -239,29 +235,29 @@ resource keyVaultSecretApiURI 'Microsoft.KeyVault/vaults/secrets@2021-11-01-prev
   }
 }
 
-// resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-//   name: '${keyVaultName}-kv-logs'
-//   scope: keyVault
-//   properties: {
-//     logs: [
-//       {
-//         categoryGroup: 'allLogs'
-//         enabled: true
-//       }
-//       {
-//         categoryGroup: 'audit'
-//         enabled: true
-//       }
-//     ]
-//     metrics: [
-//       {
-//         category: 'AllMetrics'
-//         enabled: true
-//       }
-//     ]
-//     workspaceId: logAnalyticsWorkspace.id
-//   }
-// }
+resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${keyVaultName}-kv-logs'
+  scope: keyVault
+  properties: {
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+    workspaceId: logAnalyticsWorkspace.id
+  }
+}
 
 resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01-preview' = {
   name: dbServerName
@@ -321,29 +317,29 @@ resource allowAllIPsFirewallRule 'Microsoft.DBforPostgreSQL/flexibleServers/fire
   }
 }
 
-// resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-//   name: '${dbServerName}-db-logs'
-//   scope: postgreSQLServer
-//   properties: {
-//     logs: [
-//       {
-//         categoryGroup: 'allLogs'
-//         enabled: true
-//       }
-//       {
-//         categoryGroup: 'audit'
-//         enabled: true
-//       }
-//     ]
-//     metrics: [
-//       {
-//         category: 'AllMetrics'
-//         enabled: true
-//       }
-//     ]
-//     workspaceId: logAnalyticsWorkspace.id
-//   }
-// }
+resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${dbServerName}-db-logs'
+  scope: postgreSQLServer
+  properties: {
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+    workspaceId: logAnalyticsWorkspace.id
+  }
+}
 
 resource apiServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${apiServiceName}-plan'
@@ -421,35 +417,34 @@ resource apiServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
   }
 }
 
-// resource apiServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-//   name: '${apiServiceName}-app-logs'
-//   scope: apiService
-//   properties: {
-//     logs: [
-//       {
-//         categoryGroup: 'allLogs'
-//         enabled: true
-//       }
-//       {
-//         categoryGroup: 'audit'
-//         enabled: true
-//       }
-//     ]
-//     metrics: [
-//       {
-//         category: 'AllMetrics'
-//         enabled: true
-//       }
-//     ]
-//     workspaceId: logAnalyticsWorkspace.id
-//   }
-// }
+resource apiServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${apiServiceName}-app-logs'
+  scope: apiService
+  properties: {
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+    workspaceId: logAnalyticsWorkspace.id
+  }
+}
 
 resource webServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${webServiceName}-plan'
   location: location
   tags: tagsArray
-
   properties: {
     reserved: true
   }
@@ -480,6 +475,7 @@ resource webServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
   parent: webService
   dependsOn: [
     rbacKVSecretApiWebApiUri
+    rbacKVSecretApiWebEventHubConnectionString
     rbacKVSecretWebAppInsightsKey
   ]
   kind: 'string'
@@ -495,6 +491,10 @@ resource webServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
         //'https://${apiServiceName}.azurewebsites.net/todos/'
       }
       {
+        name: 'AZURE_EVENTHUB_NAMESPACE_CONNECTION_STRING'
+        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=AZURE-EVENTHUB-NAMESPACE-CONNECTION-STRING)'
+      }
+      {
         name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
         value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
       }
@@ -506,33 +506,33 @@ resource webServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
   }
 }
 
-// resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-//   name: '${webServiceName}-web-logs'
-//   scope: webService
-//   properties: {
-//     logs: [
-//       {
-//         categoryGroup: 'allLogs'
-//         enabled: true
-//       }
-//       {
-//         categoryGroup: 'audit'
-//         enabled: true
-//       }
-//     ]
-//     metrics: [
-//       {
-//         category: 'AllMetrics'
-//         enabled: true
-//         // retentionPolicy: {
-//         //   days: 90
-//         //   enabled: true
-//         // }
-//       }
-//     ]
-//     workspaceId: logAnalyticsWorkspace.id
-//   }
-// }
+resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${webServiceName}-web-logs'
+  scope: webService
+  properties: {
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+        // retentionPolicy: {
+        //   days: 90
+        //   enabled: true
+        // }
+      }
+    ]
+    workspaceId: logAnalyticsWorkspace.id
+  }
+}
 
 resource eventConsumerServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${eventConsumerServiceName}-plan'
@@ -574,17 +574,21 @@ resource eventConsumerServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
     rbacKVSecretEventConsumerHubRG
     rbacKVSecretEventConsumerHubSubscriptionId
     rbacKVSecretEventConsumerHubTenantId
-    rbacKVSecretEventConsumerSpringCloudStreamInDestination
-    rbacKVSecretEventConsumerSpringCloudStreamInGroup
-    rbacKVSecretEventConsumerSpringCloudStreamOutDestination
-    rbacKVSecretEventConsumerSpringDatasourceUserName
-    rbacKVSecretEventConsumerSpringDatasourceUserPassword
+    rbacKVSecretEventConsumerInDestination
+    rbacKVSecretEventConsumerInGroup
+    rbacKVSecretEventConsumerInDestination
+    rbacKVSecretEventConsumerSpringDSUser
+    rbacKVSecretEventConsumerSpringDSPassword
     rbacKVSecretEventConsumerSpringDataSourceURL
     rbacKVSecretEventConsumerAppInsightsKey
   ]
   kind: 'string'
   properties: {
     appSettings: [
+      {
+        name: 'PORT'
+        value: eventConsumerServicePort
+      }
       {
         name: 'SPRING_DATASOURCE_URL'
         value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=SPRING-DATASOURCE-URL)'
@@ -648,33 +652,33 @@ resource eventConsumerServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
   }
 }
 
-// resource eventConsumerServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-//   name: '${eventConsumerServiceName}-web-logs'
-//   scope: eventConsumerService
-//   properties: {
-//     logs: [
-//       {
-//         categoryGroup: 'allLogs'
-//         enabled: true
-//       }
-//       {
-//         categoryGroup: 'audit'
-//         enabled: true
-//       }
-//     ]
-//     metrics: [
-//       {
-//         category: 'AllMetrics'
-//         enabled: true
-//         // retentionPolicy: {
-//         //   days: 90
-//         //   enabled: true
-//         // }
-//       }
-//     ]
-//     workspaceId: logAnalyticsWorkspace.id
-//   }
-// }
+resource eventConsumerServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${eventConsumerServiceName}-web-logs'
+  scope: eventConsumerService
+  properties: {
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+      {
+        categoryGroup: 'audit'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+        // retentionPolicy: {
+        //   days: 90
+        //   enabled: true
+        // }
+      }
+    ]
+    workspaceId: logAnalyticsWorkspace.id
+  }
+}
 
 @description('This is the built-in Key Vault Secrets User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
 resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
@@ -785,6 +789,17 @@ module rbacKVSecretApiWebApiUri './deployment-mi-role-assignment-kv-secret.bicep
   }
 }
 
+module rbacKVSecretApiWebEventHubConnectionString './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-web-event-hub-connection-string'
+  params: {
+    roleDefinitionId: keyVaultSecretsUser.id
+    principalId: webService.identity.principalId
+    roleAssignmentNameGuid: guid(webService.id, keyVaultSecretAzureEventHubConnectionString.id, keyVaultSecretsUser.id)
+    kvName: keyVault.name
+    kvSecretName: keyVaultSecretAzureEventHubConnectionString.name
+  }
+}
+
 module rbacKVSecretEventConsumerClientId './deployment-mi-role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-hub-client-id'
   params: {
@@ -851,8 +866,8 @@ module rbacKVSecretEventConsumerHubTenantId './deployment-mi-role-assignment-kv-
   }
 }
 
-module rbacKVSecretEventConsumerSpringCloudStreamInDestination './deployment-mi-role-assignment-kv-secret.bicep' = {
-  name: 'deployment-rbac-kv-secret-event-consumer-cloud-stream-in-destination'
+module rbacKVSecretEventConsumerInDestination './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-event-consumer-in-destination'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
     principalId: eventConsumerService.identity.principalId
@@ -862,8 +877,8 @@ module rbacKVSecretEventConsumerSpringCloudStreamInDestination './deployment-mi-
   }
 }
 
-module rbacKVSecretEventConsumerSpringCloudStreamInGroup './deployment-mi-role-assignment-kv-secret.bicep' = {
-  name: 'deployment-rbac-kv-secret-event-consumer-cloud-stream-in-group'
+module rbacKVSecretEventConsumerInGroup './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-event-consumer-in-group'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
     principalId: eventConsumerService.identity.principalId
@@ -873,8 +888,8 @@ module rbacKVSecretEventConsumerSpringCloudStreamInGroup './deployment-mi-role-a
   }
 }
 
-module rbacKVSecretEventConsumerSpringCloudStreamOutDestination './deployment-mi-role-assignment-kv-secret.bicep' = {
-  name: 'deployment-rbac-kv-secret-event-consumer-cloud-stream-out-destination'
+module rbacKVSecretEventConsumerOutDestination './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-event-consumer-out-destination'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
     principalId: eventConsumerService.identity.principalId
@@ -884,8 +899,8 @@ module rbacKVSecretEventConsumerSpringCloudStreamOutDestination './deployment-mi
   }
 }
 
-module rbacKVSecretEventConsumerSpringDatasourceUserName './deployment-mi-role-assignment-kv-secret.bicep' = {
-  name: 'deployment-rbac-kv-secret-event-consumer-spring-datasource-user-name'
+module rbacKVSecretEventConsumerSpringDSUser './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-event-consumer-spring-ds-user'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
     principalId: eventConsumerService.identity.principalId
@@ -895,8 +910,8 @@ module rbacKVSecretEventConsumerSpringDatasourceUserName './deployment-mi-role-a
   }
 }
 
-module rbacKVSecretEventConsumerSpringDatasourceUserPassword './deployment-mi-role-assignment-kv-secret.bicep' = {
-  name: 'deployment-rbac-kv-secret-event-consumer-spring-datasource-user-password'
+module rbacKVSecretEventConsumerSpringDSPassword './deployment-mi-role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-event-consumer-spring-ds-password'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
     principalId: eventConsumerService.identity.principalId

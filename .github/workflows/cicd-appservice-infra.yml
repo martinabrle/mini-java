@@ -15,13 +15,19 @@ on:
 jobs:
   cleanup_if_requested:
     runs-on: ubuntu-latest
-
+    environment: APP_SERVICE_SIMPLE
     steps:
       - name: Azure login
         if: github.event.inputs.run_cleanup == 'true'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set default Azure subscription
+        run: echo "${{ secrets.AZURE_CREDENTIALS }}" > ./secrets.txt
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3.11
 
       - name: Set default Azure subscription
         if: github.event.inputs.run_cleanup == 'true'
@@ -40,10 +46,52 @@ jobs:
           echo "${{ steps.check_next_steps.outputs.DELETE_RG }}"
           az group delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --yes
 
+deploy_event_hub_if_needed:
+    # Having this as a separte Job, as there are many situations where Log Analytics
+    # workspace would be outside of the current subscription
+    needs: [cleanup_if_requested]
+    runs-on: ubuntu-latest
+    environment: APP_SERVICE_SIMPLE
+    defaults:
+      run:
+        working-directory: ./scripts
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set default Azure subscription
+        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Check the resource group exists
+        id: event_hub_rg_exists
+        run: |
+          EVENT_HUB_RG_EXISTS=$(az group exists --name ${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
+          echo "::set-output name=EVENT_HUB_RG_EXISTS::${EVENT_HUB_RG_EXISTS}"
+
+      - name: Create Event Hub Namespace Azure resource group
+        if: steps.event_hub_rg_exists.outputs.EVENT_HUB_RG_EXISTS == 'false'
+        run: |
+          az deployment sub create \
+           --location ${{ secrets.AZURE_LOCATION }} \
+           --template-file ./deployment-rg.bicep \
+           --parameters name=${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }}
+
+      - name: Deploy EventHub
+        if: steps.event_hub_rg_exists.outputs.EVENT_HUB_RG_EXISTS == 'false'
+        run: |
+          az deployment group create --resource-group ${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} --template-file ./deployment-event-hub.bicep \
+                        --parameters location=${{ secrets.AZURE_LOCATION }} \
+                                     eventHubNamespaceName=${{ secrets.AZURE_EVENT_HUB_NAMESPACE }} \
+                                     eventHubName=${{ secrets.SPRING_CLOUD_STREAM_OUT_DESTINATION }}
+
   deploy_infra:
     needs: [cleanup_if_requested]
-
     runs-on: ubuntu-latest
+    environment: APP_SERVICE_SIMPLE
     defaults:
       run:
         working-directory: ./scripts
@@ -72,7 +120,6 @@ jobs:
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                      logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}  \
                                      logAnalyticsWorkspaceRG=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }}  \
-                                     appInsightsName=${{ secrets.AZURE_APP_INSIGHTS_NAME }}  \
                                      dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                      dbName=${{ secrets.AZURE_DB_NAME }} \
                                      dbAdminName=${{ secrets.AZURE_DB_ADMIN_NAME }} \
