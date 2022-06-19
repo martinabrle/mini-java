@@ -36,6 +36,6 @@
       set SPRING_CLOUD_STREAM_IN_DESTINATION=YOUR_EVENT_HUB_NAME
       set SPRING_CLOUD_STREAM_OUT_DESTINATION=YOUR_EVENT_HUB_NAME
       ```
-* Start the event consumer app using './mvnw spring-boot:run'
+* Start the event consumer app using code('./mvnw spring-boot:run')
 * If you configured [capturing of events in Azure Blob Storage or Azure Data Lake Storage](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-capture-overview), you can check your storage account and review archived events
 
