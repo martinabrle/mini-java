@@ -46,7 +46,7 @@ jobs:
           echo "${{ steps.check_next_steps.outputs.DELETE_RG }}"
           az group delete --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }} --yes
 
-deploy_event_hub_if_needed:
+  deploy_event_hub_if_needed:
     # Having this as a separte Job, as there are many situations where Log Analytics
     # workspace would be outside of the current subscription
     needs: [cleanup_if_requested]
@@ -88,7 +88,7 @@ deploy_event_hub_if_needed:
                                      eventHubNamespaceName=${{ secrets.AZURE_EVENT_HUB_NAMESPACE }} \
                                      eventHubName=${{ secrets.SPRING_CLOUD_STREAM_OUT_DESTINATION }}
 
-deploy_infra:
+  deploy_infra:
     needs: [cleanup_if_requested]
     runs-on: ubuntu-latest
     environment: APP_SERVICE_SIMPLE
