@@ -1,7 +1,7 @@
 # Spring Boot Kafka event consumer
 
 ### Getting it running
-* Start the command line, clone the whole repo and change your current directory to 'consumer_kafka' sub-dir
+* Start the command line, clone the whole repo and change your current directory to '''consumer_kafka''' sub-dir
 * [Create an Azure EventHub](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#create-an-azure-event-hub-using-the-azure-portal)
 * [Sign in into Azure from your command line (az login) and set your subscription](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#sign-in-to-azure-and-set-your-subscription)
 * [Create an Azure service principal for this app](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#create-a-service-principal)
