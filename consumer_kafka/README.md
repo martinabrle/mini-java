@@ -1,7 +1,7 @@
 # Spring Boot Kafka event consumer
 
 ### Getting it running
-* Start the command line, clone the whole repo and change your current directory to '''consumer_kafka''' sub-dir
+* Start the command line, clone the whole repo and change your current directory to ```consumer_kafka``` sub-dir
 * [Create an Azure EventHub](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#create-an-azure-event-hub-using-the-azure-portal)
 * [Sign in into Azure from your command line (az login) and set your subscription](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#sign-in-to-azure-and-set-your-subscription)
 * [Create an Azure service principal for this app](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-kafka-azure-event-hub#create-a-service-principal)
@@ -36,6 +36,6 @@
       set SPRING_CLOUD_STREAM_IN_DESTINATION=YOUR_EVENT_HUB_NAME
       set SPRING_CLOUD_STREAM_OUT_DESTINATION=YOUR_EVENT_HUB_NAME
       ```
-* Start the event consumer app using code('./mvnw spring-boot:run')
+* Start the event consumer app using ```./mvnw spring-boot:run```
 * If you configured [capturing of events in Azure Blob Storage or Azure Data Lake Storage](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-capture-overview), you can check your storage account and review archived events
 
