@@ -21,7 +21,6 @@ resource eventHubNamespace 'Microsoft.EventHub/namespaces@2022-01-01-preview' = 
   properties: {
     isAutoInflateEnabled: false
     kafkaEnabled: true
-    maximumThroughputUnits: 1
     zoneRedundant: false
   }
 }
