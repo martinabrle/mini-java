@@ -23,11 +23,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Set default Azure subscription
-        run: echo "${{ secrets.AZURE_CREDENTIALS }}" > ./secrets.txt
+      #- name: Set default Azure subscription
+      #  run: echo "${{ secrets.AZURE_CREDENTIALS }}" > ./secrets.txt
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3.11
+      #- name: Setup tmate session
+      #  uses: mxschmitt/action-tmate@v3.11
 
       - name: Set default Azure subscription
         if: github.event.inputs.run_cleanup == 'true'
@@ -117,18 +117,25 @@ jobs:
           clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`        
           az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment.bicep \
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
-                                     logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}  \
-                                     logAnalyticsWorkspaceRG=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }}  \
                                      dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                      dbName=${{ secrets.AZURE_DB_NAME }} \
                                      dbAdminName=${{ secrets.AZURE_DB_ADMIN_NAME }} \
                                      dbAdminPassword=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} \
                                      dbUserName=${{ secrets.AZURE_API_DB_USER_NAME }} \
                                      dbUserPassword=${{ secrets.AZURE_API_DB_USER_PASSWORD }} \
+                                     eventHubClientId=${{ secrets.AZURE_EVENT_HUB_CLIENT_ID }} \
+                                     eventHubClientSecret=${{ secrets.AZURE_EVENT_HUB_CLIENT_SECRET }} \
+                                     eventHubRG=${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} \
+                                     eventHubNamespaceName=${{ secrets.AZURE_EVENT_HUB_NAMESPACE }} \
+                                     springCloudStreamInDestination=${{ secrets.SPRING_CLOUD_STREAM_IN_DESTINATION }} \
+                                     springCloudStreamInGroup=${{ secrets.SPRING_CLOUD_STREAM_IN_GROUP }} \
+                                     springCloudStreamOutDestination=${{ secrets.SPRING_CLOUD_STREAM_OUT_DESTINATION }} \
                                      apiServiceName=${{ secrets.AZURE_API_SERVICE_NAME }} \
                                      apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
                                      webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
                                      webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
+                                     eventConsumerServiceName=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
+                                     eventConsumerServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
                                      clientIPAddress=$clientIP
       #Debug: - name: Setup tmate session
       #         uses: mxschmitt/action-tmate@v3.11
