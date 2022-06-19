@@ -239,29 +239,29 @@ resource keyVaultSecretApiURI 'Microsoft.KeyVault/vaults/secrets@2021-11-01-prev
   }
 }
 
-resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${keyVaultName}-kv-logs'
-  scope: keyVault
-  properties: {
-    logs: [
-      {
-        categoryGroup: 'allLogs'
-        enabled: true
-      }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-      }
-    ]
-    workspaceId: logAnalyticsWorkspace.id
-  }
-}
+// resource kvDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: '${keyVaultName}-kv-logs'
+//   scope: keyVault
+//   properties: {
+//     logs: [
+//       {
+//         categoryGroup: 'allLogs'
+//         enabled: true
+//       }
+//       {
+//         categoryGroup: 'audit'
+//         enabled: true
+//       }
+//     ]
+//     metrics: [
+//       {
+//         category: 'AllMetrics'
+//         enabled: true
+//       }
+//     ]
+//     workspaceId: logAnalyticsWorkspace.id
+//   }
+// }
 
 resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01-preview' = {
   name: dbServerName
@@ -321,29 +321,29 @@ resource allowAllIPsFirewallRule 'Microsoft.DBforPostgreSQL/flexibleServers/fire
   }
 }
 
-resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${dbServerName}-db-logs'
-  scope: postgreSQLServer
-  properties: {
-    logs: [
-      {
-        categoryGroup: 'allLogs'
-        enabled: true
-      }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-      }
-    ]
-    workspaceId: logAnalyticsWorkspace.id
-  }
-}
+// resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: '${dbServerName}-db-logs'
+//   scope: postgreSQLServer
+//   properties: {
+//     logs: [
+//       {
+//         categoryGroup: 'allLogs'
+//         enabled: true
+//       }
+//       {
+//         categoryGroup: 'audit'
+//         enabled: true
+//       }
+//     ]
+//     metrics: [
+//       {
+//         category: 'AllMetrics'
+//         enabled: true
+//       }
+//     ]
+//     workspaceId: logAnalyticsWorkspace.id
+//   }
+// }
 
 resource apiServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${apiServiceName}-plan'
@@ -421,29 +421,29 @@ resource apiServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
   }
 }
 
-resource apiServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${apiServiceName}-app-logs'
-  scope: apiService
-  properties: {
-    logs: [
-      {
-        categoryGroup: 'allLogs'
-        enabled: true
-      }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-      }
-    ]
-    workspaceId: logAnalyticsWorkspace.id
-  }
-}
+// resource apiServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: '${apiServiceName}-app-logs'
+//   scope: apiService
+//   properties: {
+//     logs: [
+//       {
+//         categoryGroup: 'allLogs'
+//         enabled: true
+//       }
+//       {
+//         categoryGroup: 'audit'
+//         enabled: true
+//       }
+//     ]
+//     metrics: [
+//       {
+//         category: 'AllMetrics'
+//         enabled: true
+//       }
+//     ]
+//     workspaceId: logAnalyticsWorkspace.id
+//   }
+// }
 
 resource webServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${webServiceName}-plan'
@@ -506,33 +506,33 @@ resource webServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
   }
 }
 
-resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${webServiceName}-web-logs'
-  scope: webService
-  properties: {
-    logs: [
-      {
-        categoryGroup: 'allLogs'
-        enabled: true
-      }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-        // retentionPolicy: {
-        //   days: 90
-        //   enabled: true
-        // }
-      }
-    ]
-    workspaceId: logAnalyticsWorkspace.id
-  }
-}
+// resource webServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: '${webServiceName}-web-logs'
+//   scope: webService
+//   properties: {
+//     logs: [
+//       {
+//         categoryGroup: 'allLogs'
+//         enabled: true
+//       }
+//       {
+//         categoryGroup: 'audit'
+//         enabled: true
+//       }
+//     ]
+//     metrics: [
+//       {
+//         category: 'AllMetrics'
+//         enabled: true
+//         // retentionPolicy: {
+//         //   days: 90
+//         //   enabled: true
+//         // }
+//       }
+//     ]
+//     workspaceId: logAnalyticsWorkspace.id
+//   }
+// }
 
 resource eventConsumerServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: '${eventConsumerServiceName}-plan'
@@ -648,33 +648,33 @@ resource eventConsumerServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
   }
 }
 
-resource eventConsumerServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: '${eventConsumerServiceName}-web-logs'
-  scope: eventConsumerService
-  properties: {
-    logs: [
-      {
-        categoryGroup: 'allLogs'
-        enabled: true
-      }
-      {
-        categoryGroup: 'audit'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-        // retentionPolicy: {
-        //   days: 90
-        //   enabled: true
-        // }
-      }
-    ]
-    workspaceId: logAnalyticsWorkspace.id
-  }
-}
+// resource eventConsumerServiceDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: '${eventConsumerServiceName}-web-logs'
+//   scope: eventConsumerService
+//   properties: {
+//     logs: [
+//       {
+//         categoryGroup: 'allLogs'
+//         enabled: true
+//       }
+//       {
+//         categoryGroup: 'audit'
+//         enabled: true
+//       }
+//     ]
+//     metrics: [
+//       {
+//         category: 'AllMetrics'
+//         enabled: true
+//         // retentionPolicy: {
+//         //   days: 90
+//         //   enabled: true
+//         // }
+//       }
+//     ]
+//     workspaceId: logAnalyticsWorkspace.id
+//   }
+// }
 
 @description('This is the built-in Key Vault Secrets User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
 resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
