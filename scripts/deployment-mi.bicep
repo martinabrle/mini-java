@@ -549,7 +549,7 @@ resource eventConsumerServicePlan 'Microsoft.Web/serverfarms@2021-03-01' = {
 }
 
 resource eventConsumerService 'Microsoft.Web/sites@2021-03-01' = {
-  name: webServiceName
+  name: eventConsumerServiceName
   location: location
   tags: tagsArray
   identity: {
