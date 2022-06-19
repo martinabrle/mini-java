@@ -88,7 +88,7 @@ deploy_event_hub_if_needed:
                                      eventHubNamespaceName=${{ secrets.AZURE_EVENT_HUB_NAMESPACE }} \
                                      eventHubName=${{ secrets.SPRING_CLOUD_STREAM_OUT_DESTINATION }}
 
-  deploy_infra:
+deploy_infra:
     needs: [cleanup_if_requested]
     runs-on: ubuntu-latest
     environment: APP_SERVICE_SIMPLE
