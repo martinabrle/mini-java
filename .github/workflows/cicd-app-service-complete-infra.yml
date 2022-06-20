@@ -109,9 +109,13 @@ jobs:
       - name: Deploy Azure resources
         run: |
           clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
-          azureCredentialsLocal='${{ secrets.AZURE_CREDENTIALS }}'
-          #deploymentClientId=`echo '$azureCredentialsLocal' | jq '.clientId'`
-          echo '$azureCredentialsLocal' | jq '.clientId'
+          azureCredentials=$(cat << EOF
+          ${{ secrets.AZURE_CREDENTIALS }}
+          EOF
+          )
+          echo $azureCredentials
+
+          echo "$azureCredentials" | jq '.clientId'
 
           az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./templates/app-service-complete.bicep \
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
