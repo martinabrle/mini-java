@@ -30,7 +30,7 @@ param springCloudStreamOutDestination string
 
 param clientIPAddress string
 
-param apringAppName string
+param springAppName string
 param apiServiceName string
 param apiServicePort string
 
@@ -360,7 +360,7 @@ resource postgreSQLServerDiagnotsicsLogs 'Microsoft.Insights/diagnosticSettings@
 }
 
 resource springApps 'Microsoft.AppPlatform/Spring@2022-05-01-preview' = {
-  name: apringAppName
+  name: springAppName
   location: location
   tags: tagsArray
   sku: {
