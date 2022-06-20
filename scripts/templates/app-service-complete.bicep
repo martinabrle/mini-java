@@ -775,6 +775,16 @@ module rbacKVSecretApiSpringDataSourceURL './components/role-assignment-kv-secre
   }
 }
 
+resource rbacKVSecretApiSpringDataSourceURL2 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+  name: guid(apiService.id, keyVaultSecretSpringDataSourceURL.id, keyVaultSecretsUser.id)
+  scope: keyVaultSecretSpringDataSourceURL
+  properties: {
+    roleDefinitionId: keyVaultSecretsUser.id
+    principalId: apiService.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
 module rbacKVSecretApiAppInsightsKey './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-api-app-insights'
   params: {
