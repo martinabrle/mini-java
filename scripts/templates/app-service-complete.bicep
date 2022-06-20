@@ -20,10 +20,9 @@ param dbUserPassword string
 param eventHubClientId string
 @secure()
 param eventHubClientSecret string
-
 param eventHubTenantId string =  tenant().tenantId //event hub may be in another tenant
 param eventHubSubscriptionId string = subscription().id //event hub may be in another subscription
-param eventHubRG string
+param eventHubRG string = resourceGroup().id
 param eventHubNamespaceName string
 param springCloudStreamInDestination string
 param springCloudStreamInGroup string
@@ -48,11 +47,6 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12
   scope: resourceGroup(logAnalyticsWorkspaceRG)
 }
 
-resource eventHubNamespace 'Microsoft.EventHub/namespaces@2022-01-01-preview' existing = {
-  name: eventHubNamespaceName
-  scope: resourceGroup(eventHubRG)
-}
-
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
   location: location
@@ -61,6 +55,22 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   properties: {
     Application_Type: 'web'
     WorkspaceResourceId: logAnalyticsWorkspace.id
+  }
+}
+
+resource eventHubNamespace 'Microsoft.EventHub/namespaces@2022-01-01-preview' = {
+  name: eventHubNamespaceName
+  location: location
+  tags: tagsArray
+  sku: {
+    capacity: 1
+    name: 'Standard'
+    tier: 'Standard'
+  }
+  properties: {
+    isAutoInflateEnabled: false
+    kafkaEnabled: true
+    zoneRedundant: false
   }
 }
 
@@ -712,7 +722,7 @@ resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01
 // as we're trying to have the least possible assignment scope
 // Even though these assignments below work, let's try to avoid
 // too broad of an access
-// module rbac './deployment-mi-role-assignment-kv.bicep' = {
+// module rbac './components/role-assignment-kv.bicep' = {
 //   name: 'deployment-rbac-api'
 //   params: {
 //     roleDefinitionId: keyVaultSecretsUser.id
@@ -722,7 +732,7 @@ resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01
 //   }
 // }
 
-// module rbacWeb './deployment-mi-role-assignment-kv.bicep' = {
+// module rbacWeb './components/role-assignment-kv.bicep' = {
 //   name: 'deployment-rbac-web'
 //   params: {
 //     roleDefinitionId: keyVaultSecretsUser.id
@@ -732,7 +742,7 @@ resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01
 //   }
 // }
 
-module rbacKVSecretApiSpringDatasourceUserName './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretApiSpringDatasourceUserName './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-api-spring-datasource-user-name'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -743,7 +753,7 @@ module rbacKVSecretApiSpringDatasourceUserName './deployment-mi-role-assignment-
   }
 }
 
-module rbacKVSecretApiSpringDatasourceUserPassword './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretApiSpringDatasourceUserPassword './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-api-spring-datasource-user-password'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -754,7 +764,7 @@ module rbacKVSecretApiSpringDatasourceUserPassword './deployment-mi-role-assignm
   }
 }
 
-module rbacKVSecretApiSpringDataSourceURL './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretApiSpringDataSourceURL './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-api-spring-datasource-url'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -765,7 +775,7 @@ module rbacKVSecretApiSpringDataSourceURL './deployment-mi-role-assignment-kv-se
   }
 }
 
-module rbacKVSecretApiAppInsightsKey './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretApiAppInsightsKey './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-api-app-insights'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -776,7 +786,7 @@ module rbacKVSecretApiAppInsightsKey './deployment-mi-role-assignment-kv-secret.
   }
 }
 
-module rbacKVSecretWebAppInsightsKey './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretWebAppInsightsKey './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-web-app-insights'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -787,7 +797,7 @@ module rbacKVSecretWebAppInsightsKey './deployment-mi-role-assignment-kv-secret.
   }
 }
 
-module rbacKVSecretApiWebApiUri './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretApiWebApiUri './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-web-api-uri'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -798,7 +808,7 @@ module rbacKVSecretApiWebApiUri './deployment-mi-role-assignment-kv-secret.bicep
   }
 }
 
-module rbacKVSecretApiWebEventHubConnectionString './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretApiWebEventHubConnectionString './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-web-event-hub-connection-string'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -809,7 +819,7 @@ module rbacKVSecretApiWebEventHubConnectionString './deployment-mi-role-assignme
   }
 }
 
-module rbacKVSecretEventConsumerClientId './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerClientId './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-hub-client-id'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -820,7 +830,7 @@ module rbacKVSecretEventConsumerClientId './deployment-mi-role-assignment-kv-sec
   }
 }
 
-module rbacKVSecretEventConsumerClientSecret './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerClientSecret './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-hub-client-secret'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -831,7 +841,7 @@ module rbacKVSecretEventConsumerClientSecret './deployment-mi-role-assignment-kv
   }
 }
 
-module rbacKVSecretEventConsumerHubNamespace './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerHubNamespace './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-hub-namespace'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -842,7 +852,7 @@ module rbacKVSecretEventConsumerHubNamespace './deployment-mi-role-assignment-kv
   }
 }
 
-module rbacKVSecretEventConsumerHubRG './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerHubRG './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-hub-rg'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -853,7 +863,7 @@ module rbacKVSecretEventConsumerHubRG './deployment-mi-role-assignment-kv-secret
   }
 }
 
-module rbacKVSecretEventConsumerHubSubscriptionId './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerHubSubscriptionId './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-hub-subscription-id'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -864,7 +874,7 @@ module rbacKVSecretEventConsumerHubSubscriptionId './deployment-mi-role-assignme
   }
 }
 
-module rbacKVSecretEventConsumerHubTenantId './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerHubTenantId './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-hub-tenant-id'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -875,7 +885,7 @@ module rbacKVSecretEventConsumerHubTenantId './deployment-mi-role-assignment-kv-
   }
 }
 
-module rbacKVSecretEventConsumerInDestination './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerInDestination './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-in-destination'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -886,7 +896,7 @@ module rbacKVSecretEventConsumerInDestination './deployment-mi-role-assignment-k
   }
 }
 
-module rbacKVSecretEventConsumerInGroup './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerInGroup './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-in-group'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -897,7 +907,7 @@ module rbacKVSecretEventConsumerInGroup './deployment-mi-role-assignment-kv-secr
   }
 }
 
-module rbacKVSecretEventConsumerOutDestination './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerOutDestination './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-out-destination'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -908,7 +918,7 @@ module rbacKVSecretEventConsumerOutDestination './deployment-mi-role-assignment-
   }
 }
 
-module rbacKVSecretEventConsumerSpringDSUser './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerSpringDSUser './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-spring-ds-user'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -919,7 +929,7 @@ module rbacKVSecretEventConsumerSpringDSUser './deployment-mi-role-assignment-kv
   }
 }
 
-module rbacKVSecretEventConsumerSpringDSPassword './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerSpringDSPassword './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-spring-ds-password'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -930,7 +940,7 @@ module rbacKVSecretEventConsumerSpringDSPassword './deployment-mi-role-assignmen
   }
 }
 
-module rbacKVSecretEventConsumerSpringDataSourceURL './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerSpringDataSourceURL './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-spring-datasource-url'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -941,7 +951,7 @@ module rbacKVSecretEventConsumerSpringDataSourceURL './deployment-mi-role-assign
   }
 }
 
-module rbacKVSecretEventConsumerAppInsightsKey './deployment-mi-role-assignment-kv-secret.bicep' = {
+module rbacKVSecretEventConsumerAppInsightsKey './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-app-insights'
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
@@ -953,7 +963,7 @@ module rbacKVSecretEventConsumerAppInsightsKey './deployment-mi-role-assignment-
 }
 
 // TODO coming at some point..
-// module rbacPGSQL './deployment-mi-role-assignment-pgsql.bicep' = {
+// module rbacPGSQL './components/role-assignment-pgsql.bicep' = {
 //   name: 'deployment-rbac-pgsql'
 //   params: {
 //     roleDefinitionId: pgsqlFlexibleServerAdmin.id

@@ -7,8 +7,6 @@ export UNIQUE_STRING="`openssl rand -hex 5`"
 export AZURE_RESOURCE_GROUP="maabr-${UNIQUE_STRING}_rg"
 export AZURE_LOCATION="eastus"
 export AZURE_RESOURCE_TAGS="{ 'Workload': 'DEVTEST', 'CostCenter': 'FIN', 'Department': 'RESEARCH', 'DeleteNightly': 'true', 'DeleteWeekly': 'true' }"
-export AZURE_LOG_ANALYTICS_WRKSPC_NAME="maabr-${UNIQUE_STRING}-log"
-export AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP="maabr-${UNIQUE_STRING}-log_rg"
 
 export AZURE_EVENT_HUB_CLIENT_ID=${eventHubClientId} \
 export AZURE_EVENT_HUB_CLIENT_SECRET=${eventHubClientSecret} \
@@ -17,13 +15,8 @@ export SPRING_CLOUD_STREAM_IN_DESTINATION="maabr-hub" \
 export SPRING_CLOUD_STREAM_IN_GROUP="\$Default" \
 export SPRING_CLOUD_STREAM_OUT_DESTINATION="maabr-hub" \
 
-export AZURE_KEY_VAULT_NAME="maabr-${UNIQUE_STRING}-kv"
-
-export AZURE_APP_INSIGHTS_NAME="maabr-${UNIQUE_STRING}-app-insights"
-
 export AZURE_DB_SERVER_NAME="maabr-${UNIQUE_STRING}-pg"
 export AZURE_DB_NAME="tododb"
-
 
 export AZURE_DB_ADMIN_NAME="a`openssl rand -hex 12`"
 export AZURE_DB_ADMIN_PASSWORD=`openssl rand -base64 22`
@@ -32,8 +25,10 @@ export AZURE_API_DB_USER_PASSWORD=`openssl rand -base64 22`
 
 export AZURE_API_SERVICE_NAME="maabr-${UNIQUE_STRING}-api"
 export AZURE_API_SERVICE_PORT="443"
+
 export AZURE_WEB_SERVICE_NAME="maabr-${UNIQUE_STRING}-web"
 export AZURE_WEB_SERVICE_PORT="443"
+
 export AZURE_EVENT_CONSUMER_SERVICE_NAME="maabr-${UNIQUE_STRING}-evt"
 export AZURE_EVENT_CONSUMER_SERVICE_PORT="443"
 
@@ -45,12 +40,8 @@ az deployment group create --resource-group ${AZURE_LOG_ANALYTICS_WRKSPC_RESOURC
 
 az deployment sub create --location ${AZURE_LOCATION} --template-file ./templates/components/rg.bicep --parameters name=$AZURE_RESOURCE_GROUP resourceTags="${AZURE_RESOURCE_TAGS}"
 
-az deployment group create --resource-group ${AZURE_RESOURCE_GROUP} --template-file ./templates/app-service-complete.bicep \
+az deployment group create --resource-group ${AZURE_RESOURCE_GROUP} --template-file ./templates/spring-apps.bicep \
               --parameters  location=${AZURE_LOCATION}  \
-                            logAnalyticsWorkspaceName=${AZURE_LOG_ANALYTICS_WRKSPC_NAME}  \
-                            logAnalyticsWorkspaceRG=${AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP}  \
-                            keyVaultName=${AZURE_KEY_VAULT_NAME}  \
-                            appInsightsName=${AZURE_APP_INSIGHTS_NAME} \
                             dbServerName=${AZURE_DB_SERVER_NAME} \
                             dbName=${AZURE_DB_NAME} \
                             dbAdminName=${AZURE_DB_ADMIN_NAME} \
@@ -71,8 +62,8 @@ az deployment group create --resource-group ${AZURE_RESOURCE_GROUP} --template-f
                             eventConsumerServicePort=${AZURE_EVENT_CONSUMER_SERVICE_PORT} \
                             clientIPAddress=$clientIP
 
-az group delete --resource-group ${AZURE_RESOURCE_GROUP}
-az group delete --resource-group ${AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP}
+#az group delete --resource-group ${AZURE_RESOURCE_GROUP} -y
+#az group delete --resource-group ${AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP} -y
 
 ./mvnw spring-boot:run
 

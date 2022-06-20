@@ -16,9 +16,9 @@ param eventHubClientId string
 @secure()
 param eventHubClientSecret string
 
-param eventHubTenantId string = tenant().tenantId //event hub may be in another tenant
-param eventHubSubscriptionId string = subscription().id //event hub may be in another subscription
-param eventHubRG string
+param eventHubTenantId string = tenant().tenantId //event hub may be in another tenant (requires script modification)
+param eventHubSubscriptionId string = subscription().id //event hub may be in another subscription (requires script modification)
+param eventHubRG string = resourceGroup().id //event hub may be in another resource group (requires script modification)
 param eventHubNamespaceName string
 param springCloudStreamInDestination string
 param springCloudStreamInGroup string
@@ -38,10 +38,20 @@ param location string = resourceGroup().location
 
 param tagsArray object = resourceGroup().tags
 
-
-resource eventHubNamespace 'Microsoft.EventHub/namespaces@2022-01-01-preview' existing = {
+resource eventHubNamespace 'Microsoft.EventHub/namespaces@2022-01-01-preview' = {
   name: eventHubNamespaceName
-  scope: resourceGroup(eventHubRG)
+  location: location
+  tags: tagsArray
+  sku: {
+    capacity: 1
+    name: 'Standard'
+    tier: 'Standard'
+  }
+  properties: {
+    isAutoInflateEnabled: false
+    kafkaEnabled: true
+    zoneRedundant: false
+  }
 }
 
 resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01' = {

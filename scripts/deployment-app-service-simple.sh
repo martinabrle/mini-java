@@ -10,7 +10,6 @@ export AZURE_RESOURCE_TAGS="{ 'Workload': 'DEVTEST', 'CostCenter': 'FIN', 'Depar
 
 export AZURE_EVENT_HUB_CLIENT_ID=${eventHubClientId} \
 export AZURE_EVENT_HUB_CLIENT_SECRET=${eventHubClientSecret} \
-export AZURE_EVENT_HUB_RESOURCE_GROUP="maabr-${UNIQUE_STRING}-evt_rg" \
 export AZURE_EVENT_HUB_NAMESPACE="maabr-${UNIQUE_STRING}-evt-ns" \
 export SPRING_CLOUD_STREAM_IN_DESTINATION="maabr-hub" \
 export SPRING_CLOUD_STREAM_IN_GROUP="\$Default" \
@@ -33,16 +32,15 @@ export AZURE_WEB_SERVICE_PORT="443"
 export AZURE_EVENT_CONSUMER_SERVICE_NAME="maabr-${UNIQUE_STRING}-evt"
 export AZURE_EVENT_CONSUMER_SERVICE_PORT="443"
 
-az deployment sub create --location ${AZURE_LOCATION} --template-file ./deployment-rg.bicep --parameters name=${AZURE_EVENT_HUB_RESOURCE_GROUP} resourceTags="${AZURE_RESOURCE_TAGS}"
+az deployment sub create --location ${AZURE_LOCATION} --template-file ./templates/components/rg.bicep --parameters name=${AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP} resourceTags="${AZURE_RESOURCE_TAGS}"
 
-az deployment group create --resource-group ${AZURE_EVENT_HUB_RESOURCE_GROUP} --template-file ./deployment-event-hub.bicep \
+az deployment group create --resource-group ${AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP} --template-file ./templates/components/logs.bicep \
               --parameters location=${AZURE_LOCATION} \
-                           eventHubNamespaceName=${AZURE_EVENT_HUB_NAMESPACE} \
-                           eventHubName=${SPRING_CLOUD_STREAM_OUT_DESTINATION}
+                           logAnalyticsWorkspaceName=${AZURE_LOG_ANALYTICS_WRKSPC_NAME}
 
-az deployment sub create --location ${AZURE_LOCATION} --template-file ./deployment-rg.bicep --parameters name=$AZURE_RESOURCE_GROUP resourceTags="${AZURE_RESOURCE_TAGS}"
+az deployment sub create --location ${AZURE_LOCATION} --template-file ./templates/components/rg.bicep --parameters name=$AZURE_RESOURCE_GROUP resourceTags="${AZURE_RESOURCE_TAGS}"
 
-az deployment group create --resource-group ${AZURE_RESOURCE_GROUP} --template-file ./deployment.bicep \
+az deployment group create --resource-group ${AZURE_RESOURCE_GROUP} --template-file ./templates/app-service-simple.bicep \
               --parameters  location=${AZURE_LOCATION}  \
                             dbServerName=${AZURE_DB_SERVER_NAME} \
                             dbName=${AZURE_DB_NAME} \
@@ -52,7 +50,6 @@ az deployment group create --resource-group ${AZURE_RESOURCE_GROUP} --template-f
                             dbUserPassword=${AZURE_API_DB_USER_PASSWORD} \
                             eventHubClientId=${AZURE_EVENT_HUB_CLIENT_ID} \
                             eventHubClientSecret=${AZURE_EVENT_HUB_CLIENT_SECRET} \
-                            eventHubRG=${AZURE_EVENT_HUB_RESOURCE_GROUP} \
                             eventHubNamespaceName=${AZURE_EVENT_HUB_NAMESPACE} \
                             springCloudStreamInDestination=${SPRING_CLOUD_STREAM_IN_DESTINATION} \
                             springCloudStreamInGroup=${SPRING_CLOUD_STREAM_IN_GROUP} \
@@ -65,9 +62,9 @@ az deployment group create --resource-group ${AZURE_RESOURCE_GROUP} --template-f
                             eventConsumerServicePort=${AZURE_EVENT_CONSUMER_SERVICE_PORT} \
                             clientIPAddress=$clientIP
 
-az group delete --resource-group ${AZURE_RESOURCE_GROUP}
-az group delete --resource-group ${AZURE_EVENT_HUB_RESOURCE_GROUP}
-az group delete --resource-group ${AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP}
+#az group delete --resource-group ${AZURE_RESOURCE_GROUP} -y
+#az group delete --resource-group ${AZURE_EVENT_HUB_RESOURCE_GROUP} -y
+#az group delete --resource-group ${AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP} -y
 
 ./mvnw spring-boot:run
 

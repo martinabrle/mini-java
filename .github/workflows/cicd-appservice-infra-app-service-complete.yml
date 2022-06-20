@@ -1,4 +1,4 @@
-name: ci-cd-appservice-infra-mi
+name: cicd-appservice-infra-app-service-complete
 
 on:
   #push:
@@ -71,59 +71,18 @@ jobs:
         run: |
           az deployment sub create \
            --location ${{ secrets.AZURE_LOCATION }} \
-           --template-file ./deployment-rg.bicep \
+           --template-file ./templates/components/rg.bicep \
            --parameters name=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }} resourceTags="${{ secrets.AZURE_RESOURCE_TAGS }}"
 
       - name: Deploy Log Workspace
         if: steps.logs_rg_exists.outputs.LOGS_RG_EXISTS == 'false'
         run: |
-          az deployment group create --resource-group ${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} --template-file ./deployment-logs.bicep \
+          az deployment group create --resource-group ${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} --template-file ./templates/components/logs.bicep \
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                      logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}
 
-  deploy_event_hub_if_needed:
-    # Having this as a separte Job, as there are many situations where Log Analytics
-    # workspace would be outside of the current subscription
-    needs: [cleanup_if_requested]
-    runs-on: ubuntu-latest
-    environment: APP_SERVICE_COMPLETE
-    defaults:
-      run:
-        working-directory: ./scripts
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set default Azure subscription
-        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Check the resource group exists
-        id: event_hub_rg_exists
-        run: |
-          EVENT_HUB_RG_EXISTS=$(az group exists --name ${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }})
-          echo "::set-output name=EVENT_HUB_RG_EXISTS::${EVENT_HUB_RG_EXISTS}"
-
-      - name: Create Event Hub Namespace Azure resource group
-        if: steps.event_hub_rg_exists.outputs.EVENT_HUB_RG_EXISTS == 'false'
-        run: |
-          az deployment sub create \
-           --location ${{ secrets.AZURE_LOCATION }} \
-           --template-file ./deployment-rg.bicep \
-           --parameters name=${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }} resourceTags="${{ secrets.AZURE_RESOURCE_TAGS }}"
-
-      - name: Deploy EventHub
-        if: steps.event_hub_rg_exists.outputs.EVENT_HUB_RG_EXISTS == 'false'
-        run: |
-          az deployment group create --resource-group ${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} --template-file ./deployment-event-hub.bicep \
-                        --parameters location=${{ secrets.AZURE_LOCATION }} \
-                                     eventHubNamespaceName=${{ secrets.AZURE_EVENT_HUB_NAMESPACE }} \
-                                     eventHubName=${{ secrets.SPRING_CLOUD_STREAM_OUT_DESTINATION }}
   deploy_infra:
-    needs: [deploy_log_analytics_if_needed, deploy_event_hub_if_needed]
+    needs: [deploy_log_analytics_if_needed]
     runs-on: ubuntu-latest
     environment: APP_SERVICE_COMPLETE
     defaults:
@@ -144,13 +103,13 @@ jobs:
         run: |
           az deployment sub create \
            --location ${{ secrets.AZURE_LOCATION }} \
-           --template-file ./deployment-rg.bicep \
+           --template-file ./templates/components/rg.bicep \
            --parameters name=${{ secrets.AZURE_RESOURCE_GROUP }} location=${{ secrets.AZURE_LOCATION }} resourceTags="${{ secrets.AZURE_RESOURCE_TAGS }}"
 
       - name: Deploy Azure resources
         run: |
           clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`        
-          az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./deployment-mi.bicep \
+          az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./templates/app-service-simple.bicep \
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                      logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}  \
                                      logAnalyticsWorkspaceRG=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }}  \
@@ -164,7 +123,6 @@ jobs:
                                      dbUserPassword=${{ secrets.AZURE_API_DB_USER_PASSWORD }} \
                                      eventHubClientId=${{ secrets.AZURE_EVENT_HUB_CLIENT_ID }} \
                                      eventHubClientSecret=${{ secrets.AZURE_EVENT_HUB_CLIENT_SECRET }} \
-                                     eventHubRG=${{ secrets.AZURE_EVENT_HUB_RESOURCE_GROUP }} \
                                      eventHubNamespaceName=${{ secrets.AZURE_EVENT_HUB_NAMESPACE }} \
                                      springCloudStreamInDestination=${{ secrets.SPRING_CLOUD_STREAM_IN_DESTINATION }} \
                                      springCloudStreamInGroup=${{ secrets.SPRING_CLOUD_STREAM_IN_GROUP }} \
