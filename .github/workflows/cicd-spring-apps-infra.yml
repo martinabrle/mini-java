@@ -1,4 +1,4 @@
-name: ci-cd-appservice-spring-apps
+name: ci-cd-spring-apps
 
 on:
   #push:

@@ -1,4 +1,4 @@
-name: cicd-appservice-infra-app-service-simple
+name: cicd-app-service-complete-infra
 
 on:
   #push:
@@ -15,19 +15,13 @@ on:
 jobs:
   cleanup_if_requested:
     runs-on: ubuntu-latest
-    environment: APP_SERVICE_SIMPLE
+    environment: APP_SERVICE_COMPLETE
     steps:
       - name: Azure login
         if: github.event.inputs.run_cleanup == 'true'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      #- name: Set default Azure subscription
-      #  run: echo "${{ secrets.AZURE_CREDENTIALS }}" > ./secrets.txt
-
-      #- name: Setup tmate session
-      #  uses: mxschmitt/action-tmate@v3.11
 
       - name: Set default Azure subscription
         if: github.event.inputs.run_cleanup == 'true'
@@ -86,11 +80,11 @@ jobs:
           az deployment group create --resource-group ${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }} --template-file ./templates/components/logs.bicep \
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
                                      logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}
-                                     
+
   deploy_infra:
-    needs: [cleanup_if_requested]
+    needs: [deploy_log_analytics_if_needed]
     runs-on: ubuntu-latest
-    environment: APP_SERVICE_SIMPLE
+    environment: APP_SERVICE_COMPLETE
     defaults:
       run:
         working-directory: ./scripts
@@ -117,6 +111,10 @@ jobs:
           clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`        
           az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./templates/app-service-simple.bicep \
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
+                                     logAnalyticsWorkspaceName=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_NAME }}  \
+                                     logAnalyticsWorkspaceRG=${{ secrets.AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP }}  \
+                                     keyVaultName=${{ secrets.AZURE_KEY_VAULT_NAME }}  \
+                                     appInsightsName=${{ secrets.AZURE_APP_INSIGHTS_NAME }}  \
                                      dbServerName=${{ secrets.AZURE_DB_SERVER_NAME }} \
                                      dbName=${{ secrets.AZURE_DB_NAME }} \
                                      dbAdminName=${{ secrets.AZURE_DB_ADMIN_NAME }} \
@@ -136,5 +134,6 @@ jobs:
                                      eventConsumerServiceName=${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_NAME }} \
                                      eventConsumerServicePort=${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_PORT }} \
                                      clientIPAddress=$clientIP
+      
       #Debug: - name: Setup tmate session
       #         uses: mxschmitt/action-tmate@v3.11
