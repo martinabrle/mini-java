@@ -109,13 +109,10 @@ jobs:
       - name: Deploy Azure resources
         run: |
           clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
-          azureCredentials=$(cat << EOF
-          ${{ secrets.AZURE_CREDENTIALS }}
-          EOF
-          )
-          echo $azureCredentials
-
-          currentClientId=`echo "$azureCredentials" | jq '.clientId'`
+          currentUserId=`az ad signed-in-user show --query "objectId" --output tsv`
+          currentUserId=`az ad signed-in-user show --query "objectId" --output tsv`
+          
+          az role assignment create --assignee $currentUserId --role "Key Vault Administrator" --scope "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourcegroups/${{ secrets.AZURE_RESOURCE_GROUP }}"
 
           az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./templates/app-service-complete.bicep \
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
@@ -141,8 +138,7 @@ jobs:
                                      webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
                                      eventConsumerServiceName=${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_NAME }} \
                                      eventConsumerServicePort=${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_PORT }} \
-                                     clientIPAddress=$clientIP \
-                                     currentClientId=$currentClientId
+                                     clientIPAddress=$clientIP
       
       #Debug: - name: Setup tmate session
       #         uses: mxschmitt/action-tmate@v3.11

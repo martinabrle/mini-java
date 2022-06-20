@@ -45,8 +45,10 @@ az deployment group create --resource-group ${AZURE_LOG_ANALYTICS_WRKSPC_RESOURC
 
 az deployment sub create --location ${AZURE_LOCATION} --template-file ./templates/components/rg.bicep --parameters name=$AZURE_RESOURCE_GROUP resourceTags="${AZURE_RESOURCE_TAGS}"
 
+currentUserId=`az ad signed-in-user show --query "objectId" --output tsv`
+currentSubscriptionId=`az account show --query "id" --output tsv`
 
-deploymentClientId=`az ad signed-in-user show | jq '.objectId'`
+az role assignment create --assignee $currentUserId --role "Key Vault Administrator" --scope "/subscriptions/${currentSubscriptionId}/resourcegroups/${AZURE_RESOURCE_GROUP}"
 
 az deployment group create --resource-group ${AZURE_RESOURCE_GROUP} --template-file ./templates/app-service-complete.bicep \
               --parameters  location=${AZURE_LOCATION}  \
@@ -72,8 +74,7 @@ az deployment group create --resource-group ${AZURE_RESOURCE_GROUP} --template-f
                             webServicePort=${AZURE_WEB_SERVICE_PORT} \
                             eventConsumerServiceName=${AZURE_EVENT_CONSUMER_SERVICE_NAME} \
                             eventConsumerServicePort=${AZURE_EVENT_CONSUMER_SERVICE_PORT} \
-                            clientIPAddress=$clientIP \
-                            currentClientId=$deploymentClientId
+                            clientIPAddress=$clientIP
 
 az group delete --resource-group ${AZURE_RESOURCE_GROUP}
 az group delete --resource-group ${AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP}
