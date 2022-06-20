@@ -109,10 +109,10 @@ jobs:
       - name: Deploy Azure resources
         run: |
           clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
-          currentUserId=`az ad signed-in-user show --query "objectId" --output tsv`
-          currentUserId=`az ad signed-in-user show --query "objectId" --output tsv`
           
-          az role assignment create --assignee $currentUserId --role "Key Vault Administrator" --scope "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourcegroups/${{ secrets.AZURE_RESOURCE_GROUP }}"
+          azureClientId=$(jq '.clientId' << 'END_TEMPLATE' ${{ secrets.AZURE_CREDENTIALS }} END_TEMPLATE)
+
+          az role assignment create --assignee $azureClientId --role "Key Vault Administrator" --scope "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourcegroups/${{ secrets.AZURE_RESOURCE_GROUP }}"
 
           az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./templates/app-service-complete.bicep \
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
