@@ -764,18 +764,18 @@ module rbacKVSecretApiSpringDatasourceUserPassword './components/role-assignment
   }
 }
 
-module rbacKVSecretApiSpringDataSourceURL './components/role-assignment-kv-secret.bicep' = {
-  name: 'deployment-rbac-kv-secret-api-spring-datasource-url'
-  params: {
-    roleDefinitionId: keyVaultSecretsUser.id
-    principalId: apiService.identity.principalId
-    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretSpringDataSourceURL.id, keyVaultSecretsUser.id)
-    kvName: keyVault.name
-    kvSecretName: keyVaultSecretSpringDataSourceURL.name
-  }
-}
+// module rbacKVSecretApiSpringDataSourceURL './components/role-assignment-kv-secret.bicep' = {
+//   name: 'deployment-rbac-kv-secret-api-spring-datasource-url'
+//   params: {
+//     roleDefinitionId: keyVaultSecretsUser.id
+//     principalId: apiService.identity.principalId
+//     roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretSpringDataSourceURL.id, keyVaultSecretsUser.id)
+//     kvName: keyVault.name
+//     kvSecretName: keyVaultSecretSpringDataSourceURL.name
+//   }
+// }
 
-resource rbacKVSecretApiSpringDataSourceURL2 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource rbacKVSecretApiSpringDataSourceURL 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid(apiService.id, keyVaultSecretSpringDataSourceURL.id, keyVaultSecretsUser.id)
   scope: keyVaultSecretSpringDataSourceURL
   properties: {
