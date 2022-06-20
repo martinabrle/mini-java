@@ -109,8 +109,8 @@ jobs:
       - name: Deploy Azure resources
         run: |
           clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
-          
-          currentClientId=`echo '${{ secrets.AZURE_CREDENTIALS }}' | jq '.clientId'`
+          azureCredentialsLocal='${{ secrets.AZURE_CREDENTIALS }}'
+          deploymentClientId=`echo '${azureCredentialsLocal}' | jq '.clientId'`
 
           az deployment group create --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --template-file ./templates/app-service-complete.bicep \
                         --parameters location=${{ secrets.AZURE_LOCATION }}  \
@@ -137,7 +137,7 @@ jobs:
                                      eventConsumerServiceName=${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_NAME }} \
                                      eventConsumerServicePort=${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_PORT }} \
                                      clientIPAddress=$clientIP
-                                     currentClientId=$currentClientId
+                                     currentClientId=$deploymentClientId
       
       #Debug: - name: Setup tmate session
       #         uses: mxschmitt/action-tmate@v3.11
