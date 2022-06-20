@@ -110,9 +110,13 @@ jobs:
         run: |
           clientIP=`dig +short myip.opendns.com @resolver1.opendns.com.`
 
+          #unable to assign "Key Vault Administrator" to the current azureClientId gtom the bicep script
+          #weird - but perhaps this will sove the timing issues
+          
           azureConnection=$(cat << 'END_TEMPLATE'
           ${{ secrets.AZURE_CREDENTIALS }}
           END_TEMPLATE
+          )
 
           azureClientId=$(echo $azureConnection | jq -j '.clientId')
           echo "$azureClientId"
