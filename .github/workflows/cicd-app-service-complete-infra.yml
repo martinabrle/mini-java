@@ -136,7 +136,7 @@ jobs:
                                      webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
                                      eventConsumerServiceName=${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_NAME }} \
                                      eventConsumerServicePort=${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_PORT }} \
-                                     clientIPAddress=$clientIP
+                                     clientIPAddress=$clientIP \
                                      currentClientId=$deploymentClientId
       
       #Debug: - name: Setup tmate session
