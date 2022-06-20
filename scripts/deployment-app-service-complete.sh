@@ -45,6 +45,9 @@ az deployment group create --resource-group ${AZURE_LOG_ANALYTICS_WRKSPC_RESOURC
 
 az deployment sub create --location ${AZURE_LOCATION} --template-file ./templates/components/rg.bicep --parameters name=$AZURE_RESOURCE_GROUP resourceTags="${AZURE_RESOURCE_TAGS}"
 
+
+deploymentClientId=`az ad signed-in-user show | jq '.objectId'`
+
 az deployment group create --resource-group ${AZURE_RESOURCE_GROUP} --template-file ./templates/app-service-complete.bicep \
               --parameters  location=${AZURE_LOCATION}  \
                             logAnalyticsWorkspaceName=${AZURE_LOG_ANALYTICS_WRKSPC_NAME}  \
@@ -69,7 +72,8 @@ az deployment group create --resource-group ${AZURE_RESOURCE_GROUP} --template-f
                             webServicePort=${AZURE_WEB_SERVICE_PORT} \
                             eventConsumerServiceName=${AZURE_EVENT_CONSUMER_SERVICE_NAME} \
                             eventConsumerServicePort=${AZURE_EVENT_CONSUMER_SERVICE_PORT} \
-                            clientIPAddress=$clientIP
+                            clientIPAddress=$clientIP \
+                            currentClientId=$deploymentClientId
 
 az group delete --resource-group ${AZURE_RESOURCE_GROUP}
 az group delete --resource-group ${AZURE_LOG_ANALYTICS_WRKSPC_RESOURCE_GROUP}
