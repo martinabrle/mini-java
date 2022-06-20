@@ -807,17 +807,27 @@ module rbacKVSecretWebAppInsightsKey './components/role-assignment-kv-secret.bic
   }
 }
 
-module rbacKVSecretApiWebApiUri './components/role-assignment-kv-secret.bicep' = {
-  name: 'deployment-rbac-kv-secret-web-api-uri'
-  params: {
+// module rbacKVSecretApiWebApiUri './components/role-assignment-kv-secret.bicep' = {
+//   name: 'deployment-rbac-kv-secret-web-api-uri'
+//   params: {
+//     roleDefinitionId: keyVaultSecretsUser.id
+//     principalId: webService.identity.principalId
+//     roleAssignmentNameGuid: guid(webService.id, keyVaultSecretApiURI.id, keyVaultSecretsUser.id)
+//     kvName: keyVault.name
+//     kvSecretName: keyVaultSecretApiURI.name
+//   }
+// }
+
+
+resource rbacKVSecretApiWebApiUri 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+  name: guid(webService.id, keyVaultSecretApiURI.id, keyVaultSecretsUser.id)
+  scope: keyVaultSecretApiURI
+  properties: {
     roleDefinitionId: keyVaultSecretsUser.id
     principalId: webService.identity.principalId
-    roleAssignmentNameGuid: guid(webService.id, keyVaultSecretApiURI.id, keyVaultSecretsUser.id)
-    kvName: keyVault.name
-    kvSecretName: keyVaultSecretApiURI.name
+    principalType: 'ServicePrincipal'
   }
 }
-
 module rbacKVSecretApiWebEventHubConnectionString './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-web-event-hub-connection-string'
   params: {
