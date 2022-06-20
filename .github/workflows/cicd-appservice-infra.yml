@@ -135,8 +135,8 @@ jobs:
                                      apiServicePort=${{ secrets.AZURE_API_SERVICE_PORT }} \
                                      webServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
                                      webServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
-                                     eventConsumerServiceName=${{ secrets.AZURE_WEB_SERVICE_NAME }} \
-                                     eventConsumerServicePort=${{ secrets.AZURE_WEB_SERVICE_PORT }} \
+                                     eventConsumerServiceName=${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_NAME }} \
+                                     eventConsumerServicePort=${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_PORT }} \
                                      clientIPAddress=$clientIP
       #Debug: - name: Setup tmate session
       #         uses: mxschmitt/action-tmate@v3.11
