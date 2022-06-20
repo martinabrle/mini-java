@@ -19,7 +19,9 @@ export SPRING_CLOUD_STREAM_IN_GROUP="\$Default" \
 export SPRING_CLOUD_STREAM_OUT_DESTINATION="maabr-hub" \
 
 export AZURE_KEY_VAULT_NAME="maabr-${UNIQUE_STRING}-kv"
+
 export AZURE_APP_INSIGHTS_NAME="maabr-${UNIQUE_STRING}-app-insights"
+
 export AZURE_DB_SERVER_NAME="maabr-${UNIQUE_STRING}-pg"
 export AZURE_DB_NAME="tododb"
 

@@ -16,8 +16,8 @@ param eventHubClientId string
 @secure()
 param eventHubClientSecret string
 
-param eventHubTenantId string = subscription().id //event hub may be in another tenant
-param eventHubSubscriptionId string = tenant().tenantId //event hub may be in another subscription
+param eventHubTenantId string = tenant().tenantId //event hub may be in another tenant
+param eventHubSubscriptionId string = subscription().id //event hub may be in another subscription
 param eventHubRG string
 param eventHubNamespaceName string
 param springCloudStreamInDestination string
@@ -41,7 +41,7 @@ param tagsArray object = resourceGroup().tags
 
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2022-01-01-preview' existing = {
   name: eventHubNamespaceName
-  scope: resourceGroup(eventHubSubscriptionId, eventHubRG)
+  scope: resourceGroup(eventHubRG)
 }
 
 resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01' = {
