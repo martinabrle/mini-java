@@ -38,6 +38,8 @@ param webServicePort string
 param eventConsumerServiceName string
 param eventConsumerServicePort string
 
+param currentClientId string
+
 param location string = resourceGroup().location
 
 param tagsArray object = resourceGroup().tags
@@ -223,7 +225,6 @@ resource eventHubNamespaceRootManageSharedAccessKey 'Microsoft.EventHub/namespac
   name: 'RootManageSharedAccessKey'
 
 }
-
 // var listEventHubKeysEndpoint = '${eventHubNamespace.id}/AuthorizationRules/RootManageSharedAccessKey'
 // var eventHubNamespaceConnectionString = 'Endpoint=sb://${eventHubNamespace.name}.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=${listKeys(listEventHubKeysEndpoint, eventHubNamespace.apiVersion).primaryKey}'
 
@@ -705,11 +706,23 @@ resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01
   name: '4633458b-17de-408a-b874-0445c86b69e6'
 }
 
-// @description('This is the built-in Key Vault Administrator User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
-// resource keyVaultAdministrator 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
-//   scope: keyVaultSecretAppInsightsKey
-//   name: '00482a5a-887f-4fb3-b363-3b7fe8e74483'
-// }
+@description('This is the built-in Key Vault Administrator User role. See https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
+resource keyVaultAdministrator 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  scope: keyVaultSecretAppInsightsKey
+  name: '00482a5a-887f-4fb3-b363-3b7fe8e74483'
+}
+
+module rbacKeyVaultAdmin './components/role-assignment-kv.bicep' = {
+  name: 'deployment-rbac-kv-deployer'
+  params: {
+    roleDefinitionId: keyVaultAdministrator.id
+    principalId: currentClientId
+    roleAssignmentNameGuid: guid(currentClientId, keyVault.id, keyVaultAdministrator.id)
+    kvName: keyVault.name
+  }
+}
+
+
 
 //TODO Coming at some point.. - or some variation of
 // @description('This is the built-in Admin for PGSQL Flexible Server. Coming at some point to... https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')
