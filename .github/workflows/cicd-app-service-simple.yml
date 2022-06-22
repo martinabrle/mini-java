@@ -20,14 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set default Azure subscription
-        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
       #Debug: - name: Setup tmate session
       #         uses: mxschmitt/action-tmate@v3.11
 
@@ -40,7 +32,8 @@ jobs:
 
               psql "${dbConnectionStringTodoDB}" --file=./db.sql
               
-              psql "${dbConnectionStringPostgresDB}" "SELECT * FROM pg_roles;"
+              psql "${dbConnectionStringPostgresDB}" -tAc "SELECT * FROM pg_roles;"
+              psql "${dbConnectionStringPostgresDB}" -tAc "SELECT * FROM pg_roles WHERE rolname='${{ secrets.AZURE_API_DB_USER_NAME }}';"
 
               dbUserExists=`psql "${dbConnectionStringPostgresDB}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ secrets.AZURE_API_DB_USER_NAME }}';"`
               echo "User already exists: $dbUserExists"
