@@ -230,7 +230,7 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
           value: 'https://${apiServiceName}.azurewebsites.net/todos/'
         }
         {
-          name: 'AZURE-EVENTHUB-NAMESPACE-CONNECTION-STRING'
+          name: 'AZURE_EVENTHUB_NAMESPACE_CONNECTION-STRING'
           value: eventHubNamespaceRootManageSharedAccessKey.listKeys().primaryConnectionString
         }
         {
