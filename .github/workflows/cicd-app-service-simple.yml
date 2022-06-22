@@ -47,7 +47,6 @@ jobs:
               dbUserName="${{secrets.AZURE_API_DB_USER_NAME}}"
               dbUserPassword="${{secrets.AZURE_API_DB_USER_PASSWORD}}"
               dbUserName="tester"
-              echo "new user: '$dbUserName'"
 
               dbUserExists=`psql "${dbConnectionStringPostgresDB}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName';"`
 
@@ -56,7 +55,7 @@ jobs:
                 psql "${dbConnectionStringPostgresDB}" -tAc "CREATE USER $dbUserName WITH PASSWORD '$dbUserPassword';"
               else
                 echo "...re-setting the password"
-                psql "${dbConnectionStringPostgresDB}" -tAc "ALTER USER $dbUserName SET PASSWORD TO '$dbUserPassword';"
+                psql "${dbConnectionStringPostgresDB}" -tAc "ALTER USER $dbUserName WITH PASSWORD '$dbUserPassword';"
               fi
               echo "Granting user access"
               psql "${dbConnectionStringPostgresDB}" -tAc "GRANT CONNECT ON DATABASE ${{ secrets.AZURE_DB_NAME }} TO $dbUserName;"
