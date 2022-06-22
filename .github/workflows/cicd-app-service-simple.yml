@@ -39,6 +39,9 @@ jobs:
               psql "${dbConnectionStringPostgresDB}" -c "SELECT * FROM pg_roles WHERE rolname like '%$dbUserName%';"
 
               dbUserExists=`psql "${dbConnectionStringPostgresDB}" -tAc "SELECT 1 FROM pg_roles WHERE rolname like '%$dbUserName%';"`
+              dbUserExists=`psql "${dbConnectionStringPostgresDB}" -tAc "SELECT * FROM pg_roles WHERE rolname='u5487f349fd17b43df9fc8d9b';"`
+              
+              
               echo "User already exists: $dbUserExists"
               if [[ $dbUserExists -ne '1' ]]; then
                 echo "...creating the user"
