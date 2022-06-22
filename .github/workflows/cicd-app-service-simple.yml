@@ -47,6 +47,7 @@ jobs:
               $dbUserName="${{secrets.AZURE_API_DB_USER_NAME}}"
               $dbUserPassword="${{secrets.AZURE_API_DB_USER_PASSWORD}}"
               $dbUserName="tester"
+              echo "new user: ''$dbUserName''"
 
               dbUserExists=`psql "${dbConnectionStringPostgresDB}" -tAc "SELECT 1 FROM pg_roles WHERE rolname=''$dbUserName'';"`
               
