@@ -44,14 +44,13 @@ jobs:
               
               psql "${dbConnectionStringTodoDB}" --file=./db.sql
               
-              $dbUserName="${{secrets.AZURE_API_DB_USER_NAME}}"
-              $dbUserPassword="${{secrets.AZURE_API_DB_USER_PASSWORD}}"
-              $dbUserName="tester"
+              dbUserName="${{secrets.AZURE_API_DB_USER_NAME}}"
+              dbUserPassword="${{secrets.AZURE_API_DB_USER_PASSWORD}}"
+              dbUserName="tester"
               echo "new user: ''$dbUserName''"
 
               dbUserExists=`psql "${dbConnectionStringPostgresDB}" -tAc "SELECT 1 FROM pg_roles WHERE rolname=''$dbUserName'';"`
-              
-              
+
               if [[ $dbUserExists -ne '1' ]]; then
                 echo "...creating the user"
                 psql "${dbConnectionStringPostgresDB}" -tAc "CREATE USER $dbUserName WITH PASSWORD ''$dbUserPassword'';"
