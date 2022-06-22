@@ -41,7 +41,7 @@ jobs:
               
               dbUserExists=`psql "${dbConnectionString}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ secrets.AZURE_API_DB_USER_NAME }}'"`
                
-              if [[ $dbUserExists -eq '1' ]]; thenl
+              if [[ $dbUserExists -eq '1' ]]; then
                 psql "${dbConnectionString}" -tAc "CREATE USER ${{ secrets.AZURE_API_DB_USER_NAME }} WITH PASSWORD '${{ secrets.AZURE_API_DB_USER_PASSWORD }}';"
               else
                 psql "${dbConnectionString}" -tAc "ALTER USER ${{ secrets.AZURE_API_DB_USER_NAME }} SET PASSWORD TO '${{ secrets.AZURE_API_DB_USER_PASSWORD }}';"
