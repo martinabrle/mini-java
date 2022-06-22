@@ -40,7 +40,7 @@ jobs:
 
               psql "${dbConnectionStringTodoDB}" --file=./db.sql
               
-              psql "${dbConnectionStringPostgresDB}" "SELECT * FROM pg_roles WHERE rolname='${{ secrets.AZURE_API_DB_USER_NAME }}';"
+              psql "${dbConnectionStringPostgresDB}" "SELECT * FROM pg_roles;"
 
               dbUserExists=`psql "${dbConnectionStringPostgresDB}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ secrets.AZURE_API_DB_USER_NAME }}';"`
               echo "User already exists: $dbUserExists"
