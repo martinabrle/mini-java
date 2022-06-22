@@ -36,9 +36,9 @@ jobs:
               psql "${dbConnectionStringTodoDB}" --file=./db.sql
               
               psql "${dbConnectionStringPostgresDB}" -c 'SELECT * FROM pg_roles;'
-              psql "${dbConnectionStringPostgresDB}" -c "SELECT * FROM pg_roles WHERE rolname='$dbUserName';"
+              psql "${dbConnectionStringPostgresDB}" -c "SELECT * FROM pg_roles WHERE rolname like '%$dbUserName%';"
 
-              dbUserExists=`psql "${dbConnectionStringPostgresDB}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='$dbUserName';"`
+              dbUserExists=`psql "${dbConnectionStringPostgresDB}" -tAc "SELECT 1 FROM pg_roles WHERE rolname like '%$dbUserName%';"`
               echo "User already exists: $dbUserExists"
               if [[ $dbUserExists -ne '1' ]]; then
                 echo "...creating the user"
