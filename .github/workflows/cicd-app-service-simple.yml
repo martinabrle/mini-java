@@ -35,24 +35,25 @@ jobs:
       #         run mvwm and init it from java spring-boot on the admin connection (?)
       - name: Initialize database
         run: |
-              dbConnectionString="host=${{ secrets.AZURE_DB_SERVER_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=${{ secrets.AZURE_DB_ADMIN_NAME }} password=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} sslmode=require"
+              dbConnectionStringTodoDB="host=${{ secrets.AZURE_DB_SERVER_NAME }}.postgres.database.azure.com port=5432 dbname=${{ secrets.AZURE_DB_NAME }} user=${{ secrets.AZURE_DB_ADMIN_NAME }} password=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} sslmode=require"
+              dbConnectionStringPostgresDB="host=${{ secrets.AZURE_DB_SERVER_NAME }}.postgres.database.azure.com port=5432 dbname=postgres user=${{ secrets.AZURE_DB_ADMIN_NAME }} password=${{ secrets.AZURE_DB_ADMIN_PASSWORD }} sslmode=require"
 
-              psql "${dbConnectionString}" --file=./db.sql
+              psql "${dbConnectionStringTodoDB}" --file=./db.sql
               
-              dbUserExists=`psql "${dbConnectionString}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ secrets.AZURE_API_DB_USER_NAME }}'"`
+              dbUserExists=`psql "${dbConnectionStringPostgresDB}" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${{ secrets.AZURE_API_DB_USER_NAME }}'"`
               echo "User already exists: $dbUserExists"
               if [[ $dbUserExists -ne '1' ]]; then
                 echo "...creating the user"
-                psql "${dbConnectionString}" -tAc "CREATE USER ${{ secrets.AZURE_API_DB_USER_NAME }} WITH PASSWORD '${{ secrets.AZURE_API_DB_USER_PASSWORD }}';"
+                psql "${dbConnectionStringPostgresDB}" -tAc "CREATE USER ${{ secrets.AZURE_API_DB_USER_NAME }} WITH PASSWORD '${{ secrets.AZURE_API_DB_USER_PASSWORD }}';"
               else
                 echo "...re-setting the password"
-                psql "${dbConnectionString}" -tAc "ALTER USER ${{ secrets.AZURE_API_DB_USER_NAME }} SET PASSWORD TO '${{ secrets.AZURE_API_DB_USER_PASSWORD }}';"
+                psql "${dbConnectionStringPostgresDB}" -tAc "ALTER USER ${{ secrets.AZURE_API_DB_USER_NAME }} SET PASSWORD TO '${{ secrets.AZURE_API_DB_USER_PASSWORD }}';"
               fi
               echo "Granting user access"
-              psql "${dbConnectionString}" -tAc "GRANT CONNECT ON DATABASE ${{ secrets.AZURE_DB_NAME }} TO ${{ secrets.AZURE_API_DB_USER_NAME }};"
-              psql "${dbConnectionString}" -tAc "GRANT USAGE ON SCHEMA public TO ${{ secrets.AZURE_API_DB_USER_NAME }};"
-              psql "${dbConnectionString}" -tAc "GRANT SELECT ON todo TO ${{ secrets.AZURE_API_DB_USER_NAME }};"
-              psql "${dbConnectionString}" -tAc "GRANT INSERT ON todo TO ${{ secrets.AZURE_API_DB_USER_NAME }};"              
+              psql "${dbConnectionStringPostgresDB}" -tAc "GRANT CONNECT ON DATABASE ${{ secrets.AZURE_DB_NAME }} TO ${{ secrets.AZURE_API_DB_USER_NAME }};"
+              psql "${dbConnectionStringTodoDB}" -tAc "GRANT USAGE ON SCHEMA public TO ${{ secrets.AZURE_API_DB_USER_NAME }};"
+              psql "${dbConnectionStringTodoDB}" -tAc "GRANT SELECT ON todo TO ${{ secrets.AZURE_API_DB_USER_NAME }};"
+              psql "${dbConnectionStringTodoDB}" -tAc "GRANT INSERT ON todo TO ${{ secrets.AZURE_API_DB_USER_NAME }};"              
 
   build_api:
     runs-on: ubuntu-latest
