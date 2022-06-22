@@ -16,5 +16,5 @@ INSERT INTO todo ("todo_text", "created_date_time", tracking_id) VALUES ('Put Ha
 INSERT INTO todo ("todo_text", "created_date_time", tracking_id) VALUES ('Make Stark Industries a massive success','2018-04-16 12:05:25-07', '00000000-0000-0000-0000-000000000007') ON CONFLICT DO NOTHING;
 INSERT INTO todo ("todo_text", "created_date_time", tracking_id) VALUES ('Keep escaping death in the most Tony Stark way possible','2019-04-11 14:08:25-07', '00000000-0000-0000-0000-000000000008') ON CONFLICT DO NOTHING;
 INSERT INTO todo ("todo_text", "created_date_time", tracking_id) VALUES ('Learn Spring boot','2019-11-21 10:44:00-07', '00000000-0000-0000-0000-000000000009') ON CONFLICT DO NOTHING;
-INSERT INTO todo ("todo_text", "created_date_time", trackingId) VALUES ('Deploy a multi tier Spring boot app into Azure','2022-04-22 19:10:25-07', '00000000-0000-0000-0000-000000000010') ON CONFLICT DO NOTHING;
+INSERT INTO todo ("todo_text", "created_date_time", tracking_id) VALUES ('Deploy a multi tier Spring boot app into Azure','2022-04-22 19:10:25-07', '00000000-0000-0000-0000-000000000010') ON CONFLICT DO NOTHING;
 
