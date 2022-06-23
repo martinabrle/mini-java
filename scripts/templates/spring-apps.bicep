@@ -228,7 +228,7 @@ resource eventHubNamespaceRootManageSharedAccessKey 'Microsoft.EventHub/namespac
 
 resource keyVaultSecretAzureEventHubConnectionString 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'AZURE-EVENTHUB-NAMESPACE-CONNECTION-STRING'
+  name: 'AZURE_EVENTHUB_NAMESPACE_CONNECTION_STRING'
   properties: {
     value: eventHubNamespaceRootManageSharedAccessKey.listKeys().primaryConnectionString
     contentType: 'string'
@@ -412,7 +412,7 @@ resource springAppsApiService 'Microsoft.AppPlatform/Spring/apps@2022-05-01-prev
 }
 
 resource springAppsApiServiceDeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-05-01-preview' = {
-  name:  '${apiServiceName}-deployment'
+  name: '${apiServiceName}-deployment'
   parent: springAppsApiService
   dependsOn: [
     rbacKVSecretApiSpringDataSourceURL
@@ -460,7 +460,7 @@ resource springAppsWebService 'Microsoft.AppPlatform/Spring/apps@2022-05-01-prev
 }
 
 resource springAppsWebServiceDeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-05-01-preview' = {
-  name:  '${webServiceName}-deployment'
+  name: '${webServiceName}-deployment'
   parent: springAppsWebService
   dependsOn: [
     rbacKVSecretWebApiUri
@@ -505,7 +505,7 @@ resource springAppsEventConsumerService 'Microsoft.AppPlatform/Spring/apps@2022-
 }
 
 resource eventConsumerServiceDeployment 'Microsoft.AppPlatform/Spring/apps/deployments@2022-05-01-preview' = {
-  name:  '${eventConsumerServiceName}-deployment'
+  name: '${eventConsumerServiceName}-deployment'
   parent: springAppsEventConsumerService
   dependsOn: [
     rbacKVSecretEventConsumerClientId
@@ -598,7 +598,7 @@ module rbacKVSecretApiAppInsightsKey './components/role-assignment-kv-secret.bic
   params: {
     roleDefinitionId: keyVaultSecretsUser.id
     principalId: springAppsApiService.identity.principalId
-    roleAssignmentNameGuid: guid(springAppsApiService .id, keyVaultSecretAppInsightsKey.id, keyVaultSecretsUser.id)
+    roleAssignmentNameGuid: guid(springAppsApiService.id, keyVaultSecretAppInsightsKey.id, keyVaultSecretsUser.id)
     kvName: keyVault.name
     kvSecretName: keyVaultSecretAppInsightsKey.name
   }
