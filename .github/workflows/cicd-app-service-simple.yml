@@ -196,6 +196,7 @@ jobs:
           path: ./consumer_kafka/target/${{ steps.version.outputs.RELEASE_FILE_NAME }}
           if-no-files-found: error
           retention-days: 1          
+  
   deploy_kafka_consumer:
     needs: [build_kafka_consumer, deploy_api]
     runs-on: ubuntu-latest
@@ -224,7 +225,7 @@ jobs:
       - name: Deploy to AppService
         uses: azure/webapps-deploy@v2
         with: 
-          app-name: "${{ secrets.AZURE_WEB_SERVICE_NAME }}"
+          app-name: "${{ secrets.AZURE_EVENT_CONSUMER_SERVICE_NAME }}"
           package: ./${{ needs.build_kafka_consumer.outputs.RELEASE_FILE_NAME }}
       
       - name: Run integration test(s)
