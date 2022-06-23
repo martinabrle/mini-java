@@ -139,7 +139,7 @@ resource keyVaultSecretSpringDataSourceURL 'Microsoft.KeyVault/vaults/secrets@20
 
 resource keyVaultSecretAzureEventHubClientId 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'EVENTHUB-CLIENT-ID'
+  name: 'EVENT-HUB-CLIENT-ID'
   properties: {
     value: eventHubClientId
     contentType: 'string'
@@ -148,7 +148,7 @@ resource keyVaultSecretAzureEventHubClientId 'Microsoft.KeyVault/vaults/secrets@
 
 resource keyVaultSecretAzureEventHubClientSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'EVENTHUB-CLIENT-SECRET'
+  name: 'EVENT-HUB-CLIENT-SECRET'
   properties: {
     value: eventHubClientSecret
     contentType: 'string'
@@ -157,7 +157,7 @@ resource keyVaultSecretAzureEventHubClientSecret 'Microsoft.KeyVault/vaults/secr
 
 resource keyVaultSecretAzureEventHubTenantId 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'EVENTHUB-TENANT-ID'
+  name: 'EVENT-HUB-TENANT-ID'
   properties: {
     value: eventHubTenantId
     contentType: 'string'
@@ -166,7 +166,7 @@ resource keyVaultSecretAzureEventHubTenantId 'Microsoft.KeyVault/vaults/secrets@
 
 resource keyVaultSecretAzureEventHubSubscriptionId 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'EVENTHUB-SUBSCRIPTION-ID'
+  name: 'EVENT-HUB-SUBSCRIPTION-ID'
   properties: {
     value: eventHubSubscriptionId
     contentType: 'string'
@@ -175,7 +175,7 @@ resource keyVaultSecretAzureEventHubSubscriptionId 'Microsoft.KeyVault/vaults/se
 
 resource keyVaultSecretAzureEventHubRG 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'EVENTHUB-RESOURCE-GROUP'
+  name: 'EVENT-HUB-RESOURCE-GROUP'
   properties: {
     value: eventHubRG
     contentType: 'string'
@@ -184,7 +184,7 @@ resource keyVaultSecretAzureEventHubRG 'Microsoft.KeyVault/vaults/secrets@2021-1
 
 resource keyVaultSecretAzureEventHubNamespace 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'EVENTHUB-NAMESPACE'
+  name: 'EVENT-HUB-NAMESPACE'
   properties: {
     value: eventHubNamespaceName
     contentType: 'string'
@@ -228,7 +228,7 @@ resource eventHubNamespaceRootManageSharedAccessKey 'Microsoft.EventHub/namespac
 
 resource keyVaultSecretAzureEventHubConnectionString 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'EVENTHUB-NAMESPACE-CONNECTION-STRING'
+  name: 'EVENT-HUB-NAMESPACE-CONNECTION-STRING'
   properties: {
     value: eventHubNamespaceRootManageSharedAccessKey.listKeys().primaryConnectionString
     contentType: 'string'
@@ -509,12 +509,12 @@ resource webServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
         //'https://${apiServiceName}.azurewebsites.net/todos/'
       }
       {
-        name: 'EVENTHUB_NAMESPACE_CONNECTION_STRING'
-        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=EVENTHUB-NAMESPACE-CONNECTION-STRING)'
+        name: 'EVENT_HUB_NAMESPACE_CONNECTION_STRING'
+        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=EVENT-HUB-NAMESPACE-CONNECTION-STRING)'
       }
       {
         name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
+        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APPLICATION-INSIGHTS-CONNECTION-STRING)'
       }
       {
         name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
@@ -719,8 +719,6 @@ resource keyVaultSecretsUser 'Microsoft.Authorization/roleDefinitions@2018-01-01
 //     kvName: keyVault.name
 //   }
 // }
-
-
 
 //TODO Coming at some point.. - or some variation of
 // @description('This is the built-in Admin for PGSQL Flexible Server. Coming at some point to... https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles')

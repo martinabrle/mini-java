@@ -230,11 +230,11 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
           value: 'https://${apiServiceName}.azurewebsites.net/todos/'
         }
         {
-          name: 'EVENTHUB_NAMESPACE_CONNECTION_STRING'
+          name: 'EVENT_HUB_NAMESPACE_CONNECTION_STRING'
           value: eventHubNamespaceRootManageSharedAccessKey.listKeys().primaryConnectionString
         }
         {
-          name: 'EVENTHUB_NAME'
+          name: 'EVENT_HUB_NAME'
           value: springCloudStreamOutDestination
         }
         {

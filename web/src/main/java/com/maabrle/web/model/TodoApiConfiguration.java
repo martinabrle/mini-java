@@ -14,8 +14,8 @@ public class TodoApiConfiguration {
 
     private Properties properties;
     private String API_URI;
-    private String EVENTHUB_NAME;
-    private String EVENTHUB_NAMESPACE_CONNECTION_STRING;
+    private String EVENT_HUB_NAME;
+    private String EVENT_HUB_NAMESPACE_CONNECTION_STRING;
 
     protected TodoApiConfiguration() {
         try {
@@ -31,9 +31,9 @@ public class TodoApiConfiguration {
         }
 
         API_URI = getProperty(properties, "todo.api.url", "API_URI");
-        EVENTHUB_NAMESPACE_CONNECTION_STRING = getProperty(properties, "todo.eventhub.namespace.connection_string",
-                "EVENTHUB_NAMESPACE_CONNECTION_STRING");
-        EVENTHUB_NAME = getProperty(properties, "todo.eventhub.name", "EVENTHUB_NAME");
+        EVENT_HUB_NAMESPACE_CONNECTION_STRING = getProperty(properties, "todo.eventhub.namespace.connection_string",
+                "EVENT_HUB_NAMESPACE_CONNECTION_STRING");
+        EVENT_HUB_NAME = getProperty(properties, "todo.eventhub.name", "EVENT_HUB_NAME");
     }
 
     protected static String getProperty(Properties properties, String key, String fallbackEnvVariable) {
@@ -83,10 +83,10 @@ public class TodoApiConfiguration {
     }
 
     public static String getEventHubName() {
-        return getConfig().EVENTHUB_NAME;
+        return getConfig().EVENT_HUB_NAME;
     }
 
     public static String getEventHubNameSpaceConnectionString() {
-        return getConfig().EVENTHUB_NAMESPACE_CONNECTION_STRING;
+        return getConfig().EVENT_HUB_NAMESPACE_CONNECTION_STRING;
     }
 }
