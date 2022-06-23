@@ -237,7 +237,16 @@ resource keyVaultSecretAzureEventHubConnectionString 'Microsoft.KeyVault/vaults/
 
 resource keyVaultSecretAppInsightsKey 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'APPLICATIONINSIGHTS-CONNECTION-STRING'
+  name: 'APPLICATION-INSIGHTS-CONNECTION-STRING'
+  properties: {
+    value: appInsights.properties.ConnectionString
+    contentType: 'string'
+  }
+}
+
+resource keyVaultSecretAppInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: keyVault
+  name: 'APP-INSIGHTS-INSTRUMENTATION-KEY'
   properties: {
     value: appInsights.properties.ConnectionString
     contentType: 'string'
@@ -482,7 +491,8 @@ resource springAppsWebServiceDeployment 'Microsoft.AppPlatform/Spring/apps/deplo
         'PORT': webServicePort
         'API_URI': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=API-URI)'
         'EVENT_HUB_NAMESPACE_CONNECTION_STRING': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=EVENT-HUB-NAMESPACE-CONNECTION-STRING)'
-        'APPLICATIONINSIGHTS_CONNECTION_STRING': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
+        'APPLICATIONINSIGHTS_CONNECTION_STRING': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APPLICATION-INSIGHTS-CONNECTION-STRING)'
+        'APPINSIGHTS_INSTRUMENTATIONKEY': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APP-INSIGHTS_INSTRUMENTATION-KEY)'
         'SCM_DO_BUILD_DURING_DEPLOYMENT': 'false'
       }
     }

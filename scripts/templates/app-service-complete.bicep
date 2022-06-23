@@ -237,9 +237,18 @@ resource keyVaultSecretAzureEventHubConnectionString 'Microsoft.KeyVault/vaults/
 
 resource keyVaultSecretAppInsightsKey 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'APPLICATIONINSIGHTS-CONNECTION-STRING'
+  name: 'APPLICATION-INSIGHTS-CONNECTION-STRING'
   properties: {
     value: appInsights.properties.ConnectionString
+    contentType: 'string'
+  }
+}
+
+resource keyVaultSecretAppInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: keyVault
+  name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+  properties: {
+    value: appInsights.properties.InstrumentationKey
     contentType: 'string'
   }
 }
@@ -396,6 +405,7 @@ resource apiServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
     rbacKVSecretApiSpringDatasourceUserName
     rbacKVSecretApiSpringDatasourceUserPassword
     rbacKVSecretApiAppInsightsKey
+    rbacKVSecretApiAppInsightsInstrKey
   ]
   kind: 'string'
   properties: {
@@ -426,6 +436,10 @@ resource apiServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
       {
         name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
         value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
+      }
+      {
+        name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APP-INSIGHTS_INSTRUMENTATION-KEY)'
       }
       {
         name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
@@ -495,6 +509,7 @@ resource webServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
     rbacKVSecretApiWebApiUri
     rbacKVSecretApiWebEventHubConnectionString
     rbacKVSecretWebAppInsightsKey
+    rbacKVSecretWebAppInsightsInstrKey
   ]
   kind: 'string'
   properties: {
@@ -515,6 +530,10 @@ resource webServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
       {
         name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
         value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APPLICATION-INSIGHTS-CONNECTION-STRING)'
+      }
+      {
+        name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APP-INSIGHTS-INSTRUMENTATION-KEY)'
       }
       {
         name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
@@ -599,6 +618,7 @@ resource eventConsumerServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
     rbacKVSecretEventConsumerSpringDSPassword
     rbacKVSecretEventConsumerSpringDataSourceURL
     rbacKVSecretEventConsumerAppInsightsKey
+    rbacKVSecretEventConsumerAppInsightsInstrKey
   ]
   kind: 'string'
   properties: {
@@ -660,7 +680,11 @@ resource eventConsumerServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
       }
       {
         name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
+        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APPLICATION-INSIGHTS-CONNECTION-STRING)'
+      }
+      {
+        name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APP-INSIGHTS-INSTRUMENTATION-KEY)'
       }
       {
         name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
@@ -805,6 +829,17 @@ module rbacKVSecretApiAppInsightsKey './components/role-assignment-kv-secret.bic
   }
 }
 
+module rbacKVSecretApiAppInsightsInstrKey './components/role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-api-app-insights-instr'
+  params: {
+    roleDefinitionId: keyVaultSecretsUser.id
+    principalId: apiService.identity.principalId
+    roleAssignmentNameGuid: guid(apiService.id, keyVaultSecretAppInsightsInstrumentationKey.id, keyVaultSecretsUser.id)
+    kvName: keyVault.name
+    kvSecretName: keyVaultSecretAppInsightsInstrumentationKey.name
+  }
+}
+
 module rbacKVSecretWebAppInsightsKey './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-web-app-insights'
   params: {
@@ -813,6 +848,17 @@ module rbacKVSecretWebAppInsightsKey './components/role-assignment-kv-secret.bic
     roleAssignmentNameGuid: guid(webService.id, keyVaultSecretAppInsightsKey.id, keyVaultSecretsUser.id)
     kvName: keyVault.name
     kvSecretName: keyVaultSecretAppInsightsKey.name
+  }
+}
+
+module rbacKVSecretWebAppInsightsInstrKey './components/role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-web-app-insights-instr'
+  params: {
+    roleDefinitionId: keyVaultSecretsUser.id
+    principalId: webService.identity.principalId
+    roleAssignmentNameGuid: guid(webService.id, keyVaultSecretAppInsightsInstrumentationKey.id, keyVaultSecretsUser.id)
+    kvName: keyVault.name
+    kvSecretName: keyVaultSecretAppInsightsInstrumentationKey.name
   }
 }
 
@@ -986,6 +1032,18 @@ module rbacKVSecretEventConsumerAppInsightsKey './components/role-assignment-kv-
     roleDefinitionId: keyVaultSecretsUser.id
     principalId: eventConsumerService.identity.principalId
     roleAssignmentNameGuid: guid(eventConsumerService.id, keyVaultSecretAppInsightsKey.id, keyVaultSecretsUser.id)
+    kvName: keyVault.name
+    kvSecretName: keyVaultSecretAppInsightsKey.name
+  }
+}
+
+
+module rbacKVSecretEventConsumerAppInsightsInstrKey './components/role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-event-consumer-app-insights-instr'
+  params: {
+    roleDefinitionId: keyVaultSecretsUser.id
+    principalId: eventConsumerService.identity.principalId
+    roleAssignmentNameGuid: guid(eventConsumerService.id, keyVaultSecretAppInsightsInstrumentationKey.id, keyVaultSecretsUser.id)
     kvName: keyVault.name
     kvSecretName: keyVaultSecretAppInsightsKey.name
   }
