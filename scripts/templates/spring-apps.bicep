@@ -21,7 +21,7 @@ param eventHubClientId string
 @secure()
 param eventHubClientSecret string
 param eventHubTenantId string = tenant().tenantId //event hub may be in another tenant (requires script modification)
-param eventHubSubscriptionId string = substring(subscription().id, lastIndexOf(subscription().id, '/')) //event hub may be in another subscription (requires script modification)
+param eventHubSubscriptionId string = substring(subscription().id, lastIndexOf(subscription().id, '/')+1) //event hub may be in another subscription (requires script modification)
 param eventHubRG string = resourceGroup().name //event hub may be in another resource group (requires script modification)
 param eventHubNamespaceName string
 param springCloudStreamInDestination string
