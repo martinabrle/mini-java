@@ -21,7 +21,7 @@ param eventHubClientId string
 @secure()
 param eventHubClientSecret string
 param eventHubTenantId string = tenant().tenantId //event hub may be in another tenant (requires script modification)
-param eventHubSubscriptionId string = substring(subscription().id, lastIndexOf(subscription().id, '/')+1) //event hub may be in another subscription (requires script modification)
+param eventHubSubscriptionId string = substring(subscription().id, lastIndexOf(subscription().id, '/') + 1) //event hub may be in another subscription (requires script modification)
 param eventHubRG string = resourceGroup().name //event hub may be in another resource group (requires script modification)
 param eventHubNamespaceName string
 param springCloudStreamInDestination string
@@ -71,6 +71,14 @@ resource eventHubNamespace 'Microsoft.EventHub/namespaces@2022-01-01-preview' = 
     isAutoInflateEnabled: false
     kafkaEnabled: true
     zoneRedundant: false
+  }
+  resource eventHub 'eventhubs@2022-01-01-preview' = {
+    name: springCloudStreamOutDestination
+    properties: {
+      messageRetentionInDays: 1
+      partitionCount: 1
+      status: 'Active'
+    }
   }
 }
 
@@ -1036,7 +1044,6 @@ module rbacKVSecretEventConsumerAppInsightsKey './components/role-assignment-kv-
     kvSecretName: keyVaultSecretAppInsightsKey.name
   }
 }
-
 
 module rbacKVSecretEventConsumerAppInsightsInstrKey './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-app-insights-instr'

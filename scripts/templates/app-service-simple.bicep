@@ -52,6 +52,14 @@ resource eventHubNamespace 'Microsoft.EventHub/namespaces@2022-01-01-preview' = 
     kafkaEnabled: true
     zoneRedundant: false
   }
+  resource eventHub 'eventhubs@2022-01-01-preview' = {
+    name: springCloudStreamOutDestination
+    properties: {
+      messageRetentionInDays: 1
+      partitionCount: 1
+      status: 'Active'
+    }
+  }
 }
 
 resource postgreSQLServer 'Microsoft.DBforPostgreSQL/flexibleServers@2021-06-01' = {
