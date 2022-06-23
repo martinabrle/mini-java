@@ -230,7 +230,7 @@ resource webService 'Microsoft.Web/sites@2021-03-01' = {
           value: 'https://${apiServiceName}.azurewebsites.net/todos/'
         }
         {
-          name: 'AZURE_EVENTHUB_NAMESPACE_CONNECTION_STRING'
+          name: 'EVENTHUB_NAMESPACE_CONNECTION_STRING'
           value: eventHubNamespaceRootManageSharedAccessKey.listKeys().primaryConnectionString
         }
         {
@@ -297,23 +297,23 @@ resource eventConsumerService 'Microsoft.Web/sites@2021-03-01' = {
           value: dbUserPassword
         }
         {
-          name: 'AZURE_EVENT_HUB_CLIENT_ID'
+          name: 'EVENT_HUB_CLIENT_ID'
           value: eventHubClientId
         }
         {
-          name: 'AZURE_EVENT_HUB_CLIENT_SECRET'
+          name: 'EVENT_HUB_CLIENT_SECRET'
           value: eventHubClientSecret
         }
         {
-          name: 'AZURE_EVENT_HUB_TENANT_ID'
+          name: 'EVENT_HUB_TENANT_ID'
           value: eventHubTenantId
         }
         {
-          name: 'AZURE_EVENT_HUB_SUBSCRIPTION_ID'
+          name: 'EVENT_HUB_SUBSCRIPTION_ID'
           value: eventHubSubscriptionId
         }
         {
-          name: 'AZURE_EVENT_HUB_NAMESPACE'
+          name: 'EVENT_HUB_NAMESPACE'
           value: eventHubNamespaceName
         }
         {
@@ -329,7 +329,7 @@ resource eventConsumerService 'Microsoft.Web/sites@2021-03-01' = {
           value: springCloudStreamOutDestination
         }
         {
-          name: 'AZURE_EVENT_HUB_RESOURCE_GROUP'
+          name: 'EVENT_HUB_RESOURCE_GROUP'
           value: eventHubRG
         }
         {

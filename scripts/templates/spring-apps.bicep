@@ -141,7 +141,7 @@ resource keyVaultSecretSpringDataSourceURL 'Microsoft.KeyVault/vaults/secrets@20
 
 resource keyVaultSecretAzureEventHubClientId 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'AZURE-EVENTHUB-CLIENT-ID'
+  name: 'EVENTHUB-CLIENT-ID'
   properties: {
     value: eventHubClientId
     contentType: 'string'
@@ -150,7 +150,7 @@ resource keyVaultSecretAzureEventHubClientId 'Microsoft.KeyVault/vaults/secrets@
 
 resource keyVaultSecretAzureEventHubClientSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'AZURE-EVENTHUB-CLIENT-SECRET'
+  name: 'EVENTHUB-CLIENT-SECRET'
   properties: {
     value: eventHubClientSecret
     contentType: 'string'
@@ -159,7 +159,7 @@ resource keyVaultSecretAzureEventHubClientSecret 'Microsoft.KeyVault/vaults/secr
 
 resource keyVaultSecretAzureEventHubTenantId 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'AZURE-EVENTHUB-TENANT-ID'
+  name: 'EVENTHUB-TENANT-ID'
   properties: {
     value: eventHubTenantId
     contentType: 'string'
@@ -168,7 +168,7 @@ resource keyVaultSecretAzureEventHubTenantId 'Microsoft.KeyVault/vaults/secrets@
 
 resource keyVaultSecretAzureEventHubSubscriptionId 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'AZURE-EVENTHUB-SUBSCRIPTION-ID'
+  name: 'EVENTHUB-SUBSCRIPTION-ID'
   properties: {
     value: eventHubSubscriptionId
     contentType: 'string'
@@ -177,7 +177,7 @@ resource keyVaultSecretAzureEventHubSubscriptionId 'Microsoft.KeyVault/vaults/se
 
 resource keyVaultSecretAzureEventHubRG 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'AZURE-EVENTHUB-RESOURCE-GROUP'
+  name: 'EVENTHUB-RESOURCE-GROUP'
   properties: {
     value: eventHubRG
     contentType: 'string'
@@ -186,7 +186,7 @@ resource keyVaultSecretAzureEventHubRG 'Microsoft.KeyVault/vaults/secrets@2021-1
 
 resource keyVaultSecretAzureEventHubNamespace 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'AZURE-EVENTHUB-NAMESPACE'
+  name: 'EVENTHUB-NAMESPACE'
   properties: {
     value: eventHubNamespaceName
     contentType: 'string'
@@ -228,7 +228,7 @@ resource eventHubNamespaceRootManageSharedAccessKey 'Microsoft.EventHub/namespac
 
 resource keyVaultSecretAzureEventHubConnectionString 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'AZURE_EVENTHUB_NAMESPACE_CONNECTION_STRING'
+  name: 'EVENTHUB-NAMESPACE-CONNECTION-STRING'
   properties: {
     value: eventHubNamespaceRootManageSharedAccessKey.listKeys().primaryConnectionString
     contentType: 'string'
@@ -481,7 +481,7 @@ resource springAppsWebServiceDeployment 'Microsoft.AppPlatform/Spring/apps/deplo
       environmentVariables: {
         'PORT': webServicePort
         'API_URI': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=API-URI)'
-        'AZURE_EVENTHUB_NAMESPACE_CONNECTION_STRING': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=AZURE-EVENTHUB-NAMESPACE-CONNECTION-STRING)'
+        'EVENTHUB_NAMESPACE_CONNECTION_STRING': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=EVENTHUB-NAMESPACE-CONNECTION-STRING)'
         'APPLICATIONINSIGHTS_CONNECTION_STRING': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
         'SCM_DO_BUILD_DURING_DEPLOYMENT': 'false'
       }
@@ -538,15 +538,15 @@ resource eventConsumerServiceDeployment 'Microsoft.AppPlatform/Spring/apps/deplo
         'SPRING_DATASOURCE_URL': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=SPRING-DATASOURCE-URL)'
         'SPRING_DATASOURCE_USERNAME': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=SPRING-DATASOURCE-USERNAME)'
         'SPRING_DATASOURCE_PASSWORD': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=SPRING-DATASOURCE-PASSWORD)'
-        'AZURE_EVENT_HUB_CLIENT_ID': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=AZURE-EVENT-HUB-CLIENT-ID)'
-        'AZURE_EVENT_HUB_CLIENT_SECRET': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=AZURE-EVENT-HUB-CLIENT-SECRET)'
-        'AZURE_EVENT_HUB_TENANT_ID': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=AZURE-EVENT-HUB-TENANT-ID)'
-        'AZURE_EVENT_HUB_SUBSCRIPTION_ID': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=AZURE-EVENT-HUB-SUBSCRIPTION-ID)'
-        'AZURE_EVENT_HUB_NAMESPACE': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=AZURE-EVENT-HUB-NAMESPACE)'
+        'EVENT_HUB_CLIENT_ID': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=EVENT-HUB-CLIENT-ID)'
+        'EVENT_HUB_CLIENT_SECRET': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=EVENT-HUB-CLIENT-SECRET)'
+        'EVENT_HUB_TENANT_ID': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=EVENT-HUB-TENANT-ID)'
+        'EVENT_HUB_SUBSCRIPTION_ID': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=EVENT-HUB-SUBSCRIPTION-ID)'
+        'EVENT_HUB_NAMESPACE': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=EVENT-HUB-NAMESPACE)'
         'SPRING_CLOUD_STREAM_IN_DESTINATION': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=SPRING-CLOUD-STREAM-IN-DESTINATION)'
         'SPRING_CLOUD_STREAM_IN_GROUP': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=SPRING-CLOUD-STREAM-IN-GROUP)'
         'SPRING_CLOUD_STREAM_OUT_DESTINATION': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=SPRING-CLOUD-STREAM-OUT-DESTINATION)'
-        'AZURE_EVENT_HUB_RESOURCE_GROUP': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=AZURE-EVENT-HUB-RESOURCE-GROUP)'
+        'EVENT_HUB_RESOURCE_GROUP': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=EVENT-HUB-RESOURCE-GROUP)'
         'APPLICATIONINSIGHTS_CONNECTION_STRING': '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APPLICATIONINSIGHTS-CONNECTION-STRING)'
         'SCM_DO_BUILD_DURING_DEPLOYMENT': 'false'
       }
