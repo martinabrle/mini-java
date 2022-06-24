@@ -145,40 +145,6 @@ jobs:
       - name: Run integration test(s)
         run: |
           echo "Run integration tests...."
-   deploy_api:
-    needs: [build_api, init_db]
-    runs-on: ubuntu-latest
-    environment: APP_SERVICE_SIMPLE
-    steps:
-      - name: Download build artefacts
-        uses: actions/download-artifact@v2
-        with:
-          name: ${{needs.build_api.outputs.RELEASE_NAME}}
-      - name: Check downloaded files
-        run: |
-          pwd
-          ls -la
-          ls -la ./${{ needs.build_api.outputs.RELEASE_FILE_NAME }}
-      
-      - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-        #see https://docs.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-cli%2Clinux
-        #    az account list-locations -o table
-
-      - name: Set default Azure subscription
-        run: az account set -s ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
-      - name: Deploy to AppService
-        uses: azure/webapps-deploy@v2
-        with: 
-          app-name: "${{ secrets.AZURE_API_SERVICE_NAME }}"
-          package: ./${{ needs.build_api.outputs.RELEASE_FILE_NAME }}
-      
-      - name: Run integration test(s)
-        run: |
-          echo "Run integration tests...."
   
   build_kafka_consumer:
     runs-on: ubuntu-latest
