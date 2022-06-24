@@ -19,7 +19,9 @@
         <input type="submit" value="Create Task">
       </form>
     </div>
-    
+    <div id="message-box" th:if="${#!strings.isEmpty(message) || strings.equals(status, 'error')}" class="${strings.isEmpty(status)? 'error' : 'status' }">
+      <p>${#strings.isEmpty(message)? 'An unknown error has occured, please try again later': message}</p>
+    </div>
     <div th:if="${todos.empty}">
       <p>All TO DOs completed. Yay!</p>
     </div>

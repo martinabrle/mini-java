@@ -64,6 +64,7 @@ public class TodoListController {
 				String trackingId = TodoService.CreateTodoAsyncEventHub(newTodo).getTrackingId();
 				model.addAttribute("status", "saving");
 				model.addAttribute("trackingId", trackingId);
+				model.addAttribute("message", String.format("Task is being saved. If not autopatically redirected, please refresh the browser", todo.getId()));
 			}
 		} catch (NewTodoIsEmptyException ex) {
 			isError = true;
