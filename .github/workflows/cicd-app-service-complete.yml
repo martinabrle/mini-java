@@ -148,7 +148,7 @@ jobs:
   
   build_kafka_consumer:
     runs-on: ubuntu-latest
-    environment: APP_SERVICE_SIMPLE
+    environment: APP_SERVICE_COMPLETE
     defaults:
       run:
         working-directory: ./consumer_kafka
@@ -199,7 +199,7 @@ jobs:
   deploy_kafka_consumer:
     needs: [build_kafka_consumer, deploy_api]
     runs-on: ubuntu-latest
-    environment: APP_SERVICE_SIMPLE
+    environment: APP_SERVICE_COMPLETE
     steps:
       - name: Download build artefacts
         uses: actions/download-artifact@v2
