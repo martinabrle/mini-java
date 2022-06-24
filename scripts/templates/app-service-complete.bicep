@@ -517,6 +517,7 @@ resource webServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
   dependsOn: [
     rbacKVSecretApiWebApiUri
     rbacKVSecretApiWebEventHubConnectionString
+    rbacKVSecretApiWebEventHubName
     rbacKVSecretWebAppInsightsKey
     rbacKVSecretWebAppInsightsInstrKey
   ]
@@ -535,6 +536,10 @@ resource webServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
       {
         name: 'EVENT_HUB_NAMESPACE_CONNECTION_STRING'
         value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=EVENT-HUB-NAMESPACE-CONNECTION-STRING)'
+      }
+      {
+        name: 'EVENT_HUB_NAME'
+        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=SPRING-CLOUD-STREAM-OUT-DESTINATION)'
       }
       {
         name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
@@ -902,6 +907,18 @@ module rbacKVSecretApiWebEventHubConnectionString './components/role-assignment-
     kvSecretName: keyVaultSecretAzureEventHubConnectionString.name
   }
 }
+
+module rbacKVSecretApiWebEventHubName './components/role-assignment-kv-secret.bicep' = {
+  name: 'deployment-rbac-kv-secret-web-event-hub-name'
+  params: {
+    roleDefinitionId: keyVaultSecretsUser.id
+    principalId: webService.identity.principalId
+    roleAssignmentNameGuid: guid(webService.id, keyVaultSecretSpringCloudStreamOutDestination.id, keyVaultSecretsUser.id)
+    kvName: keyVault.name
+    kvSecretName: keyVaultSecretSpringCloudStreamOutDestination.name
+  }
+}
+
 
 module rbacKVSecretEventConsumerClientId './components/role-assignment-kv-secret.bicep' = {
   name: 'deployment-rbac-kv-secret-event-consumer-hub-client-id'
