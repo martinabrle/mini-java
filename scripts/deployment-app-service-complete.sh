@@ -45,7 +45,7 @@ az deployment group create --resource-group ${AZURE_LOG_ANALYTICS_WRKSPC_RESOURC
 
 az deployment sub create --location ${AZURE_LOCATION} --template-file ./templates/components/rg.bicep --parameters name=$AZURE_RESOURCE_GROUP resourceTags="${AZURE_RESOURCE_TAGS}"
 
-currentUserId=`az ad signed-in-user show --query "objectId" --output tsv`
+currentUserId=`az ad signed-in-user show --query "id" --output tsv`
 currentSubscriptionId=`az account show --query "id" --output tsv`
 
 az role assignment create --assignee $currentUserId --role "Key Vault Administrator" --scope "/subscriptions/${currentSubscriptionId}/resourcegroups/${AZURE_RESOURCE_GROUP}"

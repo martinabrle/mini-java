@@ -234,8 +234,6 @@ resource eventHubNamespaceRootManageSharedAccessKey 'Microsoft.EventHub/namespac
   name: 'RootManageSharedAccessKey'
 
 }
-// var listEventHubKeysEndpoint = '${eventHubNamespace.id}/AuthorizationRules/RootManageSharedAccessKey'
-// var eventHubNamespaceConnectionString = 'Endpoint=sb://${eventHubNamespace.name}.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=${listKeys(listEventHubKeysEndpoint, eventHubNamespace.apiVersion).primaryKey}'
 
 resource keyVaultSecretAzureEventHubConnectionString 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
@@ -257,7 +255,7 @@ resource keyVaultSecretAppInsightsKey 'Microsoft.KeyVault/vaults/secrets@2021-11
 
 resource keyVaultSecretAppInsightsInstrumentationKey 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   parent: keyVault
-  name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+  name: 'APP-INSIGHTS-INSTRUMENTATION-KEY'
   properties: {
     value: appInsights.properties.InstrumentationKey
     contentType: 'string'
@@ -450,7 +448,7 @@ resource apiServicePARMS 'Microsoft.Web/sites/config@2021-03-01' = {
       }
       {
         name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APP-INSIGHTS_INSTRUMENTATION-KEY)'
+        value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=APP-INSIGHTS-INSTRUMENTATION-KEY)'
       }
       {
         name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
@@ -1055,7 +1053,7 @@ module rbacKVSecretEventConsumerAppInsightsInstrKey './components/role-assignmen
     principalId: eventConsumerService.identity.principalId
     roleAssignmentNameGuid: guid(eventConsumerService.id, keyVaultSecretAppInsightsInstrumentationKey.id, keyVaultSecretsUser.id)
     kvName: keyVault.name
-    kvSecretName: keyVaultSecretAppInsightsKey.name
+    kvSecretName: keyVaultSecretAppInsightsInstrumentationKey.name
   }
 }
 
