@@ -450,6 +450,11 @@ resource springAppsApiServiceDeployment 'Microsoft.AppPlatform/Spring/apps/deplo
         'SCM_DO_BUILD_DURING_DEPLOYMENT': 'false'
       }
     }
+    source: {
+      type: 'Jar'
+      relativePath: '<default>'
+      runtimeVersion: 'Java_11'
+    }
     active: true
   }
 }
