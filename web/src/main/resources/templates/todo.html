@@ -25,7 +25,7 @@
     </div>
     -->
     <div id="message-box">
-      <p>${message}</p>
+      <p th:text="*{message}"></p>
     </div>
     <div th:if="${todos.empty}">
       <p>All TO DOs completed. Yay!</p>
