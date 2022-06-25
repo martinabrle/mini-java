@@ -12,7 +12,7 @@
     <div>
       <form method="post" th:action="@{/create}" th:object="${newTodo}">
         <input id="todoText" placeholder="Enter the next task" required type="text" th:field="*{todoText}" />
-        <select id="processingType" required th:field="*{processingType}">
+        <select id="processingType" required name="processingType" th:field="*{processingType}">
           <option value="" hidden>Select a processing type</option>
           <option value="SYNC">Snchronously</option>
           <option value="ASYNC">Asynchronously</option>
@@ -27,7 +27,7 @@
       
     </div>
     -->
-    <div id="message-box" th:if="${#!strings.isEmpty(status) && !strings.isEmpty(message)}" class="*{status}">
+    <div id="message-box" th:if="${!strings.isEmpty(message)}" class="*{status}">
       <p th:text="*{message}"></p>
     </div>
     <div th:if="${todos.empty}">
