@@ -27,8 +27,10 @@ public class TodoListController {
 
 		LOGGER.debug("TODOs retrieval called");
 
-		model.addAttribute("newTodo", new NewTodo());
 		model.addAttribute("status", "");
+		model.addAttribute("checkStatusAsync", false);
+		model.addAttribute("message", "");
+		model.addAttribute("newTodo", new NewTodo());
 		model.addAttribute("todos", new TodoList());
 
 		try {
@@ -47,8 +49,9 @@ public class TodoListController {
 		LOGGER.debug("TODO creation called", newTodo);
 
 		model.addAttribute("newTodo", newTodo);
-		model.addAttribute("status", "");
 		model.addAttribute("todos", new TodoList());
+		model.addAttribute("status", "");
+		model.addAttribute("checkStatusAsync", false);
 		model.addAttribute("message", "");
 		boolean isError = false;
 		try {
@@ -64,7 +67,9 @@ public class TodoListController {
 				String trackingId = TodoService.CreateTodoAsyncEventHub(newTodo).getTrackingId();
 				model.addAttribute("status", "saving");
 				model.addAttribute("trackingId", trackingId);
-				model.addAttribute("message", String.format("Task is being saved. If not autopatically redirected, please refresh the browser"));
+				model.addAttribute("checkStatusAsync", true);
+				model.addAttribute("message", String
+						.format("Task is being saved. If not autopatically redirected, please refresh the browser"));
 			}
 		} catch (NewTodoIsEmptyException ex) {
 			isError = true;
@@ -93,5 +98,10 @@ public class TodoListController {
 			}
 		}
 		return "todo";
+	}
+	
+	@GetMapping("/processingStatus")
+	public String getProcessingStatus(@RequestParam(name = "trackingId", required = true, defaultValue = "") String trackingId) {
+		return "whatever";
 	}
 }

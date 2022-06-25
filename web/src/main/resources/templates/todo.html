@@ -1,44 +1,39 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
+  <head>
+    <title>Todo 3 Tier Demo App</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="./todo.js" defer></script>
+    <script th:inline="javascript">
+      let checkStatusAsync = /*[[${checkStatusAsync}]]*/ false;
+      let trackingId = /*[[${trackingId}]]*/ "";
+    </script>
+  </head>
 
-<head>
-  <title>Todo 3 Tier Demo App</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <script src="./todo.js" defer></script>
-</head>
-
-<body>
-  <div>
+  <body>
     <div>
-      <form method="post" th:action="@{/create}" th:object="${newTodo}">
-        <input id="todoText" placeholder="Enter the next task" required type="text" th:field="*{todoText}" />
-        <select id="processingType" required name="processingType" th:field="*{processingType}">
-          <option value="" hidden>Select a processing type</option>
-          <option value="SYNC">Snchronously</option>
-          <option value="ASYNC">Asynchronously</option>
-        </select>
-        <input type="submit" value="Create Task">
-      </form>
+      <div>
+        <form method="post" th:action="@{/create}" th:object="${newTodo}">
+          <input id="todoText" placeholder="Enter the next task" required type="text" th:field="*{todoText}" />
+          <select id="processingType" required name="processingType" th:field="*{processingType}">
+            <option value="" hidden>Select a processing type</option>
+            <option value="SYNC">Snchronously</option>
+            <option value="ASYNC">Asynchronously</option>
+          </select>
+          <input type="submit" value="Create Task" />
+        </form>
+      </div>
+      <div id="message-box" th:if="${!#strings.isEmpty(message)}" th:classappend="${#strings.isEmpty(status) ? 'none' : status}">
+        <p th:text="*{message}"></p>
+      </div>
+      <div th:if="${todos.empty}">
+        <p>All TO DOs completed. Yay!</p>
+      </div>
+      <div th:each="todo : ${todos}" th:key="${todo.id}">
+        <div th:text="${todo.createdDateTimeShortString}">text</div>
+        <div th:text="${todo.todoText}">text</div>
+        <div th:text="${todo.completed}">text</div>
+      </div>
     </div>
-    <!--
-    <div id="message-box" th:if="${#!strings.isEmpty(message) || strings.equals(status, 'error')}" class="${strings.isEmpty(status)? 'error' : 'status'}">
-      <p>${#strings.isEmpty(message)? 'An unknown error has occured, please try again later': message}</p>
-      <p th:text="*{message}"></p>
-      
-    </div>
-    -->
-    <div id="message-box" th:if="${!strings.isEmpty(message)}" class="*{status}">
-      <p th:text="*{message}"></p>
-    </div>
-    <div th:if="${todos.empty}">
-      <p>All TO DOs completed. Yay!</p>
-    </div>
-    <div th:each="todo : ${todos}" th:key="${todo.id}">
-      <div th:text="${todo.createdDateTimeShortString}">text</div>
-      <div th:text="${todo.todoText}">text</div>
-      <div th:text="${todo.completed}">text</div>
-    </div>
-  </div>
-</body>
-
+  </body>
 </html>
