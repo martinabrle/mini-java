@@ -1,5 +1,7 @@
 package com.maabrle.web;
 
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,9 +66,9 @@ public class TodoListController {
 				model.addAttribute("status", "saved");
 				model.addAttribute("message", String.format("Task %o has been saved.", todo.getId()));
 			} else {
-				String trackingId = TodoService.CreateTodoAsyncEventHub(newTodo).getTrackingId();
+				UUID id = TodoService.CreateTodoAsyncEventHub(newTodo).getId();
 				model.addAttribute("status", "saving");
-				model.addAttribute("trackingId", trackingId);
+				model.addAttribute("trackingId", id);
 				model.addAttribute("checkStatusAsync", true);
 				model.addAttribute("message", String
 						.format("Task is being saved. If not autopatically redirected, please refresh the browser"));
@@ -100,8 +102,8 @@ public class TodoListController {
 		return "todo";
 	}
 	
-	@GetMapping("/processingStatus")
-	public String getProcessingStatus(@RequestParam(name = "trackingId", required = true, defaultValue = "") String trackingId) {
+	@GetMapping("/todos/{id}")
+	public String getProcessingStatus(@RequestParam(name = "id", required = true, defaultValue = "") String id) {
 		return "whatever";
 	}
 }

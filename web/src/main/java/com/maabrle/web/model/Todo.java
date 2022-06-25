@@ -13,7 +13,7 @@ import java.util.UUID;
 public class Todo {
     public static final Logger LOGGER = LoggerFactory.getLogger(Todo.class);
 
-    private long id;
+    private UUID id;
 
     private Date createdDateTime;
 
@@ -21,45 +21,36 @@ public class Todo {
 
     private Date completedDateTime;
 
-    private String trackingId;
-
     public Todo() {
     }
 
-    public Todo(long id, Date createdDateTime, String todoText) {
+    public Todo(UUID id, Date createdDateTime, String todoText) {
         this.id = id;
         this.createdDateTime = createdDateTime;
         this.todoText = todoText;
         this.completedDateTime = null;
-        this.trackingId = null;
     }
 
-    public Todo(String todoText, UUID trackingId) {
-        this.id = 0;
+    public Todo(UUID id, String todoText) {
+        this.id = id;
         this.createdDateTime = null;
         this.todoText = todoText;
         this.completedDateTime = null;
-        this.trackingId = trackingId.toString();
     }
 
-    public long getId() {
+    public UUID getId() {
         return id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
     public String getTodoText() {
         return todoText;
     }
 
     public void setTodoText(String todoText) {
         this.todoText = todoText;
-    }
-
-    public String getTrackingId() {
-        return trackingId;
-    }
-
-    public void setTrackingId(String trackingId) {
-        this.trackingId = trackingId;
     }
 
     public String getCompleted() {
@@ -86,7 +77,6 @@ public class Todo {
                 "id=" + id +
                 ", todoText='" + (todoText != null ? todoText : "").replace("\'", "\\'") + '\'' +
                 ", created='" + createdDateTime + '\'' +
-                ", trackingId='" + trackingId + '\'' +
                 ", completed='" + completedDateTime + '\'' +
                 '}';
     }

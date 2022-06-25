@@ -1,6 +1,7 @@
 package com.maabrle.api;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,14 +38,14 @@ class TodoController {
 
   // Single item
   @GetMapping("/todos/{id}")
-  Todo one(@PathVariable Long id) {
+  Todo one(@PathVariable UUID id) {
     
     return repository.findById(id)
       .orElseThrow(() -> new TodoNotFoundException(id));
   }
 
   @PutMapping("/todos/{id}")
-  Todo replaceTodo(@RequestBody Todo newTodo, @PathVariable Long id) {
+  Todo replaceTodo(@RequestBody Todo newTodo, @PathVariable UUID id) {
     
     return repository.findById(id)
       .map(todo -> {
@@ -58,7 +59,7 @@ class TodoController {
   }
 
   @DeleteMapping("/todos/{id}")
-  void deleteTodo(@PathVariable Long id) {
+  void deleteTodo(@PathVariable UUID id) {
     repository.deleteById(id);
   }
 }

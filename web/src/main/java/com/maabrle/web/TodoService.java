@@ -60,7 +60,7 @@ public class TodoService {
             String apiUri = TodoApiConfiguration.getTodoApiURI();
             WebClient webClient = WebClient.create(apiUri);
 
-            var todo = new Todo(newTodo.getTodoText(), UUID.randomUUID());
+            var todo = new Todo(UUID.randomUUID(), newTodo.getTodoText());
 
             LOGGER.debug("Sending a POST request with a new TODO {}", todo);
 
@@ -84,7 +84,7 @@ public class TodoService {
         LOGGER.debug("Create a new Todo asynchronously via EventHub using CreateTodoAsyncEventHub({})", newTodo);
 
         // create a producer using the namespace connection string and event hub name
-        var todo = new Todo(newTodo.getTodoText(), UUID.randomUUID());
+        var todo = new Todo(UUID.randomUUID(), newTodo.getTodoText());
 
         try {
             LOGGER.debug("Initializing EventHubProducerClient");
