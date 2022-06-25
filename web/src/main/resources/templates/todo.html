@@ -4,6 +4,7 @@
 <head>
   <title>Todo 3 Tier Demo App</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <script src="./todo.js" defer></script>
 </head>
 
 <body>
@@ -26,6 +27,7 @@
     -->
     <div id="message-box">
       <p th:text="*{message}"></p>
+      <p  th:text="${#strings.isEmpty(message)? 'An unknown error has occured, please try again later': message}"></p>
     </div>
     <div th:if="${todos.empty}">
       <p>All TO DOs completed. Yay!</p>
