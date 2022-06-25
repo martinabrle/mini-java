@@ -51,7 +51,7 @@ jobs:
     # workspace would be outside of the current subscription
     needs: [cleanup_if_requested]
     runs-on: ubuntu-latest
-    environment: APP_SERVICE_COMPLETE
+    environment: APP_SERVICE_SIMPLE
     defaults:
       run:
         working-directory: ./scripts
