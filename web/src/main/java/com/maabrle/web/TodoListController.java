@@ -49,7 +49,7 @@ public class TodoListController {
 		model.addAttribute("newTodo", newTodo);
 		model.addAttribute("status", "");
 		model.addAttribute("todos", new TodoList());
-
+		model.addAttribute("message", "");
 		boolean isError = false;
 		try {
 			if (newTodo == null) {
