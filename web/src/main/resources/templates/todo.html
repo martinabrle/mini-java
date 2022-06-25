@@ -27,7 +27,7 @@
       
     </div>
     -->
-    <div id="message-box" th:if="${#!strings.isEmpty(message)}" class="*{status}">
+    <div id="message-box" th:if="${!strings.isEmpty(message)}" class="*{status}">
       <p th:text="*{message}"></p>
     </div>
     <div th:if="${todos.empty}">
