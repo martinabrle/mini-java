@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +31,7 @@ class TodoController {
   // tag::get-aggregate-root[]
   @GetMapping("/todos")
   List<Todo> all() {
-    return repository.findAll();
+    return repository.findAll(Sort.by(Sort.Direction.DESC, "createdDateTime"));
   }
   // end::get-aggregate-root[]
 

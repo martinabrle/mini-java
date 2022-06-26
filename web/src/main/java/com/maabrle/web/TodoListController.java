@@ -24,6 +24,7 @@ import com.maabrle.web.model.NewTodo;
 import com.maabrle.web.model.Todo;
 import com.maabrle.web.model.TodoList;
 
+//TODO: review and refactor - Thymeleaf the first time
 @Controller
 public class TodoListController {
 
@@ -59,6 +60,7 @@ public class TodoListController {
 		model.addAttribute("newTodo", newTodo);
 		model.addAttribute("todos", new TodoList());
 		model.addAttribute("status", "");
+		model.addAttribute("createdTodoId", UUID.fromString("0-0-0-0-0"));
 		model.addAttribute("checkStatusAsync", false);
 		model.addAttribute("message", "");
 		boolean isError = false;
@@ -66,14 +68,17 @@ public class TodoListController {
 			if (newTodo == null) {
 				throw new NewTodoIsEmptyException();
 			}
-
 			if (newTodo.getProcessingType().equals("SYNC")) {
 				Todo todo = TodoService.CreateTodoSync(newTodo);
 				model.addAttribute("status", "saved");
+				model.addAttribute("createdTodoId", todo.getId());
 				String taskStrParm = todo.getTodoText();
 				if (taskStrParm != null && taskStrParm.length() > 5)
 					taskStrParm = taskStrParm.substring(0, 4) + "...";
 				model.addAttribute("message", String.format("Task '%s' has been saved.", taskStrParm));
+				NewTodo newTodoEmpty = new NewTodo();
+				newTodoEmpty.setProcessingType(newTodo.getProcessingType());
+				model.addAttribute("newTodo", newTodoEmpty);
 			} else {
 				UUID id = TodoService.CreateTodoAsyncEventHub(newTodo).getId();
 				model.addAttribute("status", "saving");
@@ -117,14 +122,11 @@ public class TodoListController {
 		Todo retVal = null;
 		try {
 			retVal = TodoService.GetTodo(UUID.fromString(id));
-		} 
-		catch (TodoNotFoundException ex) {
+		} catch (TodoNotFoundException ex) {
 			return new ResponseEntity<Todo>(HttpStatus.NOT_FOUND);
-		}
-		catch (TodosRetrievalFailedException ex) {
+		} catch (TodosRetrievalFailedException ex) {
 			return new ResponseEntity<Todo>(HttpStatus.BAD_REQUEST);
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			return new ResponseEntity<Todo>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return new ResponseEntity<Todo>(retVal, HttpStatus.OK);
