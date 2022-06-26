@@ -48,6 +48,11 @@ public class ConsumerKafkaApplication {
 				if (newTodo.getCreatedDateTime() == null) {
 					newTodo.setCreatedDateTime(new Date());
 				}
+				try {
+					Thread.sleep(2000);
+				} catch (Exception ignoreException) {
+					LOGGER.error("Interrupted exteption in Thread.sleep()");
+				}
 				repository.save(newTodo);
 			} catch (Exception ex) {
 				LOGGER.error("Failed to save '{}': {}\n{}", newTodo, ex.getMessage(), ex);

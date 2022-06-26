@@ -4,7 +4,8 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.maabrle.web.exception.NewTodoIsEmptyException;
+import com.maabrle.web.exception.TodoNotFoundException;
 import com.maabrle.web.exception.TodosRetrievalFailedException;
-import com.maabrle.web.model.FetchTodoResult;
 import com.maabrle.web.model.NewTodo;
 import com.maabrle.web.model.Todo;
 import com.maabrle.web.model.TodoList;
@@ -112,19 +113,20 @@ public class TodoListController {
 
 	@RequestMapping(value = "/todos/{id}", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
-	public FetchTodoResult fetchTodo(@PathVariable(name = "id", required = true) String id) {
-		FetchTodoResult retVal = new FetchTodoResult();
+	public ResponseEntity<Todo> fetchTodo(@PathVariable(name = "id", required = true) String id) {
+		Todo retVal = null;
 		try {
 			retVal = TodoService.GetTodo(UUID.fromString(id));
 		} 
+		catch (TodoNotFoundException ex) {
+			return new ResponseEntity<Todo>(HttpStatus.NOT_FOUND);
+		}
 		catch (TodosRetrievalFailedException ex) {
-			retVal.setError(true);
-			retVal.setMessage("An error has occured while fetching the Todo: Retrieval failed.");
+			return new ResponseEntity<Todo>(HttpStatus.BAD_REQUEST);
 		}
 		catch (Exception ex) {
-			retVal.setError(true);
-			retVal.setMessage("An error has occured while fetching the Todo.");
+			return new ResponseEntity<Todo>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return retVal;
+		return new ResponseEntity<Todo>(retVal, HttpStatus.OK);
 	}
 }

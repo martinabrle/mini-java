@@ -48,7 +48,6 @@ class TodoController {
 
     Optional<Todo> retVal = repository.findById(id);
     
-    //return ResponseEntity.of(retVal);
     if (retVal.isEmpty()) {
       return new ResponseEntity<Todo>(HttpStatus.NOT_FOUND);
     }

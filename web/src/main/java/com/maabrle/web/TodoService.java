@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+
 import com.azure.messaging.eventhubs.*;
 
 import org.slf4j.Logger;
@@ -14,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.maabrle.web.exception.TodoCreationFailedException;
 import com.maabrle.web.exception.TodoNotFoundException;
 import com.maabrle.web.exception.TodosRetrievalFailedException;
-import com.maabrle.web.model.FetchTodoResult;
 import com.maabrle.web.model.NewTodo;
 import com.maabrle.web.model.Todo;
 import com.maabrle.web.model.TodoApiConfiguration;
@@ -53,9 +55,9 @@ public class TodoService {
         return retValList;
     }
 
-    public static FetchTodoResult GetTodo(UUID id) throws TodoNotFoundException, TodosRetrievalFailedException {
+    public static Todo GetTodo(UUID id) throws TodoNotFoundException, TodosRetrievalFailedException, Exception {
 
-        FetchTodoResult retVal = new FetchTodoResult();
+        Todo retVal = null;
 
         LOGGER.debug("Retrieving a TODO synchronously using GetTodo({})", id);
 
@@ -69,19 +71,30 @@ public class TodoService {
 
             WebClient webClient = WebClient.create(apiUri);
 
-            Todo retrievedTodo = webClient.get()
+            retVal = webClient.get()
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .retrieve()
                     .bodyToMono(Todo.class)
                     .block();
-            retVal.setMessage("all good");
-            retVal.setTodo(retrievedTodo);
-            if (retrievedTodo == null)
-                throw new TodosRetrievalFailedException("Unable to retrieve the item.");
-            LOGGER.debug("Received back this TODO structure as a response: {}", retrievedTodo);
-        } catch (Exception ex) {
+            
+            if (retVal == null)
+                throw new TodoNotFoundException("Unable to retrieve the Todo or Todo does not exist.");
+
+            LOGGER.debug("Received back this TODO structure as a response: {}", retVal);
+        } 
+        catch (WebClientResponseException ex) {
+            if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
+                throw new TodoNotFoundException("Todo not found.");
+            }
+            if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                throw new TodosRetrievalFailedException(ex.getMessage());
+                
+            }
+            throw new Exception(String.format("Server returned '%s'", ex.getStatusText()));
+        }
+        catch (Exception ex) {
             LOGGER.error("Retrieving the TODO {} failed: {}\n{}", id, ex.getMessage(), ex);
-            throw new TodosRetrievalFailedException(ex.getMessage());
+            throw ex;
         }
 
         return retVal;
