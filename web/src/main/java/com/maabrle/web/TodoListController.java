@@ -79,7 +79,7 @@ public class TodoListController {
 				model.addAttribute("trackingId", id);
 				model.addAttribute("checkStatusAsync", true);
 				model.addAttribute("message", String
-						.format("Task is being saved. If not autopatically redirected, please refresh the browser"));
+						.format("Task is being saved. If not automatically redirected, please refresh the browser"));
 			}
 		} catch (NewTodoIsEmptyException ex) {
 			isError = true;
