@@ -47,15 +47,13 @@ class TodoController {
   ResponseEntity<Todo> one(@PathVariable UUID id) {
 
     Optional<Todo> retVal = repository.findById(id);
-
-    return ResponseEntity.of(retVal);
-
-
-    // if (retVal.isEmpty()) {
-    //   return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    // }
     
-    // return new ResponseEntity<Todo>(retVal.get(), HttpStatus.OK);
+    //return ResponseEntity.of(retVal);
+    if (retVal.isEmpty()) {
+      return new ResponseEntity<Todo>(HttpStatus.NOT_FOUND);
+    }
+    
+    return new ResponseEntity<Todo>(retVal.get(), HttpStatus.OK);
   }
 
   @PutMapping("/todos/{id}")
