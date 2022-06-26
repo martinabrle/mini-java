@@ -78,6 +78,14 @@ public class Todo {
 		this.createdDateTime = createdDateTime;
 	}
 
+	public Date getCompletedDateTime() {
+		return completedDateTime;
+	}
+
+	public void setCompletedDateTime(Date completedDateTime) {
+		this.completedDateTime = completedDateTime;
+	}
+
 	@Override
 	public String toString() {
         try {

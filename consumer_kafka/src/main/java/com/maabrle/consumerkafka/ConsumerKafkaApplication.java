@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 
+import java.util.Date;
 import java.util.function.Consumer;
 
 import com.maabrle.consumerkafka.model.Todo;
@@ -17,12 +18,13 @@ import com.maabrle.consumerkafka.repository.TodoRepository;
 public class ConsumerKafkaApplication {
 	/************************************************************************************
 	 * private final TodoRepository repository;
-     *
+	 *
 	 * ConsumerKafkaApplication(TodoRepository repository) {
-	 *     this.repository = repository;
-	 *     //this only works when not using Kafka; when used in conjunction with Kafka,
-	 *     // it breaks consume() - consume() will not be called
-	 }***********************************************************************************/
+	 * this.repository = repository;
+	 * //this only works when not using Kafka; when used in conjunction with Kafka,
+	 * // it breaks consume() - consume() will not be called
+	 * }
+	 ***********************************************************************************/
 	@Autowired
 	private TodoRepository repository;
 
@@ -43,6 +45,9 @@ public class ConsumerKafkaApplication {
 				LOGGER.error("weird");
 			LOGGER.debug("New message saved into the repository");
 			try {
+				if (newTodo.getCreatedDateTime() == null) {
+					newTodo.setCreatedDateTime(new Date());
+				}
 				repository.save(newTodo);
 			} catch (Exception ex) {
 				LOGGER.error("Failed to save '{}': {}\n{}", newTodo, ex.getMessage(), ex);
