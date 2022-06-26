@@ -1,5 +1,6 @@
 package com.maabrle.api;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +34,9 @@ class TodoController {
 
   @PostMapping("/todos")
   Todo newTodo(@RequestBody Todo newTodo) {
+    if (newTodo.getCreatedDateTime() == null) {
+      newTodo.setCreatedDateTime(new Date());
+    }
     return repository.save(newTodo);
   }
 

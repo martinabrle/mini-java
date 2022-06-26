@@ -33,7 +33,7 @@
       <div th:each="todo : ${todos}" th:key="${todo.id}">
         <div th:text="${todo.createdDateTimeShortString}">text</div>
         <div th:text="${todo.todoText}">text</div>
-        <div th:text="${todo.completed}">text</div>
+        <div th:text="${todo.status}">text</div>
       </div>
     </div>
   </body>
