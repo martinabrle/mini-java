@@ -9,11 +9,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.maabrle.web.exception.NewTodoIsEmptyException;
 import com.maabrle.web.exception.TodosRetrievalFailedException;
+import com.maabrle.web.model.FetchTodoResult;
 import com.maabrle.web.model.NewTodo;
 import com.maabrle.web.model.Todo;
 import com.maabrle.web.model.TodoList;
@@ -64,7 +69,10 @@ public class TodoListController {
 			if (newTodo.getProcessingType().equals("SYNC")) {
 				Todo todo = TodoService.CreateTodoSync(newTodo);
 				model.addAttribute("status", "saved");
-				model.addAttribute("message", String.format("Task %o has been saved.", todo.getId()));
+				String taskStrParm = todo.getTodoText();
+				if (taskStrParm != null && taskStrParm.length() > 5)
+					taskStrParm = taskStrParm.substring(0, 4) + "...";
+				model.addAttribute("message", String.format("Task '%s' has been saved.", taskStrParm));
 			} else {
 				UUID id = TodoService.CreateTodoAsyncEventHub(newTodo).getId();
 				model.addAttribute("status", "saving");
@@ -101,9 +109,17 @@ public class TodoListController {
 		}
 		return "todo";
 	}
-	
-	@GetMapping("/todos/{id}")
-	public String getProcessingStatus(@RequestParam(name = "id", required = true, defaultValue = "") String id) {
-		return "whatever";
+
+	@RequestMapping(value = "/todos/{id}", method = RequestMethod.GET, produces = "application/json")
+	@ResponseBody
+	public FetchTodoResult fetchTodo(@PathVariable(name = "id", required = true) String id) {
+		FetchTodoResult retVal = new FetchTodoResult();
+		try {
+			retVal = TodoService.GetTodo(UUID.fromString(id));
+		} catch (Exception ex) {
+			retVal.setError(true);
+			retVal.setMessage("An error has occured while fetching new Task's status.");
+		}
+		return retVal;
 	}
 }

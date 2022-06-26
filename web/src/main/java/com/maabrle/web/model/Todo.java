@@ -53,8 +53,24 @@ public class Todo {
         this.todoText = todoText;
     }
 
-    public String getCompleted() {
-        return "Status: " + (completedDateTime != null ? "Completed" : "Pending");
+    public Date getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    public void setCreatedDateTime(Date createdDateTime) {
+        this.createdDateTime = createdDateTime;
+    }
+
+    public Date getCompletedDateTime() {
+        return completedDateTime;
+    }
+
+    public void setCompletedDateTime(Date completedDateTime) {
+        this.completedDateTime = completedDateTime;
+    }
+
+    public String getStatus() {
+        return (completedDateTime != null ? "Completed" : "Pending");
     }
 
     public String getCreatedDateTimeShortString() {

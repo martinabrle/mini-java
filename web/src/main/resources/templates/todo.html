@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Todo 3 Tier Demo App</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <script src="./todo.js" defer></script>
     <script th:inline="javascript">
       let checkStatusAsync = /*[[${checkStatusAsync}]]*/ false;
@@ -15,9 +16,9 @@
       <div>
         <form method="post" th:action="@{/create}" th:object="${newTodo}">
           <input id="todoText" placeholder="Enter the next task" required type="text" th:field="*{todoText}" />
-          <select id="processingType" required name="processingType" th:field="*{processingType}">
+          <select id="processingType" required name="processingType" title="Processing type" th:field="*{processingType}">
             <option value="" hidden>Select a processing type</option>
-            <option value="SYNC">Snchronously</option>
+            <option value="SYNC">Synchronously</option>
             <option value="ASYNC">Asynchronously</option>
           </select>
           <input type="submit" value="Create Task" />
@@ -26,7 +27,7 @@
       <div id="message-box" th:if="${!#strings.isEmpty(message)}" th:classappend="${#strings.isEmpty(status) ? 'none' : status}">
         <p th:text="*{message}"></p>
       </div>
-      <div th:if="${todos.empty}">
+      <div th:if="${todos.empty && !strings.equals(status,'error')}">
         <p>All TO DOs completed. Yay!</p>
       </div>
       <div th:each="todo : ${todos}" th:key="${todo.id}">

@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.maabrle.web.exception.TodoCreationFailedException;
+import com.maabrle.web.exception.TodoNotFoundException;
 import com.maabrle.web.exception.TodosRetrievalFailedException;
+import com.maabrle.web.model.FetchTodoResult;
 import com.maabrle.web.model.NewTodo;
 import com.maabrle.web.model.Todo;
 import com.maabrle.web.model.TodoApiConfiguration;
@@ -44,11 +46,45 @@ public class TodoService {
 
             LOGGER.debug("Received back a list of TODOs as a response: {}", retValList);
         } catch (Exception ex) {
-            LOGGER.error("Retrieving all TODOs failed: { }\n{ }", ex.getMessage(), ex);
+            LOGGER.error("Retrieving all TODOs failed: {}\n{}", ex.getMessage(), ex);
             throw new TodosRetrievalFailedException(ex.getMessage());
         }
 
         return retValList;
+    }
+
+    public static FetchTodoResult GetTodo(UUID id) throws TodoNotFoundException, TodosRetrievalFailedException {
+
+        FetchTodoResult retVal = new FetchTodoResult();
+
+        LOGGER.debug("Retrieving a TODO synchronously using GetTodo({})", id);
+
+        try {
+            // https://reflectoring.io/spring-webclient/
+
+            String apiUri = TodoApiConfiguration.getTodoApiURI();
+            if (apiUri != null && apiUri.length() > 1 && apiUri.substring(apiUri.length() - 1) != "/")
+                apiUri += "/";
+            apiUri += id;
+
+            WebClient webClient = WebClient.create(apiUri);
+
+            Todo retrievedTodo = webClient.get()
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .retrieve()
+                    .bodyToMono(Todo.class)
+                    .block();
+            retVal.setMessage("all good");
+            retVal.setTodo(retrievedTodo);
+            if (retrievedTodo == null)
+                throw new TodosRetrievalFailedException("Unable to retrieve the item.");
+            LOGGER.debug("Received back this TODO structure as a response: {}", retrievedTodo);
+        } catch (Exception ex) {
+            LOGGER.error("Retrieving the TODO {} failed: {}\n{}", id, ex.getMessage(), ex);
+            throw new TodosRetrievalFailedException(ex.getMessage());
+        }
+
+        return retVal;
     }
 
     public static Todo CreateTodoSync(NewTodo newTodo) throws TodoCreationFailedException {
@@ -73,7 +109,7 @@ public class TodoService {
 
             LOGGER.debug("Received back a new TODO as a response: {}", createdTodo);
         } catch (Exception ex) {
-            LOGGER.error("Todo creation failed: { }\n{ }", ex.getMessage(), ex);
+            LOGGER.error("Todo creation failed: {}\n{}", ex.getMessage(), ex);
             throw new TodoCreationFailedException(ex.getMessage());
         }
         return createdTodo;
@@ -115,7 +151,7 @@ public class TodoService {
 
             LOGGER.warn("Finished the async Todo submission via EventBub and closed the producer");
         } catch (Exception ex) {
-            LOGGER.error("Todo creation failed: { }\n{ }", ex.getMessage(), ex);
+            LOGGER.error("Todo creation failed: {}\n{}", ex.getMessage(), ex);
             throw new TodoCreationFailedException(ex.getMessage());
         }
         return todo;

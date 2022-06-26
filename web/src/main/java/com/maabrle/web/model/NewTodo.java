@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class NewTodo {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(Todo.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(NewTodo.class);
 
     private String processingType;
     private String todoText;
