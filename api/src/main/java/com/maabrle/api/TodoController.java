@@ -2,8 +2,11 @@ package com.maabrle.api;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +15,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.maabrle.api.exception.TodoNotFoundException;
 import com.maabrle.api.model.Todo;
 
 @RestController
@@ -42,24 +44,37 @@ class TodoController {
 
   // Single item
   @GetMapping("/todos/{id}")
-  Todo one(@PathVariable UUID id) {
+  ResponseEntity<Todo> one(@PathVariable UUID id) {
+
+    Optional<Todo> retVal = repository.findById(id);
+
+    if (retVal.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
     
-    return repository.findById(id)
-      .orElseThrow(() -> new TodoNotFoundException(id));
+    return new ResponseEntity<Todo>(retVal.get(), HttpStatus.OK);
   }
 
   @PutMapping("/todos/{id}")
-  Todo replaceTodo(@RequestBody Todo newTodo, @PathVariable UUID id) {
-    
-    return repository.findById(id)
-      .map(todo -> {
-        todo.setTodoText(newTodo.getTodoText());
-        return repository.save(todo);
-      })
-      .orElseGet(() -> {
-        newTodo.setId(id);
-        return repository.save(newTodo);
-      });
+  ResponseEntity<Todo> replaceTodo(@RequestBody Todo newTodo, @PathVariable UUID id) {
+
+    Optional<Todo> retVal = repository.findById(id);
+
+    if (retVal.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    Todo todo = retVal.get();
+
+    todo.setTodoText(newTodo.getTodoText());
+    todo.setCreatedDateTime(newTodo.getCreatedDateTime());
+    todo.setCompletedDateTime(newTodo.getCompletedDateTime());
+    if (newTodo.getCreatedDateTime() == null) {
+      newTodo.setCreatedDateTime(new Date());
+    }
+
+    todo = repository.save(todo);
+
+    return new ResponseEntity<Todo>(retVal.get(), HttpStatus.OK);
   }
 
   @DeleteMapping("/todos/{id}")

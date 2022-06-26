@@ -116,9 +116,14 @@ public class TodoListController {
 		FetchTodoResult retVal = new FetchTodoResult();
 		try {
 			retVal = TodoService.GetTodo(UUID.fromString(id));
-		} catch (Exception ex) {
+		} 
+		catch (TodosRetrievalFailedException ex) {
 			retVal.setError(true);
-			retVal.setMessage("An error has occured while fetching new Task's status.");
+			retVal.setMessage("An error has occured while fetching the Todo: Retrieval failed.");
+		}
+		catch (Exception ex) {
+			retVal.setError(true);
+			retVal.setMessage("An error has occured while fetching the Todo.");
 		}
 		return retVal;
 	}
