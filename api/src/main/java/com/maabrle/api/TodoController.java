@@ -48,11 +48,14 @@ class TodoController {
 
     Optional<Todo> retVal = repository.findById(id);
 
-    if (retVal.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    return ResponseEntity.of(retVal);
+
+
+    // if (retVal.isEmpty()) {
+    //   return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    // }
     
-    return new ResponseEntity<Todo>(retVal.get(), HttpStatus.OK);
+    // return new ResponseEntity<Todo>(retVal.get(), HttpStatus.OK);
   }
 
   @PutMapping("/todos/{id}")
@@ -61,7 +64,7 @@ class TodoController {
     Optional<Todo> retVal = repository.findById(id);
 
     if (retVal.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      return new ResponseEntity<Todo>(HttpStatus.NOT_FOUND);
     }
     Todo todo = retVal.get();
 
